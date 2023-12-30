@@ -1,0 +1,215 @@
+name: Perform Tests
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+jobs:
+  collection-packages:
+    runs-on: ubuntu-latest
+    outputs:
+      packages: ${{ steps.ls.outputs.packages }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Gather package directories
+        id: ls
+        run: echo "packages=[$(ls -d packages/* | sed 's/[^[:alnum:]]/\\&/g' | sed 's/.*/"&",/' | tr -d '\n' | sed '$s/,$//')]" >> $GITHUB_OUTPUT
+
+  cache-modules:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v2.4.0
+        name: Install pnpm
+        id: pnpm-install
+        with:
+          version: latest
+          standalone: true
+          run_install: false
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: |
+          pnpm store path
+          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+      - uses: actions/cache@v3
+        name: Setup pnpm cache
+        with:
+          path: |
+            ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+            ${{ '**/node_modules' }}
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-
+
+      - name: Install Dependencies
+        shell: bash
+        run: pnpm i
+
+      - name: Prune Store
+        shell: bash
+        run: pnpm store prune
+
+  Lint:
+    runs-on: ubuntu-latest
+    needs: [collection-packages, cache-modules]
+    strategy:
+      matrix:
+        package: ${{ fromJSON(needs.collection-packages.outputs.packages) }}
+      fail-fast: false
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v2.4.0
+        name: Install pnpm
+        id: pnpm-install
+        with:
+          version: latest
+          standalone: true
+          run_install: false
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: |
+          pnpm store path
+          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+      - name: Restore cached Modules
+        uses: actions/cache/restore@v3
+        with:
+          path: |
+            ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+            ${{ '**/node_modules' }}
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-
+
+      - name: Install Dependencies
+        shell: bash
+        run: pnpm i
+
+      - name: Lint
+        run: pnpm run -C ${{ matrix.package }} lint:check
+
+      - name: Type Check
+        run: pnpm run -C ${{ matrix.package }} lint:types
+        continue-on-error: true # AlpineTS is still not fully typed
+
+  Test:
+    runs-on: ubuntu-latest
+    needs: [collection-packages, cache-modules]
+    strategy:
+      matrix:
+        package: ${{ fromJSON(needs.collection-packages.outputs.packages) }}
+      fail-fast: false
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v2.4.0
+        name: Install pnpm
+        id: pnpm-install
+        with:
+          version: latest
+          standalone: true
+          run_install: false
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: |
+          pnpm store path
+          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+      - name: Restore cached Modules
+        uses: actions/cache/restore@v3
+        with:
+          path: |
+            ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+            ${{ '**/node_modules' }}
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-
+
+      - name: Install Dependencies
+        shell: bash
+        run: pnpm i
+
+      - name: Test
+        run: pnpm run -C ${{ matrix.package }} test --run --reporter=verbose
+
+  Build:
+    runs-on: ubuntu-latest
+    needs: [collection-packages, cache-modules]
+    strategy:
+      matrix:
+        package: ${{ fromJSON(needs.collection-packages.outputs.packages) }}
+      fail-fast: false
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v2.4.0
+        name: Install pnpm
+        id: pnpm-install
+        with:
+          version: latest
+          run_install: false
+
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: |
+          pnpm store path
+          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+      - name: Restore cached Modules
+        uses: actions/cache/restore@v3
+        with:
+          path: |
+            ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+            ${{ '**/node_modules' }}
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-
+
+      - name: Install Dependencies
+        shell: bash
+        run: pnpm i
+
+      - name: Build Package
+        run: pnpm run -C ${{ matrix.package }} -r build
+
+  check-success:
+    runs-on: ubuntu-latest
+    needs: [Lint, Test, Build]
+    if: success()
+    outputs:
+      was_successful: ${{ steps.check-success.outputs.was_successful }}
+    steps:
+      - name: Check if all jobs were successful
+        id: check-success
+        run: |
+          echo "was_successful=true" >> $GITHUB_OUTPUT
+
+  was-successful:
+    runs-on: ubuntu-latest
+    needs: [check-success]
+    if: always()
+    steps:
+      - name: Was Successful
+        run: |
+          passed="${{ needs.check-success.outputs.was_successful }}"
+          if [[ $passed == "true" ]]; then
+            echo "All checks passed"
+            exit 0
+          else
+            echo "Check(s) failed"
+            exit 1
+          fi
