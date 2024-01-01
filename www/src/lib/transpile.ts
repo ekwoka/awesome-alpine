@@ -8,9 +8,8 @@ const createWorker = () =>
     wasmURL: esbuildWASM,
   });
 
-export const transpile = async (content: string) =>
-  (
-    await (
-      await (esbuildWorker ??= createWorker())
-    ).transform(content, { loader: 'ts' })
-  ).code;
+export const transpile = async (content: string) => {
+  await (esbuildWorker ??= createWorker());
+  const result = await esbuild.transform(content, { loader: 'ts' });
+  return result.code;
+};

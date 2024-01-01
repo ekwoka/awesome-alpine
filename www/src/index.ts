@@ -1,27 +1,45 @@
-import { makeEditor, prettify } from './lib';
+import { makeEditor, prettify, transpile } from './lib';
 import Alpine from 'alpinejs';
 
 Alpine.data('editor', () => ({
-  value: `<div class="text-xl uppercase text-blue-300 flex justify-center items-center">This is the Editor</div>`,
-  editor: null,
-  get asDocument() {
-    return `<script src="/playSandbox.ts" type="module"></script><link rel="stylesheet" href="/styles.css" />${this.value}`;
+  value: {
+    html: `<div x-data=example x-text=text class="text-xl uppercase text-blue-300 flex justify-center items-center">This is the Editor</div>`,
+    typescript:
+      "Alpine.data('example', () => ({ text: 'I am the text now!' }))",
+    javascript:
+      "Alpine.data('example', () => ({ text: 'I am the text now!' }))",
   },
-  registerEditor(el: HTMLElement) {
-    this.editor = makeEditor(el, this.value, 'html');
+  editor: {
+    html: null,
+    typescript: null,
+  },
+  get asDocument() {
+    return `<script type="module">import Alpine from '/playSandbox.ts';${this.value.javascript};Alpine.start()</script><link rel="stylesheet" href="/styles.css" />${this.value.html}`;
+  },
+  registerEditor(el: HTMLElement, type: 'html' | 'typescript') {
+    this.editor[type] = makeEditor(el, this.value[type], type);
   },
   setContent(el: HTMLIFrameElement) {
     el.contentDocument.body.replaceChildren(
       document.createRange().createContextualFragment(this.asDocument),
     );
   },
-  async prettify() {
-    this.value = await prettify(this.value, 'html');
-    Alpine.raw(this.editor)?.setValue(this.value);
+  init() {
+    this.prettify();
+    Alpine.effect(
+      async () =>
+        (this.value.javascript = await transpile(this.value.typescript)),
+    );
   },
-  async update() {
-    this.value = Alpine.raw(this.editor)?.getValue();
-    this.value = await prettify(this.value, 'html');
+  async prettify() {
+    for (const type in this.value) {
+      this.value[type] = await prettify(this.value[type], 'html');
+      Alpine.raw(this.editor[type])?.setValue(this.value[type]);
+    }
+  },
+  async update(type: 'html' | 'typescript') {
+    const content = Alpine.raw(this.editor[type])?.getValue();
+    this.value[type] = await prettify(content, 'html');
   },
 }));
 
