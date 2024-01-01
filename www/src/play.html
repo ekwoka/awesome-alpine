@@ -11,13 +11,13 @@
     </script>
   </head>
   <body
-    class="bg-neutral-900 flex flex-col items-center gap-12 mx-auto pt-40 text-gray-200 min-h-[1000rem]"
+    class="bg-neutral-900 flex flex-col items-center gap-12 mx-auto pt-40 text-gray-200 min-h-[100dvh]"
     x-data="editor">
     <div>AlpineJS</div>
-    <div x-effect="setContent($el)" class="whitespace-pre">Monaco Editor</div>
+    <iframe :srcdoc="asDocument" class="w-full" x-init="prettify"></iframe>
     <div
       id="container"
-      class="w-full min-h-screen font-mono *:!text-xl"
+      class="w-full min-h-[50dvh] font-mono *:!text-xl sticky bottom-0"
       @keyup="update"
       @keyup.debounce.5000ms="prettify"
       x-init="registerEditor($el)"></div>

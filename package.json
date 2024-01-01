@@ -26,7 +26,6 @@
     "@types/node": "20.10.6",
     "@typescript-eslint/eslint-plugin": "6.16.0",
     "@typescript-eslint/parser": "6.16.0",
-    "@vitest/coverage-c8": "0.32.2",
     "autoprefixer": "10.4.16",
     "esbuild": ">=0.19.11",
     "esbuild-wasm": "0.19.11",
@@ -45,7 +44,7 @@
     "vite-plugin-external-deps": "0.0.2",
     "vite-plugin-workspace-source": "0.0.1",
     "vite-tsconfig-paths": "4.2.3",
-    "vitest": "1.1.0",
+    "vitest": "1.1.1",
     "vitest-dom": "0.1.1"
   },
   "lint-staged": {
@@ -101,6 +100,7 @@
   },
   "dependencies": {
     "alpinejs": "file:../alpinets/packages/alpinets",
+    "@alpinejs/morph": "file:../alpinets/packages/morph",
     "monaco-editor": "^0.45.0"
   }
 }
