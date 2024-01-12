@@ -326,23 +326,5 @@
         </div>
       </div>
     </main>
-    <main
-      class="!hidden flex flex-col items-center gap-12 mx-auto pt-40 text-gray-200 min-h-[100dvh]"
-      x-data="editor">
-      <div>AlpineJS</div>
-      <iframe :srcdoc="asDocument" class="w-full" x-init="prettify"></iframe>
-      <div class="w-full sticky bottom-0" @keyup.debounce.5000ms="prettify">
-        <div
-          id="html-container"
-          class="w-full min-h-[25dvh] font-mono *:!text-xl overflow-clip"
-          @keyup="update('html')"
-          x-init="registerEditor($el, 'html')"></div>
-        <div
-          id="ts-container"
-          class="w-full min-h-[25dvh] font-mono *:!text-xl overflow-clip"
-          @keyup="update('typescript')"
-          x-init="registerEditor($el, 'typescript')"></div>
-      </div>
-    </main>
   </body>
 </html>
