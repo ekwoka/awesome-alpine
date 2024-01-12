@@ -21,4 +21,5 @@ export const prettify = async (content: string, type: 'html' | 'typescript') =>
     plugins: await Promise.all(getPlugins(type)),
     singleQuote: true,
     singleAttributePerLine: true,
+    printWidth: 60,
   });

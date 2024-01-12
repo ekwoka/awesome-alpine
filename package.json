@@ -23,6 +23,8 @@
   "devDependencies": {
     "@milahu/patch-package": "6.4.14",
     "@trivago/prettier-plugin-sort-imports": "4.3.0",
+    "@types/alpinejs": "3.13.6",
+    "@types/alpinejs__persist": "3.13.3",
     "@types/node": "20.10.6",
     "@typescript-eslint/eslint-plugin": "6.17.0",
     "@typescript-eslint/parser": "6.17.0",
@@ -99,7 +101,8 @@
     }
   },
   "dependencies": {
-    "alpinejs": "file:../alpinets/packages/alpinets",
+    "@alpinejs/persist": "3.13.3",
+    "alpinejs": "3.13.3",
     "monaco-editor": "0.45.0"
   }
 }

@@ -1,7 +1,10 @@
 import { makeEditor, prettify, transpile } from './lib';
+import persist from '@alpinejs/persist';
 import Alpine from 'alpinejs';
 
+Alpine.plugin(persist);
 Alpine.data('editor', () => ({
+  panel: Alpine.$persist('html'),
   value: {
     html: `<div x-data=example x-text=text class="text-xl uppercase text-blue-300 flex justify-center items-center">This is the Editor</div>`,
     typescript:
@@ -14,7 +17,7 @@ Alpine.data('editor', () => ({
     typescript: null,
   },
   get asDocument() {
-    return `<script type="module">import Alpine from '/playSandbox.ts';${this.value.javascript};Alpine.start()</script><link rel="stylesheet" href="/styles.css" />${this.value.html}`;
+    return `<script type="module">import Alpine from '/playSandbox.ts';${this.value.javascript};Alpine.start()</script><link rel="stylesheet" href="/styles.css" /><style>body { background-color: black }</style>${this.value.html}`;
   },
   registerEditor(el: HTMLElement, type: 'html' | 'typescript') {
     this.editor[type] = makeEditor(el, this.value[type], type);

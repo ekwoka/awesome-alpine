@@ -38,11 +38,14 @@ importers:
 
   .:
     dependencies:
+      '@alpinejs/persist':
+        specifier: 3.13.3
+        version: 3.13.3
       alpinejs:
-        specifier: file:../alpinets/packages/alpinets
-        version: file:../alpinets/packages/alpinets
+        specifier: 3.13.3
+        version: 3.13.3
       monaco-editor:
-        specifier: ^0.45.0
+        specifier: 0.45.0
         version: 0.45.0
     devDependencies:
       '@milahu/patch-package':
@@ -51,6 +54,12 @@ importers:
       '@trivago/prettier-plugin-sort-imports':
         specifier: 4.3.0
         version: 4.3.0(prettier@3.1.1)
+      '@types/alpinejs':
+        specifier: 3.13.6
+        version: 3.13.6
+      '@types/alpinejs__persist':
+        specifier: 3.13.3
+        version: 3.13.3
       '@types/node':
         specifier: 20.10.6
         version: 20.10.6
@@ -132,6 +141,10 @@ packages:
     resolution: {integrity: sha512-UrcABB+4bUrFABwbluTIBErXwvbsU/V7TZWfmbgJfbkwiBuziS9gxdODUyuiecfdGQ85jglMW6juS3+z5TsKLw==}
     engines: {node: '>=10'}
     dev: true
+
+  /@alpinejs/persist@3.13.3:
+    resolution: {integrity: sha512-gXTH8ynVFmmQJf50/bukRvHRnp5fIDYBBfo1ZJMLSzSC6OefM/CAablwlDCV6gx+8ELeis+v5yFvX0MjBEQ7Uw==}
+    dev: false
 
   /@babel/code-frame@7.22.13:
     resolution: {integrity: sha512-XktuhWlJ5g+3TJXc5upd9Ks1HutSArik6jf2eAjYFyIOf4ej3RN+184cZbzDvbPnuTJIUhPKKJE3cIsYTiAT3w==}
@@ -825,6 +838,16 @@ packages:
       - supports-color
     dev: true
 
+  /@types/alpinejs@3.13.6:
+    resolution: {integrity: sha512-BMi1/2uQz7mp30VFn69SzjN7YwQ0QzE4Hn3RMBt4iMpQeasdbMiImv1f5yvK1bYmvjIyG/YFg+CgPxbjIXZk0g==}
+    dev: true
+
+  /@types/alpinejs__persist@3.13.3:
+    resolution: {integrity: sha512-YCU1/WpyeWxLVOx+y50kDYJZXud69hwwXdYIxPFnanxmwJsOZ7LMd6D4BolybmkPWluBwlbJ+6i0t5tH6bSGsg==}
+    dependencies:
+      '@types/alpinejs': 3.13.6
+    dev: true
+
   /@types/argparse@1.0.38:
     resolution: {integrity: sha512-ebDJ9b0e702Yr7pWgB0jzm+CX4Srzz8RcXtLJDJB+BSccqMa36uyH/zUsSYao5+BD1ytv3k3rPYCq4mAE1hsXA==}
     dev: true
@@ -1125,6 +1148,12 @@ packages:
       json-schema-traverse: 0.4.1
       uri-js: 4.4.1
     dev: true
+
+  /alpinejs@3.13.3:
+    resolution: {integrity: sha512-WZ6WQjkAOl+WdW/jukzNHq9zHFDNKmkk/x6WF7WdyNDD6woinrfXCVsZXm0galjbco+pEpYmJLtwlZwcOfIVdg==}
+    dependencies:
+      '@vue/reactivity': 3.1.5
+    dev: false
 
   /ansi-escapes@6.2.0:
     resolution: {integrity: sha512-kzRaCqXnpzWs+3z5ABPQiVke+iq0KXkHo8xiWV4RPTi5Yli0l97BEQuhXV1s7+aSU/fu1kUuxgS4MsQ0fRuygw==}
@@ -3872,10 +3901,3 @@ packages:
     optionalDependencies:
       commander: 9.5.0
     dev: true
-
-  file:../alpinets/packages/alpinets:
-    resolution: {directory: ../alpinets/packages/alpinets, type: directory}
-    name: alpinets
-    dependencies:
-      '@vue/reactivity': 3.1.5
-    dev: false
