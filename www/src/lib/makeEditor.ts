@@ -1,12 +1,29 @@
+import { Language } from './prettier';
+import dts from '@types/alpinejs/index.d.ts?raw';
 import * as monaco from 'monaco-editor';
 import DefaultWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker';
 import HTMLWorker from 'monaco-editor/esm/vs/language/html/html.worker?worker';
 import TSWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker';
 
+monaco.languages.typescript.typescriptDefaults.addExtraLib(
+  `
+  ${dts}
+  declare global {
+    var Alpine: Alpine;
+}`,
+  'alpinejs',
+);
+monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
+  experimentalDecorators: true,
+  allowSyntheticDefaultImports: true,
+  moduleResolution: monaco.languages.typescript.ModuleResolutionKind.NodeJs,
+  allowNonTsExtensions: true,
+  target: monaco.languages.typescript.ScriptTarget.ESNext,
+});
 export const makeEditor = (
   el: HTMLElement,
   initialContent: string,
-  type: 'html' | 'typescript',
+  type: Language,
 ) =>
   monaco.editor.create(el, {
     value: initialContent,

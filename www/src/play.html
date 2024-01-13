@@ -136,7 +136,11 @@
         <div class="flex space-x-5">
           <button
             type="button"
-            class="relative flex py-3 text-sm leading-6 font-semibold focus:outline-none text-sky-500"
+            class="relative flex py-3 text-sm leading-6 font-semibold focus:outline-none text-gray-700 hover:text-gray-900 focus:text-gray-900 dark:text-gray-300 dark:hover:text-white dark:focus:text-white"
+            :class="{
+              'text-sky-500': panel === 'html',
+              'text-gray-700 hover:text-gray-900 focus:text-gray-900 dark:text-gray-300 dark:hover:text-white dark:focus:text-white': panel !== 'html'
+            }"
             @click="panel = 'html'">
             <span
               class="absolute bottom-0 inset-x-0 bg-sky-500 h-0.5 rounded-full transition-opacity duration-150"
@@ -146,7 +150,11 @@
           </button>
           <button
             type="button"
-            class="relative flex py-3 text-sm leading-6 font-semibold focus:outline-none text-gray-700 hover:text-gray-900 focus:text-gray-900 dark:text-gray-300 dark:hover:text-white"
+            class="relative flex py-3 text-sm leading-6 font-semibold focus:outline-none text-gray-700 hover:text-gray-900 focus:text-gray-900 dark:text-gray-300 dark:hover:text-white dark:focus:text-white"
+            :class="{
+              'text-sky-500': panel === 'script',
+              'text-gray-700 hover:text-gray-900 focus:text-gray-900 dark:text-gray-300 dark:hover:text-white dark:focus:text-white': panel !== 'script'
+            }"
             @click="panel = 'script'">
             <span
               class="absolute bottom-0 inset-x-0 bg-sky-500 h-0.5 rounded-full transition-opacity duration-150"
