@@ -164,9 +164,16 @@
           </button>
           <button
             type="button"
-            class="relative flex py-3 text-sm leading-6 font-semibold focus:outline-none text-gray-700 hover:text-gray-900 focus:text-gray-900 dark:text-gray-300 dark:hover:text-white">
+            class="relative flex py-3 text-sm leading-6 font-semibold focus:outline-none text-gray-700 hover:text-gray-900 focus:text-gray-900 dark:text-gray-300 dark:hover:text-white dark:focus:text-white"
+            :class="{
+              'text-sky-500': panel === 'config',
+              'text-gray-700 hover:text-gray-900 focus:text-gray-900 dark:text-gray-300 dark:hover:text-white dark:focus:text-white': panel !== 'config'
+            }"
+            @click="panel = 'config'">
             <span
-              class="absolute bottom-0 inset-x-0 bg-sky-500 h-0.5 rounded-full transition-opacity duration-150 opacity-0"></span>
+              class="absolute bottom-0 inset-x-0 bg-sky-500 h-0.5 rounded-full transition-opacity duration-150"
+              x-cloak
+              x-show="panel === 'config'"></span>
             Config
           </button>
         </div>
@@ -258,6 +265,105 @@
                       @keyup="update('typescript')"
                       x-init="registerEditor($el, 'typescript')"></div>
                   </div>
+                  <div
+                    class="border-t border-gray-200 dark:border-white/10 flex-auto -mb-2 text-slate-100 flex flex-col gap-2 py-3 px-4"
+                    x-show="panel === 'config'">
+                    <h2 class="sr-only">Configutation Options</h2>
+                    <h3>Settings</h3>
+                    <ul class="ml-3">
+                      <li>
+                        <label class="flex gap-4">
+                          <input
+                            type="checkbox"
+                            name="setting"
+                            x-model="config.settings.typescript" />
+                          <code>Use TypeScript</code>
+                        </label>
+                      </li>
+                      <li>
+                        <label class="flex gap-4">
+                          <input
+                            type="checkbox"
+                            name="setting"
+                            x-model="config.settings.tailwind" />
+                          <code>Use Tailwind</code>
+                        </label>
+                      </li>
+                    </ul>
+                    <h3>Core Plugins</h3>
+                    <ul class="ml-3">
+                      <li>
+                        <label class="flex gap-4">
+                          <input
+                            type="checkbox"
+                            name="plugin"
+                            x-model="config.plugins"
+                            value="anchor" />
+                          <code>Anchor</code>
+                        </label>
+                      </li>
+                      <li>
+                        <label class="flex gap-4">
+                          <input
+                            type="checkbox"
+                            name="plugin"
+                            x-model="config.plugins"
+                            value="collapse" />
+                          <code>Collapse</code>
+                        </label>
+                      </li>
+                      <li>
+                        <label class="flex gap-4">
+                          <input
+                            type="checkbox"
+                            name="plugin"
+                            x-model="config.plugins"
+                            value="focus" />
+                          <code>Focus</code>
+                        </label>
+                      </li>
+                      <li>
+                        <label class="flex gap-4">
+                          <input
+                            type="checkbox"
+                            name="plugin"
+                            x-model="config.plugins"
+                            value="intersect" />
+                          <code>Intersect</code>
+                        </label>
+                      </li>
+                      <li>
+                        <label class="flex gap-4">
+                          <input
+                            type="checkbox"
+                            name="plugin"
+                            x-model="config.plugins"
+                            value="mask" />
+                          <code>Mask</code>
+                        </label>
+                      </li>
+                      <li>
+                        <label class="flex gap-4">
+                          <input
+                            type="checkbox"
+                            name="plugin"
+                            x-model="config.plugins"
+                            value="morph" />
+                          <code>Morph</code>
+                        </label>
+                      </li>
+                      <li>
+                        <label class="flex gap-4">
+                          <input
+                            type="checkbox"
+                            name="plugin"
+                            x-model="config.plugins"
+                            value="persist" />
+                          <code>Persist</code>
+                        </label>
+                      </li>
+                    </ul>
+                  </div>
                 </div>
                 <span
                   role="presentation"
@@ -277,13 +383,14 @@
                     <button
                       type="button"
                       class="flex-none group h-12 px-6 text-left text-sm leading-6 bg-white font-semibold focus:outline-none text-gray-700 hover:text-gray-900 dark:bg-gray-900 dark:text-gray-300 dark:hover:text-white flex items-center justify-between border-y border-t-transparent border-b-gray-900/10 dark:bg-gradient-to-b dark:from-[#242F41] dark:to-gray-800 dark:shadow-highlight/4 dark:ring-1 dark:ring-inset dark:ring-white/[0.08] dark:rounded-t-lg dark:border-0">
-                      <span class="space-x-3"
-                        ><span>Generated CSS</span
-                        ><small
-                          class="text-xs font-semibold text-gray-500 dark:text-gray-400"
-                          >2.01 kB</small
-                        ></span
-                      ><svg
+                      <span class="space-x-3">
+                        <span>Generated CSS</span>
+                        <small
+                          class="text-xs font-semibold text-gray-500 dark:text-gray-400">
+                          2.01 kB
+                        </small>
+                      </span>
+                      <svg
                         class="w-6 h-6 text-gray-600 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-gray-200 rotate-180"
                         fill="none"
                         viewBox="0 0 24 24">

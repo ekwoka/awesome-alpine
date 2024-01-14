@@ -1,13 +1,27 @@
-import { makeEditor, prettify, transpile } from './lib';
+import { prettify } from './lib';
+import { Language } from './lib/prettier';
+import sandboxScript from '/playSandbox.js?url';
 import persist from '@alpinejs/persist';
-import Alpine from 'alpinejs';
-import { editor } from 'monaco-editor';
+import Alpine, { type ReactiveEffect } from 'alpinejs';
+import type { editor } from 'monaco-editor';
+
+const makeEditor = () =>
+  import('./lib/makeEditor.ts').then((m) => m.makeEditor);
+
+const transpile = () => import('./lib/transpile.ts').then((m) => m.transpile);
 
 Alpine.plugin(persist);
 Alpine.data('editor', () => ({
   panel: Alpine.$persist('html'),
+  config: {
+    plugins: [],
+    settings: {
+      typescript: false,
+      tailwind: false,
+    },
+  },
   value: {
-    html: `<div x-data=example x-text=text class="text-xl uppercase text-blue-300 flex justify-center items-center">This is the Editor</div>`,
+    html: `<div x-data=example x-text=text class="text-xl uppercase text-blue-300 flex justify-center items-center" style="color:white">This is the Editor</div>`,
     typescript:
       "Alpine.data('example', () => ({ text: 'I am the text now!' }))",
     javascript:
@@ -18,10 +32,17 @@ Alpine.data('editor', () => ({
     typescript: null as editor.IStandaloneCodeEditor,
   },
   get asDocument(): string {
-    return `<script type="module">import Alpine from '/playSandbox.ts';${this.value.javascript};Alpine.start()</script><link rel="stylesheet" href="/styles.css" /><style>body { background-color: black }</style>${this.value.html}`;
+    return `<script type="module">
+    import setup from '${sandboxScript}';
+    const Alpine = await setup(${JSON.stringify(this.config)});${
+      this.value.javascript
+    };
+    Alpine.start();
+    </script>
+    <style>body { background-color: black }</style>${this.value.html}`;
   },
-  registerEditor(el: HTMLElement, type: 'html' | 'typescript') {
-    this.editor[type] = makeEditor(el, this.value[type], type);
+  async registerEditor(el: HTMLElement, type: Language) {
+    this.editor[type] = (await makeEditor())(el, this.value[type], type);
   },
   setContent(el: HTMLIFrameElement) {
     el.contentDocument.body.replaceChildren(
@@ -29,26 +50,30 @@ Alpine.data('editor', () => ({
     );
   },
   init() {
-    this.prettify();
-    Alpine.effect(
-      async () =>
-        (this.value.javascript = await transpile(this.value.typescript)),
-    );
+    let transpilationEffect: ReactiveEffect = null;
+    Alpine.effect(() => {
+      if (this.config.settings.typescript)
+        transpilationEffect ??= Alpine.effect(
+          async () =>
+            (this.value.javascript = await (
+              await transpile()
+            )(this.value.typescript)),
+        );
+      else if (transpilationEffect)
+        Alpine.release(transpilationEffect), (transpilationEffect = null);
+    });
   },
   async prettify() {
     for (const type in this.value) {
-      this.value[type] = await prettify(
-        this.value[type],
-        type as unknown as 'html',
-      );
-      Alpine.raw(this.editor[type])?.setValue(this.value[type]);
+      this.value[type] = await prettify(this.value[type], type as Language);
+      Alpine.raw(await this.editor[type])?.setValue(this.value[type]);
     }
   },
   async update(type: 'html' | 'typescript') {
     const content = Alpine.raw<(typeof this.editor)[typeof type]>(
       this.editor[type],
     )?.getValue();
-    this.value[type] = await prettify(content, 'html');
+    this.value[type] = await prettify(content, Language.HTML);
   },
 }));
 

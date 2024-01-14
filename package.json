@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "pnpm run -r build",
+    "build": "vite build",
     "doctor": "run-s lint test:run build size",
     "lint": "run-s lint:*",
     "lint:eslint": "eslint --fix ./**/src/*",
@@ -24,6 +24,12 @@
     "@milahu/patch-package": "6.4.14",
     "@trivago/prettier-plugin-sort-imports": "4.3.0",
     "@types/alpinejs": "3.13.6",
+    "@types/alpinejs__anchor": "3.13.0",
+    "@types/alpinejs__collapse": "3.13.3",
+    "@types/alpinejs__focus": "3.13.3",
+    "@types/alpinejs__intersect": "3.13.3",
+    "@types/alpinejs__mask": "3.13.3",
+    "@types/alpinejs__morph": "3.13.3",
     "@types/alpinejs__persist": "3.13.3",
     "@types/node": "20.10.6",
     "@typescript-eslint/eslint-plugin": "6.17.0",
@@ -101,6 +107,12 @@
     }
   },
   "dependencies": {
+    "@alpinejs/anchor": "3.13.3",
+    "@alpinejs/collapse": "3.13.3",
+    "@alpinejs/focus": "3.13.3",
+    "@alpinejs/intersect": "3.13.3",
+    "@alpinejs/mask": "3.13.3",
+    "@alpinejs/morph": "3.13.3",
     "@alpinejs/persist": "3.13.3",
     "alpinejs": "3.13.3",
     "monaco-editor": "0.45.0"

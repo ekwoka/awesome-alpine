@@ -39,6 +39,12 @@ export default defineConfig({
     modulePreload: {
       polyfill: false,
     },
+    rollupOptions: {
+      input: {
+        index: './www/src/index.html',
+        play: './www/src/play.html',
+      },
+    },
   },
   test: {
     globals: true,
