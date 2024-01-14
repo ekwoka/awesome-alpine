@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "pnpm run -r build",
+    "build": "vite build",
     "doctor": "run-s lint test:run build size",
     "lint": "run-s lint:*",
     "lint:eslint": "eslint --fix ./**/src/*",

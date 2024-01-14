@@ -268,7 +268,29 @@
                   <div
                     class="border-t border-gray-200 dark:border-white/10 flex-auto -mb-2 text-slate-100 flex flex-col gap-2 py-3 px-4"
                     x-show="panel === 'config'">
-                    <h2>Core Plugins</h2>
+                    <h2 class="sr-only">Configutation Options</h2>
+                    <h3>Settings</h3>
+                    <ul class="ml-3">
+                      <li>
+                        <label class="flex gap-4">
+                          <input
+                            type="checkbox"
+                            name="setting"
+                            x-model="config.settings.typescript" />
+                          <code>Use TypeScript</code>
+                        </label>
+                      </li>
+                      <li>
+                        <label class="flex gap-4">
+                          <input
+                            type="checkbox"
+                            name="setting"
+                            x-model="config.settings.tailwind" />
+                          <code>Use Tailwind</code>
+                        </label>
+                      </li>
+                    </ul>
+                    <h3>Core Plugins</h3>
                     <ul class="ml-3">
                       <li>
                         <label class="flex gap-4">

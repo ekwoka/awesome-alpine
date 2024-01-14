@@ -22,21 +22,21 @@ const gatherPlugins = (config: Config) => {
   return Promise.all(plugins.map((plugin) => plugin.then((m) => m.default)));
 };
 
-const loadTailwind = async () => {
-  const mod = await import('cdn.tailwindcss.com/3.4.0?dlx');
-  console.log('tailwind loaded:', mod);
-  return mod;
-};
+const loadTailwind = () => import('cdn.tailwindcss.com/3.4.1?dlx');
 
 export default async (config: Config) => {
   window.Alpine = Alpine;
   Alpine.plugin(await gatherPlugins(config));
-  await loadTailwind();
+  if (config.settings.tailwind) await loadTailwind();
   return Alpine;
 };
 
 type Config = {
   plugins: CorePlugins[];
+  settings: {
+    typescript: boolean;
+    tailwind: boolean;
+  };
 };
 
 enum CorePlugins {
