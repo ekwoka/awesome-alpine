@@ -59,6 +59,9 @@ importers:
       '@alpinejs/persist':
         specifier: 3.13.3
         version: 3.13.3
+      '@ekwoka/alpine-history':
+        specifier: ^0.2.0
+        version: 0.2.0(alpinejs@3.13.3)
       alpinejs:
         specifier: 3.13.3
         version: 3.13.3
@@ -333,6 +336,14 @@ packages:
       '@babel/helper-validator-identifier': 7.22.20
       to-fast-properties: 2.0.0
     dev: true
+
+  /@ekwoka/alpine-history@0.2.0(alpinejs@3.13.3):
+    resolution: {integrity: sha512-8PP0mGtJrGVJWE4+/OnLtPCee0L3Ly1lsnux4VbGBaZs8CqNjlkR31AcmoYKhfESRmNIP30Q21Jwzsc42fdJLw==}
+    peerDependencies:
+      alpinejs: 3.x
+    dependencies:
+      alpinejs: 3.13.3
+    dev: false
 
   /@esbuild/aix-ppc64@0.19.11:
     resolution: {integrity: sha512-FnzU0LyE3ySQk7UntJO4+qIiQgI7KoODnZg5xzXIrFJlKd2P2gwHsHY4927xj9y5PJmJSzULiUCWmv7iWnNa7g==}
