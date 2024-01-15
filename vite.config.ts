@@ -32,6 +32,7 @@ export default defineConfig({
     },
   },
   build: {
+    assetsInlineLimit: 0,
     target: 'esnext',
     minify: false,
     outDir: '../dist',
