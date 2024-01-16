@@ -2,7 +2,8 @@ import { prettify } from './lib';
 import { Language } from './lib/prettier';
 import sandboxScript from '/playSandbox.js?url';
 import persist from '@alpinejs/persist';
-import Alpine, { type ReactiveEffect } from 'alpinejs';
+import query, { base64URL } from '@ekwoka/alpine-history';
+import Alpine from 'alpinejs';
 import type { editor } from 'monaco-editor';
 
 const makeEditor = () =>
@@ -10,9 +11,9 @@ const makeEditor = () =>
 
 const transpile = () => import('./lib/transpile.ts').then((m) => m.transpile);
 
-Alpine.plugin(persist);
+Alpine.plugin([persist, query]);
 Alpine.data('editor', () => ({
-  panel: Alpine.$persist('html'),
+  panel: Alpine.query('html'),
   config: {
     plugins: [],
     settings: {
@@ -21,11 +22,17 @@ Alpine.data('editor', () => ({
     },
   },
   value: {
-    html: `<div x-data=example x-text=text class="text-xl uppercase text-blue-300 flex justify-center items-center" style="color:white">This is the Editor</div>`,
-    typescript:
+    html: Alpine.query(
+      `<div x-data="example" x-text="text" class="text-xl uppercase !text-blue-300 flex justify-center items-center" style="color:white">This is the Editor</div>`,
+    )
+      .encoding(base64URL)
+      .as('html'),
+    typescript: Alpine.query(
       "Alpine.data('example', () => ({ text: 'I am the text now!' }))",
-    javascript:
-      "Alpine.data('example', () => ({ text: 'I am the text now!' }))",
+    )
+      .encoding(base64URL)
+      .as('ts'),
+    javascript: '',
   },
   editor: {
     html: null as editor.IStandaloneCodeEditor,
@@ -50,21 +57,16 @@ Alpine.data('editor', () => ({
     );
   },
   init() {
-    let transpilationEffect: ReactiveEffect = null;
-    Alpine.effect(() => {
+    Alpine.effect(async () => {
       if (this.config.settings.typescript)
-        transpilationEffect ??= Alpine.effect(
-          async () =>
-            (this.value.javascript = await (
-              await transpile()
-            )(this.value.typescript)),
-        );
-      else if (transpilationEffect)
-        Alpine.release(transpilationEffect), (transpilationEffect = null);
+        this.value.javascript = await (
+          await transpile()
+        )(this.value.typescript);
+      else this.value.javascript = this.value.typescript;
     });
   },
   async prettify() {
-    for (const type in this.value) {
+    for (const type of [Language.HTML, Language.TYPESCRIPT]) {
       this.value[type] = await prettify(this.value[type], type as Language);
       Alpine.raw(await this.editor[type])?.setValue(this.value[type]);
     }
