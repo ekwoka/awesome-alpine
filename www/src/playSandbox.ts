@@ -1,9 +1,9 @@
 import { RPCReceiver, RPCSender } from './lib/postmessageRPC';
 import Alpine from 'alpinejs';
 
-const gatherPlugins = (pluginList: CorePlugins[]) => {
-  const plugins = pluginList.map((plugin) => {
-    switch (plugin) {
+const gatherPlugins = (pluginlist: CorePlugins[]) => {
+  const plugins = pluginlist.map((plugin) => {
+    switch (Number(plugin)) {
       case CorePlugins.Anchor:
         return import('@alpinejs/anchor');
       case CorePlugins.Collapse:
@@ -19,6 +19,7 @@ const gatherPlugins = (pluginList: CorePlugins[]) => {
       case CorePlugins.Persist:
         return import('@alpinejs/persist');
     }
+    return Promise.resolve({ default: () => {} });
   });
   return Promise.all(plugins.map((plugin) => plugin.then((m) => m.default)));
 };
@@ -41,13 +42,13 @@ export type Config = {
 };
 
 export enum CorePlugins {
-  Anchor = 'anchor',
-  Collapse = 'collapse',
-  Focus = 'focus',
-  Intersect = 'intersect',
-  Mask = 'mask',
-  Morph = 'morph',
-  Persist = 'persist',
+  Anchor = 1 << 0,
+  Collapse = 1 << 1,
+  Focus = 1 << 2,
+  Intersect = 1 << 3,
+  Mask = 1 << 4,
+  Morph = 1 << 5,
+  Persist = 1 << 6,
 }
 
 let started = false;

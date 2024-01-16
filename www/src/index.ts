@@ -1,9 +1,9 @@
 import { prettify } from './lib';
 import { RPCReceiver, RPCSender } from './lib/postmessageRPC';
 import { Language } from './lib/prettier';
-import type { Config, sandboxActions } from './playSandbox';
+import { CorePlugins, sandboxActions } from './playSandbox';
 import persist from '@alpinejs/persist';
-import query, { base64URL } from '@ekwoka/alpine-history';
+import query, { Encoding, base64URL } from '@ekwoka/alpine-history';
 import Alpine from 'alpinejs';
 import type { editor } from 'monaco-editor';
 
@@ -14,27 +14,58 @@ const makeEditor = () =>
 
 const transpile = () => import('./lib/transpile.js').then((m) => m.transpile);
 
+const bitwiseArray: Encoding<number[]> = {
+  to: (val) =>
+    val
+      .reduce((acc, cur) => acc | cur, 0)
+      .toString() as unknown as `${number}`[],
+  from: (val) => {
+    const bits = Number(val);
+    const active = Array.from(
+      { length: Math.ceil(Math.log2(bits)) + 1 },
+      (_, i) => 1 << i,
+    ).filter((bit) => bit & bits);
+    return active;
+  },
+};
+
+const booleanNumber: Encoding<boolean> = {
+  to: (v) => Number(v).toString() as unknown as `${boolean}`,
+  from: (v) => Boolean(Number(v)),
+};
+
 Alpine.plugin([persist, query]);
 Alpine.data('editor', () => ({
   panel: Alpine.query('html'),
   config: {
-    plugins: [],
+    plugins: Alpine.query<CorePlugins[]>([])
+      .as('coreplugins')
+      .encoding(bitwiseArray),
     settings: {
-      typescript: false,
-      tailwind: false,
+      typescript: Alpine.query(false).as('ts').encoding(booleanNumber),
+      tailwind: Alpine.query(false).as('tw').encoding(booleanNumber),
     },
-  } as Config,
+  },
   value: {
     html: Alpine.query(
-      `<div x-data="example" x-text="text" class="text-xl uppercase !text-blue-300 flex justify-center items-center" style="color:white">This is the Editor</div>`,
+      `<div
+  x-data="example"
+  x-text="text"
+  class="text-xl uppercase !text-blue-300 flex justify-center items-center"
+  style="color:white"
+>
+  This is the Editor
+</div>`,
     )
       .encoding(base64URL)
       .as('html'),
     typescript: Alpine.query(
-      "Alpine.data('example', () => ({ text: 'I am the text now!' }))",
+      `Alpine.data('example', () => ({
+  text: 'I am the text now!',
+}));`,
     )
       .encoding(base64URL)
-      .as('ts'),
+      .as('script'),
     javascript: '',
   },
   editor: {
@@ -99,6 +130,7 @@ Alpine.data('editor', () => ({
     )?.getValue();
     this.value[type] = await prettify(content, type);
   },
+  CorePlugins: Object.entries(CorePlugins).filter(([key]) => isNaN(+key)),
 }));
 
 window.Alpine = Alpine;
