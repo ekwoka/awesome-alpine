@@ -176,6 +176,14 @@
               x-show="panel === 'config'"></span>
             Config
           </button>
+          <div class="flex justify-center items-center">
+            <button
+              type="button"
+              class="py-1 px-2 rounded bg-sky-700 hover:bg-sky-600 text-gray-100 text-sm"
+              @click="navigator.clipboard.writeText(window.location.href)">
+              Share
+            </button>
+          </div>
         </div>
         <div class="ml-auto flex items-center">
           <button
@@ -300,7 +308,7 @@
                               name="plugin"
                               x-model="config.plugins"
                               :value="plugin[1]" />
-                            <code x-text="plugin[0]">Anchor</code>
+                            <code x-text="plugin[0]">Plugin Not Found</code>
                           </label>
                         </li>
                       </template>
