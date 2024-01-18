@@ -1,3 +1,4 @@
+import { RPCReceiver } from './postmessageRPC';
 import Alpine from 'alpinejs';
 
 const gatherPlugins = (config: Config) => {
@@ -24,14 +25,14 @@ const gatherPlugins = (config: Config) => {
 
 const loadTailwind = () => import('cdn.tailwindcss.com/3.4.1?dlx');
 
-export default async (config: Config) => {
-  window.Alpine = Alpine;
+window.Alpine = Alpine;
+export const setup = async (config: Config) => {
   Alpine.plugin(await gatherPlugins(config));
   if (config.settings.tailwind) await loadTailwind();
   return Alpine;
 };
 
-type Config = {
+export type Config = {
   plugins: CorePlugins[];
   settings: {
     typescript: boolean;
@@ -39,7 +40,7 @@ type Config = {
   };
 };
 
-enum CorePlugins {
+export enum CorePlugins {
   Anchor = 'anchor',
   Collapse = 'collapse',
   Focus = 'focus',
@@ -48,3 +49,24 @@ enum CorePlugins {
   Morph = 'morph',
   Persist = 'persist',
 }
+
+const actions = {
+  log: (message: string) => console.log(message),
+  loadTailwind: () => loadTailwind(),
+  removeTailwind: () => window.location.reload(),
+  start: () => Alpine.start(),
+  loadPlugins: async (config: Config) =>
+    Alpine.plugin(await gatherPlugins(config)),
+  evaluateScript: (plugin: string) => new Function('Alpine', plugin)(Alpine),
+  replaceMarkup: (markup: string) => {
+    document.body.replaceChildren(
+      document.createRange().createContextualFragment(markup),
+    );
+  },
+};
+
+export type sandboxActions = typeof actions;
+
+new RPCReceiver(actions);
+
+window.top.postMessage({ type: 'sandbox-loaded' }, '*');

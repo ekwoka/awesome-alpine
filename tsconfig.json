@@ -5,7 +5,7 @@
     "allowJs": true,
     "declaration": true,
     "declarationMap": true,
-    "module": "es2020",
+    "module": "esnext",
     "moduleResolution": "node",
     "noImplicitThis": true,
     "target": "ESNext"

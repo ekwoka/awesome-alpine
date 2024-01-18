@@ -1,5 +1,8 @@
 import { prettify } from './lib';
 import { Language } from './lib/prettier';
+import { Config, sandboxActions } from './playSandbox';
+import { CorePlugins } from './playSandbox';
+import { RPCSender } from './postmessageRPC';
 import sandboxScript from '/playSandbox.js?url';
 import persist from '@alpinejs/persist';
 import query, { base64URL } from '@ekwoka/alpine-history';
@@ -85,5 +88,18 @@ Alpine.start();
 declare global {
   interface Window {
     Alpine: typeof Alpine;
+  }
+}
+
+const sandbox = await window.sandbox;
+
+const rpc = new RPCSender<sandboxActions>(sandbox);
+
+rpc.call.log('Hello there');
+rpc.call.loadPlugins({ plugins: [CorePlugins.Anchor] } as Config);
+
+declare global {
+  interface Window {
+    sandbox: Promise<Window>;
   }
 }
