@@ -6,15 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>AwesomeAlpine Plays</title>
     <link rel="stylesheet" href="/styles.css" />
-    <script>
-      window.sandbox = new Promise((res) => {
-        window.addEventListener('message', (e) => {
-          if (e.data.type === 'sandbox-loaded') {
-            res(e.source);
-          }
-        });
-      });
-    </script>
     <script type="module">
       import '/index.ts';
     </script>

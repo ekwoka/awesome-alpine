@@ -1,8 +1,8 @@
-import { RPCReceiver } from './postmessageRPC';
+import { RPCReceiver, RPCSender } from './lib/postmessageRPC';
 import Alpine from 'alpinejs';
 
-const gatherPlugins = (config: Config) => {
-  const plugins = config.plugins.map((plugin) => {
+const gatherPlugins = (pluginList: CorePlugins[]) => {
+  const plugins = pluginList.map((plugin) => {
     switch (plugin) {
       case CorePlugins.Anchor:
         return import('@alpinejs/anchor');
@@ -24,10 +24,10 @@ const gatherPlugins = (config: Config) => {
 };
 
 const loadTailwind = () => import('cdn.tailwindcss.com/3.4.1?dlx');
-
+const AsyncFunction = Object.getPrototypeOf(async function () {}).constructor;
 window.Alpine = Alpine;
 export const setup = async (config: Config) => {
-  Alpine.plugin(await gatherPlugins(config));
+  Alpine.plugin(await gatherPlugins(config.plugins));
   if (config.settings.tailwind) await loadTailwind();
   return Alpine;
 };
@@ -52,13 +52,21 @@ export enum CorePlugins {
 
 const actions = {
   log: (message: string) => console.log(message),
-  loadTailwind: () => loadTailwind(),
+  loadTailwind: async () => {
+    await loadTailwind();
+  },
   removeTailwind: () => window.location.reload(),
   start: () => Alpine.start(),
-  loadPlugins: async (config: Config) =>
-    Alpine.plugin(await gatherPlugins(config)),
-  evaluateScript: (plugin: string) => new Function('Alpine', plugin)(Alpine),
+  loadPlugins: async (plugins: CorePlugins[]) => {
+    console.log('Loading plugins');
+    Alpine.plugin(await gatherPlugins(plugins));
+  },
+  evaluateScript: async (plugin: string) => {
+    console.log('Evaluating script');
+    await new AsyncFunction('Alpine', plugin)(Alpine);
+  },
   replaceMarkup: (markup: string) => {
+    console.log('Replacing markup');
     document.body.replaceChildren(
       document.createRange().createContextualFragment(markup),
     );
@@ -69,4 +77,12 @@ export type sandboxActions = typeof actions;
 
 new RPCReceiver(actions);
 
-window.top.postMessage({ type: 'sandbox-loaded' }, '*');
+// eslint-disable-next-line no-constant-condition
+while (true) {
+  if (
+    (await new RPCSender<{ registerSandbox: () => void }>(self.top).call
+      .registerSandbox()
+      .wait(1000)) === undefined
+  )
+    break;
+}
