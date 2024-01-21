@@ -9,16 +9,6 @@ import type { editor } from 'monaco-editor';
 
 console.log('Hello from the playground!');
 
-const sender = new Promise<RPCSender<sandboxActions>>((res) => {
-  new RPCReceiver({
-    registerSandbox: (event?: MessageEvent<undefined>) => {
-      if (event?.source)
-        res(new RPCSender<sandboxActions>(event.source as Window));
-      return true;
-    },
-  });
-});
-
 const makeEditor = () =>
   import('./lib/makeEditor.js').then((m) => m.makeEditor);
 
@@ -55,9 +45,21 @@ Alpine.data('editor', () => ({
   async registerEditor(el: HTMLElement, type: Language) {
     this.editor[type] = (await makeEditor())(el, this.value[type], type);
   },
-  async init() {
-    console.log('Initializing');
-    this.sandbox = await sender;
+  init() {
+    console.log('Initializing Alpine');
+    new RPCReceiver({
+      registerSandbox: (event?: MessageEvent<undefined>) => {
+        if (event?.source)
+          this.initializeSandbox(
+            new RPCSender<sandboxActions>(event.source as Window),
+          );
+        return true;
+      },
+    });
+  },
+  async initializeSandbox(sandbox: RPCSender<sandboxActions>) {
+    this.sandbox = sandbox;
+    console.log('initializing sandbox');
     this.sandbox.call.log('Hello from Alpine!');
     await Promise.all([
       effectPromise(async () => {

@@ -50,26 +50,43 @@ export enum CorePlugins {
   Persist = 'persist',
 }
 
+let started = false;
+const resetAlpine = () => {
+  if (!started) return;
+  console.log('restarting alpine in sandbox');
+  Alpine.destroyTree(document.body);
+  Alpine.initTree(document.body);
+};
 const actions = {
   log: (message: string) => console.log(message),
   loadTailwind: async () => {
     await loadTailwind();
+    document.body.replaceChildren(...document.body.children);
   },
   removeTailwind: () => window.location.reload(),
-  start: () => Alpine.start(),
+  start: () => {
+    started = true;
+    Alpine.start();
+  },
   loadPlugins: async (plugins: CorePlugins[]) => {
     console.log('Loading plugins');
     Alpine.plugin(await gatherPlugins(plugins));
+    resetAlpine();
   },
   evaluateScript: async (plugin: string) => {
     console.log('Evaluating script');
     await new AsyncFunction('Alpine', plugin)(Alpine);
+    resetAlpine();
   },
   replaceMarkup: (markup: string) => {
     console.log('Replacing markup');
-    document.body.replaceChildren(
-      document.createRange().createContextualFragment(markup),
-    );
+
+    Alpine.mutateDom(() => {
+      document.body.replaceChildren(
+        document.createRange().createContextualFragment(markup),
+      );
+    });
+    resetAlpine();
   },
 };
 
@@ -79,10 +96,11 @@ new RPCReceiver(actions);
 
 // eslint-disable-next-line no-constant-condition
 while (true) {
+  console.log('Trying to register sandbox');
   if (
     (await new RPCSender<{ registerSandbox: () => void }>(self.top).call
       .registerSandbox()
-      .wait(1000)) === undefined
+      .wait(1000)) !== undefined
   )
     break;
 }
