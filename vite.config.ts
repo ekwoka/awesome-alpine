@@ -29,6 +29,7 @@ export default defineConfig({
     headers: {
       'Cross-Origin-Opener-Policy': 'same-origin',
       'Cross-Origin-Embedder-Policy': 'require-corp',
+      'Cross-Origin-Resource-Policy': 'same-site',
     },
   },
   build: {
@@ -44,8 +45,12 @@ export default defineConfig({
       input: {
         index: './www/src/index.html',
         play: './www/src/play.html',
+        sandbox: './www/src/sandbox.html',
       },
     },
+  },
+  worker: {
+    format: 'es',
   },
   test: {
     globals: true,

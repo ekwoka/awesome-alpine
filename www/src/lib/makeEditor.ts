@@ -1,4 +1,5 @@
 import { Language } from './prettier';
+// @ts-expect-error - this is a raw types import for monaco
 import dts from '@types/alpinejs/index.d.ts?raw';
 import * as monaco from 'monaco-editor';
 import DefaultWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker';
