@@ -1,6 +1,6 @@
-import { CorePlugins, gatherPlugins } from './lib/lazyModules/alpinePlugins';
-import { loadTailwind } from './lib/lazyModules/tailwind';
-import { RPCReceiver, RPCSender } from './lib/postmessageRPC';
+import { CorePlugins, gatherPlugins } from '../lib/lazyModules/alpinePlugins';
+import { loadTailwind } from '../lib/lazyModules/tailwind';
+import { RPCReceiver, RPCSender } from '../lib/postmessageRPC';
 import Alpine from 'alpinejs';
 
 const AsyncFunction = Object.getPrototypeOf(async function () {}).constructor;

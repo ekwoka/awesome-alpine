@@ -6,9 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>AwesomeAlpine Plays</title>
     <link rel="stylesheet" href="/styles.css" />
-    <script type="module">
-      import '/index.ts';
-    </script>
   </head>
   <body class="w-full min-h-screen bg-neutral-900 flex flex-col">
     <header
@@ -127,6 +124,7 @@
         ></a>
       </div>
     </header>
+    <script src="/components/editor.ts" type="module"></script>
     <main
       x-data="editor"
       class="flex-auto relative border-t border-gray-200 dark:border-gray-800">
@@ -391,5 +389,11 @@
         </div>
       </div>
     </main>
+    <script type="module">
+      import Alpine from 'alpinejs';
+
+      window.Alpine = Alpine;
+      Alpine.start();
+    </script>
   </body>
 </html>

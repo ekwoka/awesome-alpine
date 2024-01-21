@@ -1,18 +1,22 @@
-import { prettify } from './lib';
-import { CorePlugins } from './lib/lazyModules/alpinePlugins';
-import { RPCReceiver, RPCSender } from './lib/postmessageRPC';
-import { Language } from './lib/prettier';
-import { sandboxActions } from './playSandbox';
-import { bitwiseArray, booleanNumber } from './plugins/encoding';
+import { prettify } from '../lib';
+import { CorePlugins } from '../lib/lazyModules/alpinePlugins';
+import { RPCReceiver, RPCSender } from '../lib/postmessageRPC';
+import { Language } from '../lib/prettier';
+import type { sandboxActions } from '../play/playSandbox';
+// @ts-expect-error - this is a raw template inmport
+import starterHTML from '../play/starter.html?raw';
+// @ts-expect-error - this is a raw template import
+import starterScript from '../play/starter.js?raw';
+import { bitwiseArray, booleanNumber } from '../plugins/encoding';
 import persist from '@alpinejs/persist';
 import query, { base64URL } from '@ekwoka/alpine-history';
 import Alpine from 'alpinejs';
 import type { editor } from 'monaco-editor';
 
 const makeEditor = () =>
-  import('./lib/makeEditor.js').then((m) => m.makeEditor);
+  import('../lib/makeEditor.js').then((m) => m.makeEditor);
 
-const transpile = () => import('./lib/transpile.js').then((m) => m.transpile);
+const transpile = () => import('../lib/transpile.js').then((m) => m.transpile);
 
 Alpine.plugin([persist, query]);
 Alpine.data('editor', () => ({
@@ -27,25 +31,8 @@ Alpine.data('editor', () => ({
     },
   },
   value: {
-    html: Alpine.query(
-      `<div
-  x-data="example"
-  x-text="text"
-  class="text-xl uppercase !text-blue-300 flex justify-center items-center"
-  style="color:white"
->
-  This is the Editor
-</div>`,
-    )
-      .encoding(base64URL)
-      .as('html'),
-    typescript: Alpine.query(
-      `Alpine.data('example', () => ({
-  text: 'I am the text now!',
-}));`,
-    )
-      .encoding(base64URL)
-      .as('script'),
+    html: Alpine.query(starterHTML).encoding(base64URL).as('html'),
+    typescript: Alpine.query(starterScript).encoding(base64URL).as('script'),
   },
   editor: {
     html: null as editor.IStandaloneCodeEditor,
@@ -110,9 +97,6 @@ Alpine.data('editor', () => ({
   },
   CorePlugins: Object.entries(CorePlugins).filter(([key]) => isNaN(+key)),
 }));
-
-window.Alpine = Alpine;
-Alpine.start();
 
 declare global {
   interface Window {
