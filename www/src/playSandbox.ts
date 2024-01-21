@@ -1,4 +1,5 @@
 import { RPCReceiver, RPCSender } from './lib/postmessageRPC';
+import { CorePlugins } from './types';
 import Alpine from 'alpinejs';
 
 const gatherPlugins = (pluginlist: CorePlugins[]) => {
@@ -41,16 +42,6 @@ export type Config = {
   };
 };
 
-export enum CorePlugins {
-  Anchor = 1 << 0,
-  Collapse = 1 << 1,
-  Focus = 1 << 2,
-  Intersect = 1 << 3,
-  Mask = 1 << 4,
-  Morph = 1 << 5,
-  Persist = 1 << 6,
-}
-
 let started = false;
 const resetAlpine = () => {
   if (!started) return;
@@ -66,6 +57,7 @@ const actions = {
   },
   removeTailwind: () => window.location.reload(),
   start: () => {
+    console.log('starting Alpine');
     started = true;
     Alpine.start();
   },
@@ -95,8 +87,9 @@ export type sandboxActions = typeof actions;
 
 new RPCReceiver(actions);
 
+let count = 0;
 // eslint-disable-next-line no-constant-condition
-while (true) {
+while (count++ < 100) {
   console.log('Trying to register sandbox');
   if (
     (await new RPCSender<{ registerSandbox: () => void }>(self.top).call

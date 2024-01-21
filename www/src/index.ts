@@ -1,7 +1,8 @@
 import { prettify } from './lib';
 import { RPCReceiver, RPCSender } from './lib/postmessageRPC';
 import { Language } from './lib/prettier';
-import { CorePlugins, sandboxActions } from './playSandbox';
+import { sandboxActions } from './playSandbox';
+import { CorePlugins } from './types';
 import persist from '@alpinejs/persist';
 import query, { Encoding, base64URL } from '@ekwoka/alpine-history';
 import Alpine from 'alpinejs';
