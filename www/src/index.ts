@@ -1,39 +1,18 @@
 import { prettify } from './lib';
+import { CorePlugins } from './lib/lazyModules/alpinePlugins';
 import { RPCReceiver, RPCSender } from './lib/postmessageRPC';
 import { Language } from './lib/prettier';
 import { sandboxActions } from './playSandbox';
-import { CorePlugins } from './types';
+import { bitwiseArray, booleanNumber } from './plugins/encoding';
 import persist from '@alpinejs/persist';
-import query, { Encoding, base64URL } from '@ekwoka/alpine-history';
+import query, { base64URL } from '@ekwoka/alpine-history';
 import Alpine from 'alpinejs';
 import type { editor } from 'monaco-editor';
-
-console.log('Hello from the playground!');
 
 const makeEditor = () =>
   import('./lib/makeEditor.js').then((m) => m.makeEditor);
 
 const transpile = () => import('./lib/transpile.js').then((m) => m.transpile);
-
-const bitwiseArray: Encoding<number[]> = {
-  to: (val) =>
-    val
-      .reduce((acc, cur) => acc | cur, 0)
-      .toString() as unknown as `${number}`[],
-  from: (val) => {
-    const bits = Number(val);
-    const active = Array.from(
-      { length: Math.ceil(Math.log2(bits)) + 1 },
-      (_, i) => 1 << i,
-    ).filter((bit) => bit & bits);
-    return active;
-  },
-};
-
-const booleanNumber: Encoding<boolean> = {
-  to: (v) => Number(v).toString() as unknown as `${boolean}`,
-  from: (v) => Boolean(Number(v)),
-};
 
 Alpine.plugin([persist, query]);
 Alpine.data('editor', () => ({
@@ -67,7 +46,6 @@ Alpine.data('editor', () => ({
     )
       .encoding(base64URL)
       .as('script'),
-    javascript: '',
   },
   editor: {
     html: null as editor.IStandaloneCodeEditor,
@@ -95,13 +73,6 @@ Alpine.data('editor', () => ({
     this.sandbox.call.log('Hello from Alpine!');
     await Promise.all([
       effectPromise(async () => {
-        if (this.config.settings.typescript)
-          this.value.javascript = await (
-            await transpile()
-          )(this.value.typescript);
-        else this.value.javascript = this.value.typescript;
-      }),
-      effectPromise(async () => {
         console.log('Loading Tailwind');
         if (this.config.settings.tailwind)
           await this.sandbox.call.loadTailwind();
@@ -111,7 +82,13 @@ Alpine.data('editor', () => ({
         await this.sandbox.call.loadPlugins(Alpine.raw(this.config.plugins));
       }),
       effectPromise(async () => {
-        await this.sandbox.call.evaluateScript(this.value.javascript);
+        await this.sandbox.call.evaluateScript(
+          this.config.settings.typescript && this.value.typescript
+            ? await (
+                await transpile()
+              )(this.value.typescript)
+            : this.value.typescript,
+        );
       }),
       effectPromise(async () => {
         await this.sandbox.call.replaceMarkup(this.value.html);

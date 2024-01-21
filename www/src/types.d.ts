@@ -22,3 +22,8 @@ declare module 'cdn.tailwindcss.com/3.4.1?dlx' {
   const tailwind: unknown;
   export default tailwind;
 }
+
+declare module 'esbuild-wasm/esbuild.wasm?url' {
+  const esbuildWASM: string;
+  export default esbuildWASM;
+}
