@@ -53,14 +53,17 @@
             viewBox="0 0 20 20"
             class="h-5 w-5 flex-none fill-slate-400 group-hover:fill-slate-500 md:group-hover:fill-slate-400 dark:fill-slate-500">
             <path
-              d="M16.293 17.707a1 1 0 0 0 1.414-1.414l-1.414 1.414ZM9 14a5 5 0 0 1-5-5H2a7 7 0 0 0 7 7v-2ZM4 9a5 5 0 0 1 5-5V2a7 7 0 0 0-7 7h2Zm5-5a5 5 0 0 1 5 5h2a7 7 0 0 0-7-7v2Zm8.707 12.293-3.757-3.757-1.414 1.414 3.757 3.757 1.414-1.414ZM14 9a4.98 4.98 0 0 1-1.464 3.536l1.414 1.414A6.98 6.98 0 0 0 16 9h-2Zm-1.464 3.536A4.98 4.98 0 0 1 9 14v2a6.98 6.98 0 0 0 4.95-2.05l-1.414-1.414Z"></path></svg
-          ><span
-            class="sr-only md:not-sr-only md:ml-2 md:text-slate-500 md:dark:text-slate-400"
-            >Search docs</span
-          ><kbd
-            class="ml-auto hidden font-medium text-slate-400 md:block dark:text-slate-500"
-            ><kbd class="font-sans">⌘</kbd><kbd class="font-sans">K</kbd></kbd
-          >
+              d="M16.293 17.707a1 1 0 0 0 1.414-1.414l-1.414 1.414ZM9 14a5 5 0 0 1-5-5H2a7 7 0 0 0 7 7v-2ZM4 9a5 5 0 0 1 5-5V2a7 7 0 0 0-7 7h2Zm5-5a5 5 0 0 1 5 5h2a7 7 0 0 0-7-7v2Zm8.707 12.293-3.757-3.757-1.414 1.414 3.757 3.757 1.414-1.414ZM14 9a4.98 4.98 0 0 1-1.464 3.536l1.414 1.414A6.98 6.98 0 0 0 16 9h-2Zm-1.464 3.536A4.98 4.98 0 0 1 9 14v2a6.98 6.98 0 0 0 4.95-2.05l-1.414-1.414Z"></path>
+          </svg>
+          <span
+            class="sr-only md:not-sr-only md:ml-2 md:text-slate-500 md:dark:text-slate-400">
+            Search docs
+          </span>
+          <kbd
+            class="ml-auto hidden font-medium text-slate-400 md:block dark:text-slate-500">
+            <kbd class="font-sans">⌘</kbd>
+            <kbd class="font-sans">K</kbd>
+          </kbd>
         </button>
         <div
           style="
@@ -84,9 +87,10 @@
           <label
             class="sr-only"
             id="headlessui-listbox-label-:r0:"
-            data-headlessui-state=""
-            >Theme</label
-          ><button
+            data-headlessui-state="">
+            Theme
+          </label>
+          <button
             class="flex h-6 w-6 items-center justify-center rounded-lg shadow-md shadow-black/5 ring-1 ring-black/5 dark:bg-slate-700 dark:ring-inset dark:ring-white/5"
             aria-label="Theme"
             id="headlessui-listbox-button-:r1:"
@@ -127,266 +131,150 @@
     <script src="/components/editor.ts" type="module"></script>
     <main
       x-data="editor"
-      class="flex-auto relative border-t border-gray-200 dark:border-gray-800">
-      <div
-        class="flex items-center flex-none pl-5 sm:pl-6 pr-4 lg:pr-6 absolute z-10 top-0 left-0 -mb-px antialiased"
-        style="width: 531px">
-        <div class="flex space-x-5">
-          <button
-            type="button"
-            class="relative flex py-3 text-sm leading-6 font-semibold focus:outline-none text-gray-700 hover:text-gray-900 focus:text-gray-900 dark:text-gray-300 dark:hover:text-white dark:focus:text-white"
-            :class="{
+      class="flex flex-col md:flex-row flex-auto relative border-t border-gray-200 dark:border-gray-800">
+      <div class="flex flex-col flex-none w-full md:w-1/2 lg:w-1/3">
+        <div
+          class="flex items-center flex-none pl-5 sm:pl-6 pr-4 lg:pr-6 sticky z-10 top-0 -mb-px antialiased w-full">
+          <div class="flex space-x-5">
+            <button
+              type="button"
+              class="relative flex py-3 text-sm leading-6 font-semibold focus:outline-none text-gray-700 hover:text-gray-900 focus:text-gray-900 dark:text-gray-300 dark:hover:text-white dark:focus:text-white"
+              :class="{
               'text-sky-500': panel === 'html',
               'text-gray-700 hover:text-gray-900 focus:text-gray-900 dark:text-gray-300 dark:hover:text-white dark:focus:text-white': panel !== 'html'
             }"
-            @click="panel = 'html'">
-            <span
-              class="absolute bottom-0 inset-x-0 bg-sky-500 h-0.5 rounded-full transition-opacity duration-150"
-              x-cloak
-              x-show="panel === 'html'"></span>
-            HTML
-          </button>
-          <button
-            type="button"
-            class="relative flex py-3 text-sm leading-6 font-semibold focus:outline-none text-gray-700 hover:text-gray-900 focus:text-gray-900 dark:text-gray-300 dark:hover:text-white dark:focus:text-white"
-            :class="{
+              @click="panel = 'html'">
+              <span
+                class="absolute bottom-0 inset-x-0 bg-sky-500 h-0.5 rounded-full transition-opacity duration-150"
+                x-cloak
+                x-show="panel === 'html'"></span>
+              HTML
+            </button>
+            <button
+              type="button"
+              class="relative flex py-3 text-sm leading-6 font-semibold focus:outline-none text-gray-700 hover:text-gray-900 focus:text-gray-900 dark:text-gray-300 dark:hover:text-white dark:focus:text-white"
+              :class="{
               'text-sky-500': panel === 'script',
               'text-gray-700 hover:text-gray-900 focus:text-gray-900 dark:text-gray-300 dark:hover:text-white dark:focus:text-white': panel !== 'script'
             }"
-            @click="panel = 'script'">
-            <span
-              class="absolute bottom-0 inset-x-0 bg-sky-500 h-0.5 rounded-full transition-opacity duration-150"
-              x-cloak
-              x-show="panel === 'script'"></span>
-            Script
-          </button>
-          <button
-            type="button"
-            class="relative flex py-3 text-sm leading-6 font-semibold focus:outline-none text-gray-700 hover:text-gray-900 focus:text-gray-900 dark:text-gray-300 dark:hover:text-white dark:focus:text-white"
-            :class="{
+              @click="panel = 'script'">
+              <span
+                class="absolute bottom-0 inset-x-0 bg-sky-500 h-0.5 rounded-full transition-opacity duration-150"
+                x-cloak
+                x-show="panel === 'script'"></span>
+              Script
+            </button>
+            <button
+              type="button"
+              class="relative flex py-3 text-sm leading-6 font-semibold focus:outline-none text-gray-700 hover:text-gray-900 focus:text-gray-900 dark:text-gray-300 dark:hover:text-white dark:focus:text-white"
+              :class="{
               'text-sky-500': panel === 'config',
               'text-gray-700 hover:text-gray-900 focus:text-gray-900 dark:text-gray-300 dark:hover:text-white dark:focus:text-white': panel !== 'config'
             }"
-            @click="panel = 'config'">
-            <span
-              class="absolute bottom-0 inset-x-0 bg-sky-500 h-0.5 rounded-full transition-opacity duration-150"
-              x-cloak
-              x-show="panel === 'config'"></span>
-            Config
-          </button>
-          <div class="flex justify-center items-center">
+              @click="panel = 'config'">
+              <span
+                class="absolute bottom-0 inset-x-0 bg-sky-500 h-0.5 rounded-full transition-opacity duration-150"
+                x-cloak
+                x-show="panel === 'config'"></span>
+              Config
+            </button>
+            <div class="flex justify-center items-center">
+              <button
+                type="button"
+                class="py-1 px-2 rounded bg-sky-700 hover:bg-sky-600 text-gray-100 text-sm"
+                @click="navigator.clipboard.writeText(window.location.href)">
+                Share
+              </button>
+            </div>
+          </div>
+          <div class="ml-auto flex items-center">
             <button
               type="button"
-              class="py-1 px-2 rounded bg-sky-700 hover:bg-sky-600 text-gray-100 text-sm"
-              @click="navigator.clipboard.writeText(window.location.href)">
-              Share
+              class="ml-4 text-sm font-semibold text-gray-500 flex items-center hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+              @click="prettify">
+              <svg viewBox="0 0 24 24" class="w-6 h-6 mr-1" aria-hidden="true">
+                <path
+                  d="M5 9a2 2 0 0 1 2 2 1 1 0 1 0 2 0 2 2 0 0 1 2-2 1 1 0 1 0 0-2 2 2 0 0 1-2-2 1 1 0 0 0-2 0 2 2 0 0 1-2 2 1 1 0 0 0 0 2Z"
+                  fill="currentColor"
+                  class="text-gray-400 dark:text-gray-500"></path>
+                <path
+                  d="M11 16a3 3 0 0 1 3 3 1 1 0 1 0 2 0 3 3 0 0 1 3-3 1 1 0 1 0 0-2 3 3 0 0 1-3-3 1 1 0 1 0-2 0 3 3 0 0 1-3 3 1 1 0 1 0 0 2Z"
+                  fill="currentColor"
+                  class="text-gray-300 dark:text-gray-400"></path>
+              </svg>
+              Tidy
+              <span class="sr-only">, and focus editor</span>
             </button>
           </div>
         </div>
-        <div class="ml-auto flex items-center">
-          <button
-            type="button"
-            class="ml-4 text-sm font-semibold text-gray-500 flex items-center hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
-            @click="prettify">
-            <svg viewBox="0 0 24 24" class="w-6 h-6 mr-1" aria-hidden="true">
-              <path
-                d="M5 9a2 2 0 0 1 2 2 1 1 0 1 0 2 0 2 2 0 0 1 2-2 1 1 0 1 0 0-2 2 2 0 0 1-2-2 1 1 0 0 0-2 0 2 2 0 0 1-2 2 1 1 0 0 0 0 2Z"
-                fill="currentColor"
-                class="text-gray-400 dark:text-gray-500"></path>
-              <path
-                d="M11 16a3 3 0 0 1 3 3 1 1 0 1 0 2 0 3 3 0 0 1 3-3 1 1 0 1 0 0-2 3 3 0 0 1-3-3 1 1 0 1 0-2 0 3 3 0 0 1-3 3 1 1 0 1 0 0 2Z"
-                fill="currentColor"
-                class="text-gray-300 dark:text-gray-400"></path>
-            </svg>
-            Tidy
-            <span class="sr-only">, and focus editor</span>
-          </button>
+        <div class="flex flex-col flex-auto h-full w-full select-text">
+          <div
+            class="border-t border-gray-200 dark:border-white/10 flex-auto flex -mb-2"
+            x-show="panel === 'html'">
+            <div
+              class="relative flex-auto"
+              @keyup="update('html')"
+              x-init="registerEditor($el, 'html')"></div>
+          </div>
+          <div
+            class="border-t border-gray-200 dark:border-white/10 flex-auto flex -mb-2"
+            x-show="panel === 'script'">
+            <div
+              class="relative flex-auto"
+              @keyup="update('typescript')"
+              x-init="registerEditor($el, 'typescript')"></div>
+          </div>
+          <div
+            class="border-t border-gray-200 dark:border-white/10 flex-auto -mb-2 text-slate-100 flex flex-col gap-2 py-3 px-4"
+            x-show="panel === 'config'">
+            <h2 class="sr-only">Configutation Options</h2>
+            <h3>Settings</h3>
+            <ul class="ml-3">
+              <li>
+                <label class="flex gap-4">
+                  <input
+                    type="checkbox"
+                    name="setting"
+                    x-model="config.settings.typescript" />
+                  <code>Use TypeScript</code>
+                </label>
+              </li>
+              <li>
+                <label class="flex gap-4">
+                  <input
+                    type="checkbox"
+                    name="setting"
+                    x-model="config.settings.tailwind" />
+                  <code>Use Tailwind</code>
+                </label>
+              </li>
+            </ul>
+            <h3>Core Plugins</h3>
+            <ul class="ml-3">
+              <template x-for="plugin in CorePlugins" :key="plugin[1]">
+                <li>
+                  <label class="flex gap-4">
+                    <input
+                      type="checkbox"
+                      name="plugin"
+                      x-model="config.plugins"
+                      :value="plugin[1]" />
+                    <code x-text="plugin[0]">Plugin Not Found</code>
+                  </label>
+                </li>
+              </template>
+            </ul>
+          </div>
         </div>
       </div>
+      <span role="presentation" class=""></span>
       <div
-        class="SplitPane vertical"
-        style="
-          display: flex;
-          flex: 1 1 0%;
-          height: 100%;
-          position: absolute;
-          outline: none;
-          overflow: hidden;
-          user-select: text;
-          flex-direction: row;
-          left: 0px;
-          right: 0px;
-        ">
-        <div
-          class="Pane vertical Pane1"
-          style="
-            flex: 0 0 auto;
-            position: relative;
-            outline: none;
-            margin-top: -1px;
-            display: flex;
-            flex-direction: column;
-            width: 531px;
-          ">
-          <div class="flex flex-auto">
-            <div class="mt-12 relative flex-auto">
-              <div
-                class="SplitPane horizontal"
-                style="
-                  display: flex;
-                  flex: 1 1 0%;
-                  height: 100%;
-                  position: absolute;
-                  outline: none;
-                  overflow: hidden;
-                  user-select: text;
-                  bottom: 0px;
-                  flex-direction: column;
-                  min-height: 100%;
-                  top: 0px;
-                  width: 100%;
-                ">
-                <div
-                  class="Pane horizontal Pane1"
-                  style="
-                    flex: 1 1 0%;
-                    position: relative;
-                    outline: none;
-                    display: flex;
-                    flex-direction: column;
-                  ">
-                  <div
-                    class="border-t border-gray-200 dark:border-white/10 flex-auto flex -mb-2"
-                    x-show="panel === 'html'">
-                    <div
-                      class="relative flex-auto"
-                      @keyup="update('html')"
-                      x-init="registerEditor($el, 'html')"></div>
-                  </div>
-                  <div
-                    class="border-t border-gray-200 dark:border-white/10 flex-auto flex -mb-2"
-                    x-show="panel === 'script'">
-                    <div
-                      class="relative flex-auto"
-                      @keyup="update('typescript')"
-                      x-init="registerEditor($el, 'typescript')"></div>
-                  </div>
-                  <div
-                    class="border-t border-gray-200 dark:border-white/10 flex-auto -mb-2 text-slate-100 flex flex-col gap-2 py-3 px-4"
-                    x-show="panel === 'config'">
-                    <h2 class="sr-only">Configutation Options</h2>
-                    <h3>Settings</h3>
-                    <ul class="ml-3">
-                      <li>
-                        <label class="flex gap-4">
-                          <input
-                            type="checkbox"
-                            name="setting"
-                            x-model="config.settings.typescript" />
-                          <code>Use TypeScript</code>
-                        </label>
-                      </li>
-                      <li>
-                        <label class="flex gap-4">
-                          <input
-                            type="checkbox"
-                            name="setting"
-                            x-model="config.settings.tailwind" />
-                          <code>Use Tailwind</code>
-                        </label>
-                      </li>
-                    </ul>
-                    <h3>Core Plugins</h3>
-                    <ul class="ml-3">
-                      <template x-for="plugin in CorePlugins" :key="plugin[1]">
-                        <li>
-                          <label class="flex gap-4">
-                            <input
-                              type="checkbox"
-                              name="plugin"
-                              x-model="config.plugins"
-                              :value="plugin[1]" />
-                            <code x-text="plugin[0]">Plugin Not Found</code>
-                          </label>
-                        </li>
-                      </template>
-                    </ul>
-                  </div>
-                </div>
-                <span
-                  role="presentation"
-                  class="Resizer horizontal"
-                  style="z-index: 10; background: none"></span>
-                <div
-                  class="Pane horizontal Pane2"
-                  style="
-                    flex: 0 0 auto;
-                    position: relative;
-                    outline: none;
-                    height: 48px;
-                    display: flex;
-                  ">
-                  <div
-                    class="flex-auto flex flex-col ring-1 ring-gray-900/[0.07] rounded-t-lg overflow-hidden dark:rounded-none dark:ring-0 shadow-[0_2px_11px_rgba(0,0,0,0.1),0_3px_6px_rgba(0,0,0,0.05)]">
-                    <button
-                      type="button"
-                      class="flex-none group h-12 px-6 text-left text-sm leading-6 bg-white font-semibold focus:outline-none text-gray-700 hover:text-gray-900 dark:bg-gray-900 dark:text-gray-300 dark:hover:text-white flex items-center justify-between border-y border-t-transparent border-b-gray-900/10 dark:bg-gradient-to-b dark:from-[#242F41] dark:to-gray-800 dark:shadow-highlight/4 dark:ring-1 dark:ring-inset dark:ring-white/[0.08] dark:rounded-t-lg dark:border-0">
-                      <span class="space-x-3">
-                        <span>Generated CSS</span>
-                        <small
-                          class="text-xs font-semibold text-gray-500 dark:text-gray-400">
-                          2.01 kB
-                        </small>
-                      </span>
-                      <svg
-                        class="w-6 h-6 text-gray-600 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-gray-200 rotate-180"
-                        fill="none"
-                        viewBox="0 0 24 24">
-                        <path
-                          d="m17 10-5 5-5-5"
-                          stroke="currentColor"
-                          stroke-width="2"
-                          stroke-linecap="round"
-                          stroke-linejoin="round"></path>
-                      </svg>
-                    </button>
-                    <div class="relative flex-auto hidden">
-                      <div
-                        class="absolute z-10 bg-white/80 backdrop-blur top-0 left-0 right-[14px] select-none flex pl-6 pr-2.5 py-2.5 border-t border-gray-900/[0.03] dark:bg-gray-800/80 justify-between"></div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <span role="presentation" class="Resizer Resizer vertical"></span>
-        <div
-          class="Pane vertical Pane2"
-          style="
-            flex: 1 1 0%;
-            position: relative;
-            outline: none;
-            margin-top: -1px;
-          ">
-          <div class="absolute inset-0 w-full h-full">
-            <div
-              class="absolute inset-0 top-12 lg:top-0 flex flex-col border-t border-gray-200 dark:border-white/10 lg:border-0 bg-gray-50 dark:bg-black">
-              <div
-                class="flex-auto grid justify-center"
-                style="grid-template-columns: 100%">
-                <div class="relative" style="">
-                  <iframe
-                    title="Preview"
-                    class="absolute inset-0 w-full h-full bg-white"
-                    sandbox="allow-popups-to-escape-sandbox allow-scripts allow-popups allow-forms allow-pointer-lock allow-top-navigation allow-modals"
-                    style=""
-                    src="/sandbox.html"></iframe>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        class="flex-initial flex flex-col w-full h-full border-t border-gray-200 dark:border-white/10 lg:border-0 bg-gray-50 dark:bg-black">
+        <iframe
+          title="Preview"
+          class="w-full h-full bg-neutral-900"
+          sandbox="allow-scripts allow-pointer-lock"
+          src="/sandbox.html"></iframe>
       </div>
     </main>
     <script type="module">
