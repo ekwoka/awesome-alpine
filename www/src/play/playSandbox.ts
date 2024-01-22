@@ -1,38 +1,11 @@
-import { RPCReceiver, RPCSender } from './lib/postmessageRPC';
-import { CorePlugins } from './types';
+import { CorePlugins, gatherPlugins } from '../lib/lazyModules/alpinePlugins';
+import { loadTailwind } from '../lib/lazyModules/tailwind';
+import { RPCReceiver, RPCSender } from '../lib/postmessageRPC';
 import Alpine from 'alpinejs';
 
-const gatherPlugins = (pluginlist: CorePlugins[]) => {
-  const plugins = pluginlist.map((plugin) => {
-    switch (Number(plugin)) {
-      case CorePlugins.Anchor:
-        return import('@alpinejs/anchor');
-      case CorePlugins.Collapse:
-        return import('@alpinejs/collapse');
-      case CorePlugins.Focus:
-        return import('@alpinejs/focus');
-      case CorePlugins.Intersect:
-        return import('@alpinejs/intersect');
-      case CorePlugins.Mask:
-        return import('@alpinejs/mask');
-      case CorePlugins.Morph:
-        return import('@alpinejs/morph');
-      case CorePlugins.Persist:
-        return import('@alpinejs/persist');
-    }
-    return Promise.resolve({ default: () => {} });
-  });
-  return Promise.all(plugins.map((plugin) => plugin.then((m) => m.default)));
-};
-
-const loadTailwind = () => import('cdn.tailwindcss.com/3.4.1?dlx');
 const AsyncFunction = Object.getPrototypeOf(async function () {}).constructor;
+
 window.Alpine = Alpine;
-export const setup = async (config: Config) => {
-  Alpine.plugin(await gatherPlugins(config.plugins));
-  if (config.settings.tailwind) await loadTailwind();
-  return Alpine;
-};
 
 export type Config = {
   plugins: CorePlugins[];
@@ -92,7 +65,9 @@ let count = 0;
 while (count++ < 100) {
   console.log('Trying to register sandbox');
   if (
-    (await new RPCSender<{ registerSandbox: () => void }>(self.top).call
+    (await new RPCSender<{ registerSandbox: () => void }>(
+      self.top as Window,
+    ).call
       .registerSandbox()
       .wait(1000)) !== undefined
   )
