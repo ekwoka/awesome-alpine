@@ -132,7 +132,7 @@
     <main
       x-data="editor"
       class="flex flex-col md:flex-row flex-auto relative border-t border-gray-200 dark:border-gray-800">
-      <div class="flex flex-col flex-none w-full md:w-1/2 lg:w-1/3">
+      <div class="flex flex-col flex-none md:w-1/2 lg:w-1/3">
         <div
           class="flex items-center flex-none pl-5 sm:pl-6 pr-4 lg:pr-6 sticky z-10 top-0 -mb-px antialiased w-full">
           <div class="flex space-x-5">
@@ -207,12 +207,13 @@
             </button>
           </div>
         </div>
-        <div class="flex flex-col flex-auto h-full w-full select-text">
+        <div
+          class="flex flex-col flex-auto h-full w-full select-text min-h-[25vh]">
           <div
             class="border-t border-gray-200 dark:border-white/10 flex-auto flex -mb-2"
             x-show="panel === 'html'">
             <div
-              class="relative flex-auto"
+              class="relative flex-auto max-w-full"
               @keyup="update('html')"
               x-init="registerEditor($el, 'html')"></div>
           </div>
@@ -220,7 +221,7 @@
             class="border-t border-gray-200 dark:border-white/10 flex-auto flex -mb-2"
             x-show="panel === 'script'">
             <div
-              class="relative flex-auto"
+              class="relative flex-auto max-w-full"
               @keyup="update('typescript')"
               x-init="registerEditor($el, 'typescript')"></div>
           </div>
@@ -269,7 +270,7 @@
       </div>
       <span role="presentation" class=""></span>
       <div
-        class="flex-initial flex flex-col w-full h-full border-t border-gray-200 dark:border-white/10 lg:border-0 bg-gray-50 dark:bg-black">
+        class="flex-initial flex flex-col grow border-t border-gray-200 dark:border-white/10 lg:border-0 bg-gray-50 dark:bg-black">
         <iframe
           title="Preview"
           class="w-full h-full bg-neutral-900"
