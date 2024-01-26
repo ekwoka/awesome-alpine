@@ -1,3 +1,4 @@
+import oneDark from './oneDarkPro.json';
 import { Language } from './prettier';
 // @ts-expect-error - this is a raw types import for monaco
 import dts from '@types/alpinejs/index.d.ts?raw';
@@ -5,10 +6,9 @@ import * as monaco from 'monaco-editor';
 import DefaultWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker';
 import HTMLWorker from 'monaco-editor/esm/vs/language/html/html.worker?worker';
 import TSWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker';
-import tomorrow from 'monaco-themes/themes/Tomorrow-Night.json';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-monaco.editor.defineTheme('tomorrow-night', tomorrow as any);
+monaco.editor.defineTheme('onedark', oneDark as any);
 monaco.languages.typescript.typescriptDefaults.addExtraLib(
   `
   ${dts}
@@ -32,16 +32,16 @@ export const makeEditor = (
   const editor = monaco.editor.create(el, {
     value: initialContent,
     language: type,
-    theme: 'tomorrow-night',
+    theme: 'onedark',
     automaticLayout: false,
     minimap: {
       enabled: false,
     },
     lineHeight: 36,
-    letterSpacing: 1,
+    letterSpacing: 1.25,
     fontFamily: 'ml',
-    fontLigatures: true,
-    fontSize: 16,
+    fontLigatures: "'calt' on,'liga' on, 'ss02' on",
+    fontSize: 14,
     fontVariations: true,
     scrollbar: {
       vertical: 'hidden',
