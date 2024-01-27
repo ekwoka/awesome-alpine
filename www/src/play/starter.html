@@ -1,7 +1,83 @@
 <div
-  x-data="example"
-  x-text="text"
-  class="text-xl uppercase !text-blue-300 flex justify-center items-center"
-  style="color: white">
-  This is the Editor
+  x-data
+  class="text-slate-700 bg-slate-100 rounded-xl shadow-xl px-12 py-4"
+  style="
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    justify-content: center;
+    align-items: center;
+    font-family: sans-serif;
+    max-width: 520px;
+    margin: 0 auto;
+    line-height: 1.5em;
+    font-size: 1.1rem;
+    letter-spacing: 0.05em !important;
+  ">
+  <svg
+    role="img"
+    viewBox="0 0 24 24"
+    fill="currentColor"
+    style="width: 4rem; height: 4rem"
+    class="h-12 w-12"
+    xmlns="http://www.w3.org/2000/svg">
+    <title>Alpine.js</title>
+    <path
+      d="m24 12-5.72 5.746-5.724-5.741 5.724-5.75L24 12zM5.72 6.254 0 12l5.72 5.746h11.44L5.72 6.254z" />
+  </svg>
+  <h1
+    style="
+      font-weight: 500;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      font-size: 1.2rem;
+    ">
+    Awesome Alpine
+  </h1>
+  <h2
+    style="
+      font-weight: 500;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      font-size: 1.2rem;
+    ">
+    Playground
+    <span
+      x-data="version"
+      class="lowercase"
+      x-text="'v' + versions[displayCount]"></span>
+  </h2>
+  <p style="text-align: left">
+    An advanced online playground for AlpineJS, including support for things
+    like:
+  </p>
+  <div x-data="tasks" class="w-full">
+    <ul style="text-align: left; margin: 0 1rem">
+      <template x-for="[key,task] in Object.entries(tasks)" :key="key">
+        <li
+          class="transition"
+          :class="{ 'opacity-50': completions.includes(key) }">
+          <label class="flex gap-2">
+            <input type="checkbox" :value="key" x-model="completions" />
+            <span x-text="task"></span>
+          </label>
+        </li>
+      </template>
+    </ul>
+    <progress
+      class="transition-all w-full mt-4"
+      :max="Object.keys(tasks).length"
+      :value="completions.length || 0.1"></progress>
+  </div>
+  <p class="mt-4">
+    Want to dig deeper into Alpine?
+    <a
+      href="https://alpinejs.dev"
+      target="_blank"
+      class="inline-block text-blue-500 underline">
+      Read the docs!
+    </a>
+  </p>
+
+  <div x-data="counter" x-text="count"></div>
 </div>
