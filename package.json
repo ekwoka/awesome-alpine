@@ -31,7 +31,7 @@
     "@types/alpinejs__mask": "3.13.3",
     "@types/alpinejs__morph": "3.13.3",
     "@types/alpinejs__persist": "3.13.3",
-    "@types/node": "20.11.8",
+    "@types/node": "20.11.9",
     "@typescript-eslint/eslint-plugin": "6.19.1",
     "@typescript-eslint/parser": "6.19.1",
     "autoprefixer": "10.4.17",
