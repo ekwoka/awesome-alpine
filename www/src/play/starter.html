@@ -1,7 +1,178 @@
-<div
-  x-data="example"
-  x-text="text"
-  class="text-xl uppercase !text-blue-300 flex justify-center items-center"
-  style="color: white">
-  This is the Editor
+<div x-data>
+  <svg
+    role="img"
+    viewBox="0 0 24 24"
+    fill="currentColor"
+    xmlns="http://www.w3.org/2000/svg">
+    <title>Alpine.js</title>
+    <path
+      d="m24 12-5.72 5.746-5.724-5.741 5.724-5.75L24 12zM5.72 6.254 0 12l5.72 5.746h11.44L5.72 6.254z" />
+  </svg>
+  <h1>Awesome Alpine</h1>
+  <h2>
+    Playground
+    <span
+      x-data="version"
+      x-text="versions[displayCount] ? 'v' + versions[displayCount] : ''"></span>
+  </h2>
+  <p>
+    An advanced online playground for AlpineJS, including support for things
+    like:
+  </p>
+  <div x-data="tasks" class="w-full">
+    <ul>
+      <template x-for="[key,task] in Object.entries(tasks)" :key="key">
+        <li :style="{ opacity: completions.includes(key) ? '50%' : null }">
+          <label>
+            <input type="checkbox" :value="key" x-model="completions" />
+            <span x-text="task"></span>
+          </label>
+        </li>
+      </template>
+    </ul>
+    <progress
+      :max="Object.keys(tasks).length"
+      :value="completions.length || 0.1"></progress>
+  </div>
+  <hr />
+  <p>
+    Want to dig deeper into Alpine?
+    <a href="https://alpinejs.dev" target="_blank"> Read the docs! </a>
+  </p>
+
+  <div x-data="counter" x-text="count"></div>
 </div>
+
+<style>
+  blockquote,
+  dd,
+  dl,
+  figure,
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  hr,
+  p,
+  pre {
+    margin: 0;
+  }
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-size: inherit;
+    font-weight: inherit;
+  }
+  *,
+  ::after,
+  ::before {
+    box-sizing: border-box;
+    border-width: 0;
+    border-style: solid;
+    border-color: #e5e7eb;
+  }
+  body {
+    background-color: rgb(203 213 225 / 1);
+  }
+  [x-data=''] {
+    color: rgb(51 65 85 / 1);
+    background-color: rgb(241 245 249 / 1);
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    justify-content: center;
+    align-items: center;
+    font-family: sans-serif;
+    max-width: 520px;
+    margin: 0 auto;
+    line-height: 1.5em;
+    font-size: 1.1rem;
+    letter-spacing: 0.05em !important;
+    box-shadow:
+      0 0 #0000,
+      0 20px 25px -5px rgb(0 0 0 / 0.1),
+      0 8px 10px -6px rgb(0 0 0 / 0.1),
+      0 20px 25px -5px rgb(0 0 0 / 0.1),
+      0 8px 10px -6px rgb(0 0 0 / 0.1);
+    padding: 1rem 3rem;
+    border-radius: 0.75rem;
+  }
+  [x-data=''] > svg {
+    width: 4rem;
+    height: 4rem;
+  }
+  h1 {
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    font-size: 1.2rem;
+  }
+  h2 {
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    font-size: 1.2rem;
+  }
+  [x-data='version'] {
+    text-transform: lowercase;
+  }
+  [x-data='tasks'] {
+    width: 100%;
+  }
+  [x-data='tasks'] > ul {
+    list-style: none;
+    margin: 0 1rem;
+    padding: 0;
+  }
+  [x-data='tasks'] li,
+  [x-data='tasks'] progress,
+  [x-data='tasks'] progress[value]::-webkit-progress-value {
+    transition-property: all;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 150ms;
+  }
+  [x-data='tasks'] li label {
+    display: flex;
+    gap: 0.5rem;
+  }
+  [x-data='tasks'] progress {
+    height: 1rem;
+    width: 100%;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    outline-style: solid;
+    outline-width: 1px;
+    outline-color: rgb(51 65 85 / 1);
+    margin-top: 1rem;
+    border-radius: 0.3rem;
+    overflow: hidden;
+  }
+  [x-data='tasks'] progress::-webkit-progress-bar {
+    background-color: rgb(255 255 255 / 1);
+  }
+  [x-data='tasks'] progress[value]::-webkit-progress-value {
+    background-color: rgb(51 65 85 / 1);
+    border-top-right-radius: 0.3rem;
+    border-bottom-right-radius: 0.3rem;
+    transition-duration: 500ms;
+  }
+  [x-data=''] > p:last-of-type {
+    margin-top: 2rem;
+  }
+  [x-data=''] a {
+    display: inline-block;
+    text-decoration: underline;
+    color: rgb(59 130 246 / 1);
+  }
+  hr {
+    background-color: rgb(51 65 85 / 1);
+    width: 100%;
+    height: 1px;
+  }
+</style>
