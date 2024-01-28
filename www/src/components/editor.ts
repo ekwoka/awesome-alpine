@@ -28,8 +28,10 @@ Alpine.data('editor', () => ({
     settings: {
       typescript: Alpine.query(false).as('ts').encoding(booleanNumber),
       tailwind: Alpine.query(false).as('tw').encoding(booleanNumber),
+      version: Alpine.query<`${number}.${number}.${number}`>('3.13.5').as('v'),
     },
   },
+  alpineVersions: [] as string[],
   value: {
     html: Alpine.query(starterHTML).encoding(base64URL).as('html'),
     typescript: Alpine.query(starterScript).encoding(base64URL).as('script'),
@@ -58,6 +60,10 @@ Alpine.data('editor', () => ({
     this.sandbox = sandbox;
     console.log('initializing sandbox');
     this.sandbox.call.log('Hello from Alpine!');
+    await effectPromise(async () => {
+      console.log('loading Alpine version', this.config.settings.version);
+      await this.sandbox.call.loadAlpine(this.config.settings.version);
+    });
     await Promise.all([
       effectPromise(async () => {
         console.log('Loading Tailwind');
@@ -82,6 +88,11 @@ Alpine.data('editor', () => ({
       }),
     ]);
     this.sandbox.call.start();
+    const alpineRegistry = await import(
+      'registry.npmjs.com/alpinejs?dlx&json'
+    ).then((mod) => mod.default);
+    console.log(alpineRegistry);
+    this.alpineVersions = Object.keys(alpineRegistry.versions).reverse();
   },
   async prettify() {
     for (const type of [Language.HTML, Language.TYPESCRIPT]) {

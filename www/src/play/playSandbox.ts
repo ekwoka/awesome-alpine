@@ -1,11 +1,9 @@
 import { CorePlugins, gatherPlugins } from '../lib/lazyModules/alpinePlugins';
 import { loadTailwind } from '../lib/lazyModules/tailwind';
 import { RPCReceiver, RPCSender } from '../lib/postmessageRPC';
-import Alpine from 'alpinejs';
+import type { Alpine as IAlpine } from 'alpinejs';
 
 const AsyncFunction = Object.getPrototypeOf(async function () {}).constructor;
-
-window.Alpine = Alpine;
 
 export type Config = {
   plugins: CorePlugins[];
@@ -15,39 +13,61 @@ export type Config = {
   };
 };
 
-let started = false;
+const state: {
+  version: null | `${number}.${number}.${number}`;
+  alpineStarted: boolean;
+  tailwindLoaded: boolean;
+  Alpine: IAlpine | null;
+} = {
+  version: null,
+  alpineStarted: false,
+  tailwindLoaded: false,
+  Alpine: null,
+};
 const resetAlpine = () => {
-  if (!started) return;
+  if (!state.alpineStarted) return;
   console.log('restarting alpine in sandbox');
-  Alpine.destroyTree(document.body);
-  Alpine.initTree(document.body);
+  state.Alpine.destroyTree(document.body);
+  state.Alpine.initTree(document.body);
 };
 const actions = {
   log: (message: string) => console.log(message),
+  loadAlpine: async (version: `${number}.${number}.${number}`) => {
+    if (state.version === version) return;
+    if (state.version !== null) return window.location.reload();
+    state.version = version;
+    console.log('importing version', version);
+    state.Alpine = window.Alpine = await import(
+      /* @vite-ignore */ `https://esm.sh/alpinejs@${version}`
+    ).then((mod) => mod.default);
+    console.log('Alpine loaded');
+    console.log(state.Alpine);
+  },
   loadTailwind: async () => {
     await loadTailwind();
     document.body.replaceChildren(...document.body.children);
+    state.tailwindLoaded = true;
   },
-  removeTailwind: () => window.location.reload(),
+  removeTailwind: () => state.tailwindLoaded && window.location.reload(),
   start: () => {
     console.log('starting Alpine');
-    started = true;
-    Alpine.start();
+    state.alpineStarted = true;
+    state.Alpine.start();
   },
   loadPlugins: async (plugins: CorePlugins[]) => {
     console.log('Loading plugins');
-    Alpine.plugin(await gatherPlugins(plugins));
+    state.Alpine.plugin(await gatherPlugins(plugins, state.version));
     resetAlpine();
   },
   evaluateScript: async (plugin: string) => {
     console.log('Evaluating script');
-    await new AsyncFunction('Alpine', plugin)(Alpine);
+    await new AsyncFunction('Alpine', plugin)(state.Alpine);
     resetAlpine();
   },
   replaceMarkup: (markup: string) => {
     console.log('Replacing markup');
 
-    Alpine.mutateDom(() => {
+    state.Alpine.mutateDom(() => {
       document.body.replaceChildren(
         document.createRange().createContextualFragment(markup),
       );

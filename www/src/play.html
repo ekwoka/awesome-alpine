@@ -257,6 +257,18 @@
                 </label>
               </li>
             </ul>
+            <label class="flex gap-4">
+              <code> Alpine Version </code>
+              <select
+                x-model="config.settings.version"
+                class="bg-slate-700 px-2 py-1">
+                <template x-for="(version,i) in alpineVersions" :key="version">
+                  <option
+                    x-text="i ? version : `Latest (${version})`"
+                    :value="version"></option>
+                </template>
+              </select>
+            </label>
             <h3>Core Plugins</h3>
             <ul class="ml-3">
               <template x-for="plugin in CorePlugins" :key="plugin[1]">
