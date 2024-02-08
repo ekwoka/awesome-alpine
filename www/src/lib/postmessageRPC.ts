@@ -63,21 +63,25 @@ const waitForResponse = <T>(
   timeout: number = 0,
 ): Promise<T> => {
   return new Promise<T>((res) => {
+    let timeoutid;
     const handler = (event: MessageEvent<ActionResponse>) => {
       if (event.source === source && event.data.id === id) {
         window.removeEventListener('message', handler);
+        clearTimeout(timeoutid);
         res(event.data.value as T);
       }
     };
     window.addEventListener('message', handler);
     if (timeout)
-      setTimeout(() => {
+      timeoutid = setTimeout(() => {
         console.log('timing out');
         window.removeEventListener('message', handler);
         res(undefined);
       }, timeout);
   });
 };
+
+// eslint
 
 interface Action<A> {
   id: number;

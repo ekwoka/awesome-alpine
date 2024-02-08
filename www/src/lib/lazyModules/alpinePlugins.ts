@@ -1,20 +1,27 @@
-export const gatherPlugins = (pluginlist: CorePlugins[]) => {
+const importFromESM = (
+  name: string,
+  version: `${number}.${number}.${number}`,
+) => import(/* @vite-ignore */ `https://esm.sh/@alpinejs/${name}@${version}`);
+export const gatherPlugins = (
+  pluginlist: CorePlugins[],
+  version: `${number}.${number}.${number}`,
+) => {
   const plugins = pluginlist.map((plugin) => {
     switch (Number(plugin)) {
       case CorePlugins.Anchor:
-        return import('@alpinejs/anchor');
+        return importFromESM('anchor', version);
       case CorePlugins.Collapse:
-        return import('@alpinejs/collapse');
+        return importFromESM('collapse', version);
       case CorePlugins.Focus:
-        return import('@alpinejs/focus');
+        return importFromESM('focus', version);
       case CorePlugins.Intersect:
-        return import('@alpinejs/intersect');
+        return importFromESM('intersect', version);
       case CorePlugins.Mask:
-        return import('@alpinejs/mask');
+        return importFromESM('mask', version);
       case CorePlugins.Morph:
-        return import('@alpinejs/morph');
+        return importFromESM('morph', version);
       case CorePlugins.Persist:
-        return import('@alpinejs/persist');
+        return importFromESM('persist', version);
     }
     return Promise.resolve({ default: () => {} });
   });

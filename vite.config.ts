@@ -6,14 +6,17 @@ export const myPlugin = () => {
   return {
     name: 'my-plugin',
     resolveId(id: string) {
-      if (id.endsWith('?dlx')) {
+      if (id.includes('?dlx')) {
         return id;
       }
     },
     async load(id: string) {
-      if (id.endsWith('?dlx')) {
+      if (id.includes('?dlx')) {
         const res = await fetch('https://' + id);
-        return res.text();
+        const text = await res.text();
+        if (id.includes('&json'))
+          return `export default JSON.parse(${JSON.stringify(text)})`;
+        return text;
       }
     },
   };

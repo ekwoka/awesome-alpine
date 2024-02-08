@@ -11,7 +11,8 @@ Alpine.directive('partition', (el) => {
       this.dragging = true;
     },
     mouseup(e: PointerEvent) {
-      if (this.dragging) e.preventDefault();
+      if (!this.dragging) return;
+      e.preventDefault();
       console.log('ending drag');
       this.dragging = false;
     },
