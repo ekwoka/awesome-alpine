@@ -233,57 +233,64 @@
               x-init="registerEditor($el, 'typescript')"></div>
           </div>
           <div
-            class="border-t border-gray-200 dark:border-white/10 flex-auto -mb-2 text-slate-100 flex flex-col gap-2 py-3 px-4"
+            class="border-t border-gray-200 dark:border-white/10 flex-auto -mb-2 text-slate-100 flex flex-col gap-4 py-3 px-4 accent-indigo-800"
             x-show="panel === 'config'">
             <h2 class="sr-only">Configuration Options</h2>
-            <h3>Settings</h3>
-            <ul class="ml-3">
-              <li>
-                <label class="flex gap-4">
-                  <input
-                    type="checkbox"
-                    name="setting"
-                    x-model="config.settings.typescript" />
-                  <code>Use TypeScript</code>
-                </label>
-              </li>
-              <li>
-                <label class="flex gap-4">
-                  <input
-                    type="checkbox"
-                    name="setting"
-                    x-model="config.settings.tailwind" />
-                  <code>Use Tailwind</code>
-                </label>
-              </li>
-            </ul>
-            <label class="flex gap-4">
-              <code> Alpine Version </code>
+            <div class="flex flex-col gap-2">
+              <h3>Settings</h3>
+              <ul class="ml-3">
+                <li>
+                  <label class="flex gap-4">
+                    <input
+                      type="checkbox"
+                      name="setting"
+                      x-model="config.settings.typescript" />
+                    <code>Use TypeScript</code>
+                  </label>
+                </li>
+                <li>
+                  <label class="flex gap-4">
+                    <input
+                      type="checkbox"
+                      name="setting"
+                      x-model="config.settings.tailwind" />
+                    <code>Use Tailwind</code>
+                  </label>
+                </li>
+              </ul>
+            </div>
+            <label class="flex flex-col gap-2">
+              <h3>Alpine Version *</h3>
               <select
                 x-model="config.settings.version"
-                class="bg-slate-700 px-2 py-1">
+                class="bg-slate-800 px-2 py-1 max-w-max min-w-[12ch] font-mono ml-3">
                 <template x-for="(version,i) in alpineVersions" :key="version">
                   <option
                     x-text="i ? version : `Latest (${version})`"
                     :value="version"></option>
                 </template>
               </select>
+              <span class="text-xs text-slate-300/90 tracking-wide ml-3">
+                * Most versions older version will probably not work
+              </span>
             </label>
-            <h3>Core Plugins</h3>
-            <ul class="ml-3">
-              <template x-for="plugin in CorePlugins" :key="plugin[1]">
-                <li>
-                  <label class="flex gap-4">
-                    <input
-                      type="checkbox"
-                      name="plugin"
-                      x-model="config.plugins"
-                      :value="plugin[1]" />
-                    <code x-text="plugin[0]">Plugin Not Found</code>
-                  </label>
-                </li>
-              </template>
-            </ul>
+            <div class="flex flex-col gap-2">
+              <h3>Core Plugins</h3>
+              <ul class="ml-3">
+                <template x-for="plugin in CorePlugins" :key="plugin[1]">
+                  <li>
+                    <label class="flex gap-4">
+                      <input
+                        type="checkbox"
+                        name="plugin"
+                        x-model="config.plugins"
+                        :value="plugin[1]" />
+                      <code x-text="plugin[0]">Plugin Not Found</code>
+                    </label>
+                  </li>
+                </template>
+              </ul>
+            </div>
           </div>
         </div>
       </div>
