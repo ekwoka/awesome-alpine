@@ -60,10 +60,6 @@ Alpine.data('editor', () => ({
     this.sandbox = sandbox;
     console.log('initializing sandbox');
     this.sandbox.call.log('Hello from Alpine!');
-    await effectPromise(async () => {
-      console.log('loading Alpine version', this.config.settings.version);
-      await this.sandbox.call.loadAlpine(this.config.settings.version);
-    });
     await Promise.all([
       effectPromise(async () => {
         console.log('Loading Tailwind');
@@ -71,23 +67,19 @@ Alpine.data('editor', () => ({
           await this.sandbox.call.loadTailwind();
       }),
       effectPromise(async () => {
-        console.log('Adding Plugins');
-        await this.sandbox.call.loadPlugins(Alpine.raw(this.config.plugins));
-      }),
-      effectPromise(async () => {
-        await this.sandbox.call.evaluateScript(
-          this.config.settings.typescript && this.value.typescript
-            ? await (
-                await transpile()
-              )(this.value.typescript)
-            : this.value.typescript,
-        );
-      }),
-      effectPromise(async () => {
-        await this.sandbox.call.replaceMarkup(this.value.html);
+        JSON.stringify(this.config) &&
+          this.value.typescript &&
+          (await this.sandbox.call.loadScript(
+            await (
+              await transpile()
+            )(this.value.typescript, this.config),
+          ));
       }),
     ]);
-    this.sandbox.call.start();
+    await effectPromise(async () => {
+      await this.sandbox.call.replaceMarkup(this.value.html);
+    }),
+      this.sandbox.call.start();
     const alpineRegistry = await import(
       'registry.npmjs.com/alpinejs?dlx&json'
     ).then((mod) => mod.default);

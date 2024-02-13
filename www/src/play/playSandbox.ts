@@ -67,12 +67,26 @@ const actions = {
   replaceMarkup: (markup: string) => {
     console.log('Replacing markup');
 
-    state.Alpine.mutateDom(() => {
-      document.body.replaceChildren(
-        document.createRange().createContextualFragment(markup),
-      );
-    });
-    resetAlpine();
+    state.Alpine?.destroyTree(document.body);
+    state.Alpine?.stopObservingMutations();
+    document.body.replaceChildren(
+      document.createRange().createContextualFragment(markup),
+    );
+    if (!state.alpineStarted) return;
+    state.Alpine.startObservingMutations();
+    state.Alpine.initTree(document.body);
+  },
+  loadScript: async (script: {
+    id: string;
+    url: string;
+    bundleUrl: string;
+  }) => {
+    state.Alpine?.destroyTree(document.body);
+    state.Alpine?.stopObservingMutations();
+    state.Alpine = await import(script.url).then((mod) => mod.default);
+    if (!state.alpineStarted) return;
+    state.Alpine.startObservingMutations();
+    state.Alpine.initTree(document.body);
   },
 };
 
