@@ -6,6 +6,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>AwesomeAlpine Plays</title>
     <link rel="stylesheet" href="/styles.css" />
+    <script type="module">
+      import Alpine from 'alpinejs';
+
+      console.log('setting Alpine on window');
+      window.Alpine = Alpine;
+    </script>
   </head>
   <body class="w-full min-h-screen bg-neutral-900 flex flex-col">
     <header
@@ -130,7 +136,12 @@
         </a>
       </div>
     </header>
-    <script src="/components/editor.ts" type="module"></script>
+    <script type="module">
+      import { Editor } from './components/editor.ts';
+      import Alpine from 'alpinejs';
+
+      Editor(Alpine);
+    </script>
     <script src="/components/draggablePartition.ts" type="module"></script>
     <main
       x-data="editor"
@@ -229,7 +240,7 @@
             x-show="panel === 'script'">
             <div
               class="relative flex-auto max-w-full"
-              @keyup="update('typescript')"
+              @keyup.debounce.1000="update('typescript')"
               x-init="registerEditor($el, 'typescript')"></div>
           </div>
           <div
@@ -312,7 +323,7 @@
     <script type="module">
       import Alpine from 'alpinejs';
 
-      window.Alpine = Alpine;
+      console.log('starting alpine');
       Alpine.start();
     </script>
   </body>
