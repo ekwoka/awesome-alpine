@@ -22,9 +22,7 @@ export const DLX = () => {
 };
 
 export default defineConfig({
-  plugins: [
-    DLX(),
-  ],
+  plugins: [DLX()],
   root: 'src',
   server: {
     headers: {
@@ -44,9 +42,10 @@ export default defineConfig({
     },
     rollupOptions: {
       input: {
-        index: './src/index.html',
-        play: './src/play.html',
-        sandbox: './src/sandbox.html',
+        index: './src/templates/index.html',
+        play: './src/templates/play.html',
+        sandbox: './src/templates/sandbox.html',
+        'hello.rs.html': './src/templates/hello.rs.html',
       },
     },
   },

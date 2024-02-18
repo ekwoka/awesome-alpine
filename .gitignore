@@ -3,3 +3,7 @@ dist
 testing
 coverage
 .DS_Store
+.env
+
+# Local Netlify folder
+.netlify
