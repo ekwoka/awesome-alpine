@@ -1,5 +1,7 @@
 /// <reference types="vitest" />
+import posthtml from '@vituum/vite-plugin-posthtml';
 import { defineConfig } from 'vite';
+import vituum from 'vituum';
 
 export const DLX = () => {
   return {
@@ -22,15 +24,17 @@ export const DLX = () => {
 };
 
 export default defineConfig({
-  plugins: [DLX()],
-  root: 'src',
-  server: {
-    headers: {
-      'Cross-Origin-Opener-Policy': 'same-origin',
-      'Cross-Origin-Embedder-Policy': 'require-corp',
-      'Cross-Origin-Resource-Policy': 'same-site',
-    },
-  },
+  root: './src',
+  plugins: [
+    DLX(),
+    vituum({
+      pages: {
+        root: './',
+        dir: './pages',
+      },
+    }),
+    posthtml(),
+  ],
   build: {
     assetsInlineLimit: 0,
     target: 'esnext',
@@ -41,12 +45,8 @@ export default defineConfig({
       polyfill: false,
     },
     rollupOptions: {
-      input: {
-        index: './src/templates/index.html',
-        play: './src/templates/play.html',
-        sandbox: './src/templates/sandbox.html',
-        'hello.rs.html': './src/templates/hello.rs.html',
-      },
+      input: ['./pages/**/*.html'],
+      output: {},
     },
   },
   worker: {

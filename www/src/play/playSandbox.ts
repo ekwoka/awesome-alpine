@@ -83,7 +83,9 @@ const actions = {
   }) => {
     state.Alpine?.destroyTree(document.body);
     state.Alpine?.stopObservingMutations();
-    state.Alpine = await import(script.url).then((mod) => mod.default);
+    state.Alpine = await import(/* vite-ignore */ script.url).then(
+      (mod) => mod.default,
+    );
     if (!state.alpineStarted) return;
     state.Alpine.startObservingMutations();
     state.Alpine.initTree(document.body);
