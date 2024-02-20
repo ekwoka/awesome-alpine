@@ -17,7 +17,7 @@
     "test": "vitest",
     "test:run": "vitest --run",
     "postinstall": "patch-package",
-    "dev": "vite --open --force"
+    "netlify": "netlify dev"
   },
   "devDependencies": {
     "@milahu/patch-package": "6.4.14",
@@ -29,6 +29,7 @@
     "eslint": "8.56.0",
     "husky": "9.0.11",
     "lint-staged": "15.2.2",
+    "netlify-cli": "17.16.3",
     "npm-run-all2": "6.1.2",
     "postcss": "8.4.35",
     "prettier": "3.2.5",

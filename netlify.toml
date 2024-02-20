@@ -1,13 +1,13 @@
 # example netlify.toml
 [build]
-  command = "pnpm --filter @awesome-alpine/www... run build"
+  command = "pnpm --filter @awesome-alpine/www build"
   functions = "www/netlify/functions"
   publish = "www/dist"
 
 [dev]
-  command = "pnpm dev" # Command to start your dev server
+  command = "pnpm --filter @awesome-alpine/www dev" # Command to start your dev server
   port = 4173 # Port that the dev server will be listening on
-  publish = "dist" # Folder with the static content for _redirect file
+  publish = "www/dist" # Folder with the static content for _redirect file
 
 [context.dev]
   environment = { NETLIFY_EXPERIMENTAL_BUILD_RUST_SOURCE = "true" }

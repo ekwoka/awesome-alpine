@@ -1,7 +1,6 @@
 import { CorePlugin, gatherPlugins } from '../lib/lazyModules/alpinePlugins';
 import { loadTailwind } from '../lib/lazyModules/tailwind';
 import { RPCReceiver, RPCSender } from '../lib/postmessageRPC';
-import versionData from 'alpine-versions';
 import type { Alpine as IAlpine } from 'alpinejs';
 
 const AsyncFunction = Object.getPrototypeOf(async function () {}).constructor;
@@ -39,7 +38,8 @@ const actions = {
     state.version = version;
     console.log('importing version', version);
     state.Alpine = window.Alpine = await import(
-      /* @vite-ignore */ `https://esm.sh/alpinejs@${version}`
+      /* @vite-ignore */
+      `https://esm.sh/alpinejs@${version}`
     ).then((mod) => mod.default);
     console.log('Alpine loaded');
     console.log(state.Alpine);
@@ -84,9 +84,11 @@ const actions = {
   }) => {
     state.Alpine?.destroyTree(document.body);
     state.Alpine?.stopObservingMutations();
-    state.Alpine = await import(/* vite-ignore */ script.url).then(
-      (mod) => mod.default,
-    );
+
+    state.Alpine = await import(
+      /* @vite-ignore */
+      script.url
+    ).then((mod) => mod.default);
     if (!state.alpineStarted) return;
     state.Alpine.startObservingMutations();
     state.Alpine.initTree(document.body);
