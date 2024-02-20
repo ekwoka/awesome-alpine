@@ -13,51 +13,51 @@
 
 @font-face {
   font-family: ml;
-  src: url(/fonts/ml-Bold.woff2);
+  src: url(./fonts/ml-Bold.woff2);
   font-display: swap;
   font-weight: bold;
 }
 @font-face {
   font-family: ml;
-  src: url(/fonts/ml-BoldItalic.woff2);
+  src: url(./fonts/ml-BoldItalic.woff2);
   font-display: swap;
   font-weight: bold;
   font-style: italic;
 }
 @font-face {
   font-family: ml;
-  src: url(/fonts/ml-Light.woff2);
+  src: url(./fonts/ml-Light.woff2);
   font-display: swap;
   font-weight: 300;
 }
 @font-face {
   font-family: ml;
-  src: url(/fonts/ml-LightItalic.woff2);
+  src: url(./fonts/ml-LightItalic.woff2);
   font-display: swap;
   font-weight: 300;
   font-style: italic;
 }
 @font-face {
   font-family: ml;
-  src: url(/fonts/ml-Medium.woff2);
+  src: url(./fonts/ml-Medium.woff2);
   font-display: swap;
   font-weight: 500;
 }
 @font-face {
   font-family: ml;
-  src: url(/fonts/ml-MediumItalic.woff2);
+  src: url(./fonts/ml-MediumItalic.woff2);
   font-display: swap;
   font-weight: 500;
   font-style: italic;
 }
 @font-face {
   font-family: ml;
-  src: url(/fonts/ml-Regular.woff2);
+  src: url(./fonts/ml-Regular.woff2);
   font-display: swap;
 }
 @font-face {
   font-family: ml;
-  src: url(/fonts/ml-RegularItalic.woff2);
+  src: url(./fonts/ml-RegularItalic.woff2);
   font-display: swap;
   font-style: italic;
 }

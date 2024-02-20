@@ -1,4 +1,4 @@
-import { CorePlugins } from '../lib/lazyModules/alpinePlugins';
+import { CorePlugin } from '../lib/lazyModules/alpinePlugins';
 import { RPCReceiver, RPCSender } from '../lib/postmessageRPC';
 import { prettify } from '../lib/prettier';
 import { Language } from '../lib/prettier';
@@ -10,6 +10,7 @@ import starterScript from '../play/starter.js?raw';
 import { bitwiseArray, booleanNumber } from '../plugins/encoding';
 import persist from '@alpinejs/persist';
 import query, { base64URL } from '@ekwoka/alpine-history';
+import versionData from 'alpine-versions';
 import Alpine, { PluginCallback } from 'alpinejs';
 import type { editor } from 'monaco-editor';
 
@@ -26,17 +27,18 @@ export const Editor: PluginCallback = (Alpine) => {
     return {
       panel: Alpine.query('html'),
       config: {
-        plugins: Alpine.query<CorePlugins[]>([])
+        plugins: Alpine.query<CorePlugin[]>([])
           .as('coreplugins')
           .encoding(bitwiseArray),
         settings: {
           typescript: Alpine.query(false).as('ts').encoding(booleanNumber),
           tailwind: Alpine.query(false).as('tw').encoding(booleanNumber),
-          version:
-            Alpine.query<`${number}.${number}.${number}`>('3.13.5').as('v'),
+          version: Alpine.query<`${number}.${number}.${number}`>(
+            versionData.alpinejs[0],
+          ).as('v'),
         },
       },
-      alpineVersions: [] as string[],
+      versionData,
       value: {
         html: Alpine.query(starterHTML).encoding(base64URL).as('html'),
         typescript: Alpine.query(starterScript)
@@ -62,8 +64,22 @@ export const Editor: PluginCallback = (Alpine) => {
             return true;
           },
         });
+        Alpine.effect(() => {
+          console.log(
+            this.config.plugins,
+            this.config.settings.version,
+            versionData[`@alpinejs/anchor`],
+          );
+          this.config.plugins = this.config.plugins.filter(
+            this.versionExists.bind(this),
+          );
+        });
       },
-
+      versionExists(plugin: CorePlugin) {
+        return versionData[
+          `@alpinejs/${CorePlugin[plugin].toLowerCase()}`
+        ].includes(this.config.settings.version);
+      },
       async initializeSandbox(sandbox: RPCSender<sandboxActions>) {
         this.sandbox = sandbox;
         console.log('initializing sandbox');
@@ -94,11 +110,6 @@ export const Editor: PluginCallback = (Alpine) => {
           await this.sandbox.call.replaceMarkup(this.value.html);
         }),
           this.sandbox.call.start();
-        const alpineRegistry = await import(
-          'registry.npmjs.com/alpinejs?dlx&json'
-        ).then((mod) => mod.default);
-        console.log(alpineRegistry);
-        this.alpineVersions = Object.keys(alpineRegistry.versions).reverse();
       },
       async prettify() {
         for (const type of [Language.HTML, Language.TYPESCRIPT]) {
@@ -112,7 +123,9 @@ export const Editor: PluginCallback = (Alpine) => {
         )?.getValue();
         this.value[type] = await prettify(content, type);
       },
-      CorePlugins: Object.entries(CorePlugins).filter(([key]) => isNaN(+key)),
+      CorePlugins: Object.entries(CorePlugin).filter(([key]) =>
+        isNaN(+key),
+      ) as [string, CorePlugin][],
     };
   });
 };

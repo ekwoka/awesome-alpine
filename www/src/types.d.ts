@@ -28,7 +28,7 @@ declare module 'esbuild-wasm/esbuild.wasm?url' {
   export default esbuildWASM;
 }
 
-declare module 'registry.npmjs.com/alpinejs?dlx&json' {
-  const alpineRegistry: { versions: Record<string, unknown> };
-  export default alpineRegistry;
+declare module 'alpine-versions' {
+  const data: Record<string, `${number}.${number}.${number}`[]>;
+  export default data;
 }

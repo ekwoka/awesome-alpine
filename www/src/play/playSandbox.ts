@@ -1,12 +1,13 @@
-import { CorePlugins, gatherPlugins } from '../lib/lazyModules/alpinePlugins';
+import { CorePlugin, gatherPlugins } from '../lib/lazyModules/alpinePlugins';
 import { loadTailwind } from '../lib/lazyModules/tailwind';
 import { RPCReceiver, RPCSender } from '../lib/postmessageRPC';
+import versionData from 'alpine-versions';
 import type { Alpine as IAlpine } from 'alpinejs';
 
 const AsyncFunction = Object.getPrototypeOf(async function () {}).constructor;
 
 export type Config = {
-  plugins: CorePlugins[];
+  plugins: CorePlugin[];
   settings: {
     typescript: boolean;
     tailwind: boolean;
@@ -54,7 +55,7 @@ const actions = {
     state.alpineStarted = true;
     state.Alpine.start();
   },
-  loadPlugins: async (plugins: CorePlugins[]) => {
+  loadPlugins: async (plugins: CorePlugin[]) => {
     console.log('Loading plugins');
     state.Alpine.plugin(await gatherPlugins(plugins, state.version));
     resetAlpine();
