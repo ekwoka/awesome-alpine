@@ -66,8 +66,8 @@ importers:
         specifier: 15.2.2
         version: 15.2.2
       netlify-cli:
-        specifier: 17.16.3
-        version: 17.16.3(@types/node@20.11.19)
+        specifier: 17.16.4
+        version: 17.16.4(@types/node@20.11.19)
       npm-run-all2:
         specifier: 6.1.2
         version: 6.1.2
@@ -87,11 +87,11 @@ importers:
         specifier: 5.3.3
         version: 5.3.3
       vite:
-        specifier: 5.1.3
-        version: 5.1.3(@types/node@20.11.19)
+        specifier: 5.1.4
+        version: 5.1.4(@types/node@20.11.19)
       vite-plugin-dts:
-        specifier: 3.7.2
-        version: 3.7.2(@types/node@20.11.19)(typescript@5.3.3)(vite@5.1.3(@types/node@20.11.19))
+        specifier: 3.7.3
+        version: 3.7.3(@types/node@20.11.19)(typescript@5.3.3)(vite@5.1.4(@types/node@20.11.19))
       vite-plugin-external-deps:
         specifier: 0.0.3
         version: 0.0.3
@@ -99,8 +99,8 @@ importers:
         specifier: 0.0.3
         version: 0.0.3
       vitest:
-        specifier: 1.3.0
-        version: 1.3.0(@types/node@20.11.19)
+        specifier: 1.3.1
+        version: 1.3.1(@types/node@20.11.19)
 
   www:
     dependencies:
@@ -148,11 +148,11 @@ importers:
         specifier: 3.4.1
         version: 3.4.1
       vite:
-        specifier: 5.1.3
-        version: 5.1.3(@types/node@20.11.19)
+        specifier: 5.1.4
+        version: 5.1.4(@types/node@20.11.19)
       vite-plugin-dts:
-        specifier: 3.7.2
-        version: 3.7.2(@types/node@20.11.19)(typescript@5.3.3)(vite@5.1.3(@types/node@20.11.19))
+        specifier: 3.7.3
+        version: 3.7.3(@types/node@20.11.19)(typescript@5.3.3)(vite@5.1.4(@types/node@20.11.19))
       vite-plugin-external-deps:
         specifier: 0.0.3
         version: 0.0.3
@@ -160,8 +160,8 @@ importers:
         specifier: 0.0.3
         version: 0.0.3
       vitest:
-        specifier: 1.3.0
-        version: 1.3.0(@types/node@20.11.19)
+        specifier: 1.3.1
+        version: 1.3.1(@types/node@20.11.19)
       vituum:
         specifier: 1.1.0
         version: 1.1.0(@types/node@20.11.19)
@@ -906,12 +906,12 @@ packages:
       yargs: 17.7.2
     dev: true
 
-  /@netlify/build@29.35.1(@types/node@20.11.19):
-    resolution: {integrity: sha512-BOXhBFL85D6WdfXFxkZ3q1DBTbL5BG+GwkJWMJS7W5uJYL9+DskJ0aOlFjosJqMbNF4vZds1ChTkufpepr3YHA==}
+  /@netlify/build@29.36.1(@types/node@20.11.19):
+    resolution: {integrity: sha512-S+zQbdw7Np4NesLK3kA1BzmNK8oijNZ13y2kknJdGLyQbz+bQxU0iMIuMyFca+6LtGPPonCFlWPz+cKe9G0/Mw==}
     engines: {node: ^14.16.0 || >=16.0.0}
     hasBin: true
     peerDependencies:
-      '@netlify/opentelemetry-sdk-setup': ^1.0.2
+      '@netlify/opentelemetry-sdk-setup': ^1.0.3
     peerDependenciesMeta:
       '@netlify/opentelemetry-sdk-setup':
         optional: true
@@ -919,7 +919,7 @@ packages:
       '@bugsnag/js': 7.20.2
       '@netlify/blobs': 6.5.0
       '@netlify/cache-utils': 5.1.5
-      '@netlify/config': 20.12.0
+      '@netlify/config': 20.12.1
       '@netlify/edge-bundler': 11.2.2(supports-color@9.4.0)
       '@netlify/framework-info': 9.8.10
       '@netlify/functions-utils': 5.2.51(supports-color@9.4.0)
@@ -928,7 +928,7 @@ packages:
       '@netlify/plugins-list': 6.75.0
       '@netlify/run-utils': 5.1.1
       '@netlify/zip-it-and-ship-it': 9.29.2(supports-color@9.4.0)
-      '@opentelemetry/api': 1.6.0
+      '@opentelemetry/api': 1.7.0
       '@sindresorhus/slugify': 2.2.1
       ansi-escapes: 6.2.0
       chalk: 5.3.0
@@ -996,8 +996,8 @@ packages:
       readdirp: 3.6.0
     dev: true
 
-  /@netlify/config@20.12.0:
-    resolution: {integrity: sha512-RgUxG8I2tO/mef3/UY2k10yHOz68UKmJjpM8NCLd7hNYXfdXJeBKTwGJklrjV7zkx3XKbDgSJZwICBF0s6IM0Q==}
+  /@netlify/config@20.12.1:
+    resolution: {integrity: sha512-sziuaOA9XfeQjQf6Yru7S9k9xTMy9GAJSPJL02WFld0cFDA5dgDyAFLN34jedIbgl7jVV+g7Vb2nOJocfgibbg==}
     engines: {node: ^14.16.0 || >=16.0.0}
     hasBin: true
     dependencies:
@@ -1454,11 +1454,6 @@ packages:
     resolution: {integrity: sha512-D4iHGTdAnEEVsB8fl95m1hiz7D5YiRdQ9b/OEb3BYRVwbLsGHcRVPz+u+BgRLNk0Q0/4iZCBqDN96j2XNxfXrA==}
     dependencies:
       '@octokit/openapi-types': 18.1.1
-    dev: true
-
-  /@opentelemetry/api@1.6.0:
-    resolution: {integrity: sha512-OWlrQAnWn9577PhVgqjUvMr1pg57Bc4jv0iL4w0PRuOSRvq67rvHW9Ie/dZVMvCzhSCB+UxhcY/PmCmFj33Q+g==}
-    engines: {node: '>=8.0.0'}
     dev: true
 
   /@opentelemetry/api@1.7.0:
@@ -2176,38 +2171,38 @@ packages:
       - supports-color
     dev: true
 
-  /@vitest/expect@1.3.0:
-    resolution: {integrity: sha512-7bWt0vBTZj08B+Ikv70AnLRicohYwFgzNjFqo9SxxqHHxSlUJGSXmCRORhOnRMisiUryKMdvsi1n27Bc6jL9DQ==}
+  /@vitest/expect@1.3.1:
+    resolution: {integrity: sha512-xofQFwIzfdmLLlHa6ag0dPV8YsnKOCP1KdAeVVh34vSjN2dcUiXYCD9htu/9eM7t8Xln4v03U9HLxLpPlsXdZw==}
     dependencies:
-      '@vitest/spy': 1.3.0
-      '@vitest/utils': 1.3.0
+      '@vitest/spy': 1.3.1
+      '@vitest/utils': 1.3.1
       chai: 4.4.1
     dev: true
 
-  /@vitest/runner@1.3.0:
-    resolution: {integrity: sha512-1Jb15Vo/Oy7mwZ5bXi7zbgszsdIBNjc4IqP8Jpr/8RdBC4nF1CTzIAn2dxYvpF1nGSseeL39lfLQ2uvs5u1Y9A==}
+  /@vitest/runner@1.3.1:
+    resolution: {integrity: sha512-5FzF9c3jG/z5bgCnjr8j9LNq/9OxV2uEBAITOXfoe3rdZJTdO7jzThth7FXv/6b+kdY65tpRQB7WaKhNZwX+Kg==}
     dependencies:
-      '@vitest/utils': 1.3.0
+      '@vitest/utils': 1.3.1
       p-limit: 5.0.0
       pathe: 1.1.2
     dev: true
 
-  /@vitest/snapshot@1.3.0:
-    resolution: {integrity: sha512-swmktcviVVPYx9U4SEQXLV6AEY51Y6bZ14jA2yo6TgMxQ3h+ZYiO0YhAHGJNp0ohCFbPAis1R9kK0cvN6lDPQA==}
+  /@vitest/snapshot@1.3.1:
+    resolution: {integrity: sha512-EF++BZbt6RZmOlE3SuTPu/NfwBF6q4ABS37HHXzs2LUVPBLx2QoY/K0fKpRChSo8eLiuxcbCVfqKgx/dplCDuQ==}
     dependencies:
       magic-string: 0.30.7
       pathe: 1.1.2
       pretty-format: 29.7.0
     dev: true
 
-  /@vitest/spy@1.3.0:
-    resolution: {integrity: sha512-AkCU0ThZunMvblDpPKgjIi025UxR8V7MZ/g/EwmAGpjIujLVV2X6rGYGmxE2D4FJbAy0/ijdROHMWa2M/6JVMw==}
+  /@vitest/spy@1.3.1:
+    resolution: {integrity: sha512-xAcW+S099ylC9VLU7eZfdT9myV67Nor9w9zhf0mGCYJSO+zM2839tOeROTdikOi/8Qeusffvxb/MyBSOja1Uig==}
     dependencies:
       tinyspy: 2.2.1
     dev: true
 
-  /@vitest/utils@1.3.0:
-    resolution: {integrity: sha512-/LibEY/fkaXQufi4GDlQZhikQsPO2entBKtfuyIpr1jV4DpaeasqkeHjhdOhU24vSHshcSuEyVlWdzvv2XmYCw==}
+  /@vitest/utils@1.3.1:
+    resolution: {integrity: sha512-d3Waie/299qqRyHTm2DjADeTaNdNSVsnwHPWrs20JMpjh6eiVq7ggggweO8rc4arhf6rRkWuHKwvxGvejUXZZQ==}
     dependencies:
       diff-sequences: 29.6.3
       estree-walker: 3.0.3
@@ -6063,7 +6058,7 @@ packages:
     dependencies:
       jws: 3.2.2
       lodash: 4.17.21
-      ms: 2.1.2
+      ms: 2.1.3
       semver: 7.6.0
     dev: true
 
@@ -6380,7 +6375,7 @@ packages:
       '@colors/colors': 1.6.0
       '@types/triple-beam': 1.3.5
       fecha: 4.2.3
-      ms: 2.1.2
+      ms: 2.1.3
       safe-stable-stringify: 2.4.3
       triple-beam: 1.4.1
     dev: true
@@ -6813,8 +6808,8 @@ packages:
     resolution: {integrity: sha512-9iN1ka/9zmX1ZvLV9ewJYEk9h7RyRRtqdK0woXcqohu8EWIerfPUjYJPg0ULy0UqP7cslmdGc8xKDJcojlKiaw==}
     dev: true
 
-  /netlify-cli@17.16.3(@types/node@20.11.19):
-    resolution: {integrity: sha512-xLtmouGr+UGwS4XhdG55ZpiEJd+IBu/VC7sZOS5Kl6EBHkv3xpdpOd0Hhc2OzH50tlOLlJaQ2luOkLkOTupeUA==}
+  /netlify-cli@17.16.4(@types/node@20.11.19):
+    resolution: {integrity: sha512-W1bKXIsA72ItJKIVv6KuHyZa9kfSTyYtw3YVTEV5pWuiZfeONe4P2dE6QgAWHMb9KO+Gzp+TY9t+RBr/AaOyiw==}
     engines: {node: '>=18.14.0'}
     hasBin: true
     requiresBuild: true
@@ -6822,9 +6817,9 @@ packages:
       '@bugsnag/js': 7.20.2
       '@fastify/static': 6.10.2
       '@netlify/blobs': 6.5.0
-      '@netlify/build': 29.35.1(@types/node@20.11.19)
+      '@netlify/build': 29.36.1(@types/node@20.11.19)
       '@netlify/build-info': 7.13.0
-      '@netlify/config': 20.12.0
+      '@netlify/config': 20.12.1
       '@netlify/edge-bundler': 11.2.2(supports-color@9.4.0)
       '@netlify/local-functions-proxy': 1.1.1
       '@netlify/zip-it-and-ship-it': 9.29.2(supports-color@9.4.0)
@@ -9689,8 +9684,8 @@ packages:
     engines: {node: '>= 0.8'}
     dev: true
 
-  /vite-node@1.3.0(@types/node@20.11.19):
-    resolution: {integrity: sha512-D/oiDVBw75XMnjAXne/4feCkCEwcbr2SU1bjAhCcfI5Bq3VoOHji8/wCPAfUkDIeohJ5nSZ39fNxM3dNZ6OBOA==}
+  /vite-node@1.3.1(@types/node@20.11.19):
+    resolution: {integrity: sha512-azbRrqRxlWTJEVbzInZCTchx0X69M/XPTCz4H+TLvlTcR/xH/3hkRqhOakT41fMJCMzXTu4UvegkZiEoJAWvng==}
     engines: {node: ^18.0.0 || >=20.0.0}
     hasBin: true
     dependencies:
@@ -9698,7 +9693,7 @@ packages:
       debug: 4.3.4(supports-color@9.4.0)
       pathe: 1.1.2
       picocolors: 1.0.0
-      vite: 5.1.3(@types/node@20.11.19)
+      vite: 5.1.4(@types/node@20.11.19)
     transitivePeerDependencies:
       - '@types/node'
       - less
@@ -9710,8 +9705,8 @@ packages:
       - terser
     dev: true
 
-  /vite-plugin-dts@3.7.2(@types/node@20.11.19)(typescript@5.3.3)(vite@5.1.3(@types/node@20.11.19)):
-    resolution: {integrity: sha512-kg//1nDA01b8rufJf4TsvYN8LMkdwv0oBYpiQi6nRwpHyue+wTlhrBiqgipdFpMnW1oOYv6ywmzE5B0vg6vSEA==}
+  /vite-plugin-dts@3.7.3(@types/node@20.11.19)(typescript@5.3.3)(vite@5.1.4(@types/node@20.11.19)):
+    resolution: {integrity: sha512-26eTlBYdpjRLWCsTJebM8vkCieE+p9gP3raf+ecDnzzK5E3FG6VE1wcy55OkRpfWWVlVvKkYFe6uvRHYWx7Nog==}
     engines: {node: ^14.18.0 || >=16.0.0}
     peerDependencies:
       typescript: 5.3.3
@@ -9726,7 +9721,7 @@ packages:
       debug: 4.3.4(supports-color@9.4.0)
       kolorist: 1.8.0
       typescript: 5.3.3
-      vite: 5.1.3(@types/node@20.11.19)
+      vite: 5.1.4(@types/node@20.11.19)
       vue-tsc: 1.8.27(typescript@5.3.3)
     transitivePeerDependencies:
       - '@types/node'
@@ -9742,8 +9737,8 @@ packages:
     resolution: {integrity: sha512-NB/DZf8P5OGa2C1IsKMDtaRnDg0k6L8MKwzatHRGMwJUqxk2SKvbpNi0PNX4igZ4RgOkQu2AwYq0m1li8MiW2Q==}
     dev: true
 
-  /vite@5.1.3(@types/node@20.11.19):
-    resolution: {integrity: sha512-UfmUD36DKkqhi/F75RrxvPpry+9+tTkrXfMNZD+SboZqBCMsxKtO52XeGzzuh7ioz+Eo/SYDBbdb0Z7vgcDJew==}
+  /vite@5.1.4(@types/node@20.11.19):
+    resolution: {integrity: sha512-n+MPqzq+d9nMVTKyewqw6kSt+R3CkvF9QAKY8obiQn8g1fwTscKxyfaYnC632HtBXAQGc1Yjomphwn1dtwGAHg==}
     engines: {node: ^18.0.0 || >=20.0.0}
     hasBin: true
     peerDependencies:
@@ -9778,15 +9773,15 @@ packages:
       fsevents: 2.3.3
     dev: true
 
-  /vitest@1.3.0(@types/node@20.11.19):
-    resolution: {integrity: sha512-V9qb276J1jjSx9xb75T2VoYXdO1UKi+qfflY7V7w93jzX7oA/+RtYE6TcifxksxsZvygSSMwu2Uw6di7yqDMwg==}
+  /vitest@1.3.1(@types/node@20.11.19):
+    resolution: {integrity: sha512-/1QJqXs8YbCrfv/GPQ05wAZf2eakUPLPa18vkJAKE7RXOKfVHqMZZ1WlTjiwl6Gcn65M5vpNUB6EFLnEdRdEXQ==}
     engines: {node: ^18.0.0 || >=20.0.0}
     hasBin: true
     peerDependencies:
       '@edge-runtime/vm': '*'
       '@types/node': ^18.0.0 || >=20.0.0
-      '@vitest/browser': 1.3.0
-      '@vitest/ui': 1.3.0
+      '@vitest/browser': 1.3.1
+      '@vitest/ui': 1.3.1
       happy-dom: 9.1.9
       jsdom: '*'
     peerDependenciesMeta:
@@ -9804,11 +9799,11 @@ packages:
         optional: true
     dependencies:
       '@types/node': 20.11.19
-      '@vitest/expect': 1.3.0
-      '@vitest/runner': 1.3.0
-      '@vitest/snapshot': 1.3.0
-      '@vitest/spy': 1.3.0
-      '@vitest/utils': 1.3.0
+      '@vitest/expect': 1.3.1
+      '@vitest/runner': 1.3.1
+      '@vitest/snapshot': 1.3.1
+      '@vitest/spy': 1.3.1
+      '@vitest/utils': 1.3.1
       acorn-walk: 8.3.2
       chai: 4.4.1
       debug: 4.3.4(supports-color@9.4.0)
@@ -9821,8 +9816,8 @@ packages:
       strip-literal: 2.0.0
       tinybench: 2.6.0
       tinypool: 0.8.2
-      vite: 5.1.3(@types/node@20.11.19)
-      vite-node: 1.3.0(@types/node@20.11.19)
+      vite: 5.1.4(@types/node@20.11.19)
+      vite-node: 1.3.1(@types/node@20.11.19)
       why-is-node-running: 2.2.2
     transitivePeerDependencies:
       - less
@@ -9842,7 +9837,7 @@ packages:
       fast-glob: 3.3.2
       lodash: 4.17.21
       minimatch: 9.0.3
-      vite: 5.1.3(@types/node@20.11.19)
+      vite: 5.1.4(@types/node@20.11.19)
     transitivePeerDependencies:
       - '@types/node'
       - less
