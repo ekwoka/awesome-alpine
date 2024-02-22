@@ -1,13 +1,13 @@
-import { CorePlugin } from '../lib/lazyModules/alpinePlugins';
-import { RPCReceiver, RPCSender } from '../lib/postmessageRPC';
-import { prettify } from '../lib/prettier';
-import { Language } from '../lib/prettier';
-import type { sandboxActions } from '../play/playSandbox';
+import { CorePlugin } from '../../lib/lazyModules/alpinePlugins';
+import { RPCReceiver, RPCSender } from '../../lib/postmessageRPC';
+import { prettify } from '../../lib/prettier';
+import { Language } from '../../lib/prettier';
+import type { sandboxActions } from '../../play/playSandbox';
 // @ts-expect-error - this is a raw template inmport
-import starterHTML from '../play/starter.html?raw';
+import starterHTML from '../../play/starter.html?raw';
 // @ts-expect-error - this is a raw template import
-import starterScript from '../play/starter.js?raw';
-import { bitwiseArray, booleanNumber } from '../plugins/encoding';
+import starterScript from '../../play/starter.js?raw';
+import { bitwiseArray, booleanNumber } from '../../plugins/encoding';
 import persist from '@alpinejs/persist';
 import query, { base64URL } from '@ekwoka/alpine-history';
 import versionData from 'alpine-versions';
@@ -15,9 +15,10 @@ import Alpine, { PluginCallback } from 'alpinejs';
 import type { editor } from 'monaco-editor';
 
 const makeEditor = () =>
-  import('../lib/makeEditor.js').then((m) => m.makeEditor);
+  import('../../lib/makeEditor.js').then((m) => m.makeEditor);
 
-const transpile = () => import('../lib/transpile.js').then((m) => m.transpile);
+const transpile = () =>
+  import('../../lib/transpile.js').then((m) => m.transpile);
 
 export const Editor: PluginCallback = (Alpine) => {
   Alpine.plugin([persist, query]);
@@ -25,7 +26,7 @@ export const Editor: PluginCallback = (Alpine) => {
   Alpine.data('editor', () => {
     let abortController: AbortController = null;
     return {
-      panel: Alpine.query('html'),
+      panel: Alpine.query('markup'),
       config: {
         plugins: Alpine.query<CorePlugin[]>([])
           .as('coreplugins')
@@ -65,11 +66,6 @@ export const Editor: PluginCallback = (Alpine) => {
           },
         });
         Alpine.effect(() => {
-          console.log(
-            this.config.plugins,
-            this.config.settings.version,
-            versionData[`@alpinejs/anchor`],
-          );
           this.config.plugins = this.config.plugins.filter(
             this.versionExists.bind(this),
           );
@@ -129,18 +125,6 @@ export const Editor: PluginCallback = (Alpine) => {
     };
   });
 };
-
-declare global {
-  interface Window {
-    Alpine: typeof Alpine;
-  }
-}
-
-declare global {
-  interface Window {
-    sandbox: Window;
-  }
-}
 
 const effectPromise = (fn: () => Promise<void>) =>
   new Promise<void>((res) => {

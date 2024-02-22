@@ -6,7 +6,7 @@
   "scripts": {
     "build": "vite build",
     "build-site": "vite build",
-    "dev": "vite --open",
+    "dev": "vite",
     "doctor": "run-s lint test:run build",
     "lint": "run-s lint:*",
     "lint:eslint": "eslint --fix ./src/**/*.ts",
@@ -25,6 +25,7 @@
     "esbuild": "0.20.1",
     "esbuild-wasm": "0.20.1",
     "postcss": "8.4.35",
+    "posthtml-expressions": "1.11.3",
     "tailwindcss": "3.4.1",
     "vite": "5.1.4",
     "vite-plugin-dts": "3.7.3",

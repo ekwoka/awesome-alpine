@@ -66,8 +66,8 @@ importers:
         specifier: 15.2.2
         version: 15.2.2
       netlify-cli:
-        specifier: 17.16.4
-        version: 17.16.4(@types/node@20.11.19)
+        specifier: 17.17.0
+        version: 17.17.0(@types/node@20.11.19)
       npm-run-all2:
         specifier: 6.1.2
         version: 6.1.2
@@ -144,6 +144,9 @@ importers:
       postcss:
         specifier: 8.4.35
         version: 8.4.35
+      posthtml-expressions:
+        specifier: 1.11.3
+        version: 1.11.3
       tailwindcss:
         specifier: 3.4.1
         version: 3.4.1
@@ -6808,8 +6811,8 @@ packages:
     resolution: {integrity: sha512-9iN1ka/9zmX1ZvLV9ewJYEk9h7RyRRtqdK0woXcqohu8EWIerfPUjYJPg0ULy0UqP7cslmdGc8xKDJcojlKiaw==}
     dev: true
 
-  /netlify-cli@17.16.4(@types/node@20.11.19):
-    resolution: {integrity: sha512-W1bKXIsA72ItJKIVv6KuHyZa9kfSTyYtw3YVTEV5pWuiZfeONe4P2dE6QgAWHMb9KO+Gzp+TY9t+RBr/AaOyiw==}
+  /netlify-cli@17.17.0(@types/node@20.11.19):
+    resolution: {integrity: sha512-dM15h9PeWmZaxiwkrrDCgpIQpBtnomwQdsgSync7yQHl0XcxSa78K3P5GbugdHkLqi7mq0GaXez9QDbVFXcTsA==}
     engines: {node: '>=18.14.0'}
     hasBin: true
     requiresBuild: true

@@ -1,0 +1,115 @@
+<script type="module">
+  import { Editor } from '../components/organisms/editor.ts';
+  import Alpine from 'alpinejs';
+
+  Alpine.plugin(Editor);
+</script>
+<div x-data="editor"
+     class="flex flex-col flex-none max-md:!w-full md:w-1/2 lg:w-1/3 min-w-[400px] max-w-[1000px]"
+     x-bind="$partition.scalable">
+  <div class="flex items-center flex-none pl-5 sm:pl-6 pr-4 lg:pr-6 sticky z-10 top-0 -mb-px antialiased w-full">
+    <div class="flex space-x-5">
+      <script locals>
+    module.exports = {
+      buttons: ['markup', 'script', 'config']
+    }
+      </script>
+      <each loop="button in buttons">
+      <button type="button"
+              class="relative flex py-3 text-sm leading-6 font-semibold focus:outline-none text-gray-700 hover:text-gray-900 focus:text-gray-900 dark:text-gray-300 dark:hover:text-white dark:focus:text-white capitalize"
+              :class="{ 'text-sky-500': panel === '{{ button }}', 'text-gray-700 hover:text-gray-900 focus:text-gray-900 dark:text-gray-300 dark:hover:text-white dark:focus:text-white': panel !== '{{ button }}' }"
+              @click="panel = '{{ button }}'">
+        <span class="absolute bottom-0 inset-x-0 bg-sky-500 h-0.5 rounded-full transition-opacity duration-150"
+              x-cloak
+              x-show="panel === '{{ button }}'"></span>
+        {{ button }}
+      </button>
+      </each>
+      <div class="flex justify-center items-center">
+        <button type="button"
+                class="py-1 px-2 rounded bg-sky-700 hover:bg-sky-600 text-gray-100 text-sm"
+                @click="navigator.clipboard.writeText(window.location.href)">Share</button>
+      </div>
+    </div>
+    <div class="ml-auto flex items-center">
+      <button type="button"
+              class="ml-4 text-sm font-semibold text-gray-500 flex items-center hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+              @click="prettify">
+        <svg viewBox="0 0 24 24" class="w-6 h-6 mr-1" aria-hidden="true">
+          <path d="M5 9a2 2 0 0 1 2 2 1 1 0 1 0 2 0 2 2 0 0 1 2-2 1 1 0 1 0 0-2 2 2 0 0 1-2-2 1 1 0 0 0-2 0 2 2 0 0 1-2 2 1 1 0 0 0 0 2Z" fill="currentColor" class="text-gray-400 dark:text-gray-500">
+          </path>
+          <path d="M11 16a3 3 0 0 1 3 3 1 1 0 1 0 2 0 3 3 0 0 1 3-3 1 1 0 1 0 0-2 3 3 0 0 1-3-3 1 1 0 1 0-2 0 3 3 0 0 1-3 3 1 1 0 1 0 0 2Z" fill="currentColor" class="text-gray-300 dark:text-gray-400">
+          </path>
+        </svg>
+        Tidy
+        <span class="sr-only">, and focus editor</span>
+      </button>
+    </div>
+  </div>
+  <div class="flex flex-col flex-auto h-full w-full select-text min-h-[25vh]">
+    <div class="border-t border-gray-200 dark:border-white/10 flex-auto flex -mb-2"
+         x-show="panel === 'markup'">
+      <div class="relative flex-auto max-w-full"
+           @keyup="update('html')"
+           x-init="registerEditor($el, 'html')"></div>
+    </div>
+    <div class="border-t border-gray-200 dark:border-white/10 flex-auto flex -mb-2"
+         x-show="panel === 'script'">
+      <div class="relative flex-auto max-w-full"
+           @keyup.debounce.1000="update('typescript')"
+           x-init="registerEditor($el, 'typescript')"></div>
+    </div>
+    <div class="border-t border-gray-200 dark:border-white/10 flex-auto -mb-2 text-slate-100 flex flex-col gap-4 py-3 px-4 accent-indigo-800"
+         x-show="panel === 'config'">
+      <h2 class="sr-only">Configuration Options</h2>
+      <div class="flex flex-col gap-2">
+        <h3>Settings</h3>
+        <ul class="ml-3">
+          <li>
+            <label class="flex gap-4">
+              <input type="checkbox" name="setting" x-model="config.settings.typescript" />
+              <code>Use TypeScript</code>
+            </label>
+          </li>
+          <li>
+            <label class="flex gap-4">
+              <input type="checkbox" name="setting" x-model="config.settings.tailwind" />
+              <code>Use Tailwind</code>
+            </label>
+          </li>
+        </ul>
+      </div>
+      <label class="flex flex-col gap-2">
+        <h3>Alpine Version</h3>
+        <select x-model="config.settings.version"
+                class="bg-slate-800 px-2 py-1 max-w-max min-w-[12ch] font-mono ml-3">
+          <each loop="version, index in alpineVersions.alpinejs">
+          <option value="{{ version }}">
+            <if condition="index === 0"> Latest ({{ version }}) </if>
+            <else> {{ version }} </else>
+          </option>
+          </each>
+        </select>
+      </label>
+      <div class="flex flex-col gap-2">
+        <h3>Core Plugins</h3>
+        <ul class="ml-3">
+          <each loop="plugin in CorePlugins">
+          <li>
+            <label class="flex gap-4">
+              <input type="checkbox"
+                     name="plugin"
+                     x-model="config.plugins"
+                     value="{{ plugin[1] }}"
+                     :disabled="!versionExists({{ plugin[1] }})" />
+              <code :class="{ 'line-through opacity-70': !versionExists({{ plugin[1] }}) }">
+                {{ plugin[0] }}
+              </code>
+            </label>
+          </li>
+          </each>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
