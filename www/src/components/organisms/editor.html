@@ -5,14 +5,14 @@
   Alpine.plugin(Editor);
 </script>
 <div x-data="editor"
-     class="flex flex-col flex-none max-md:!w-full md:w-1/2 lg:w-1/3 min-w-[400px] max-w-[1000px]"
+     class="flex flex-col flex-none max-md:!w-full md:w-1/2 lg:w-1/3 min-w-[400px] max-w-[1000px] md:!h-full"
      x-bind="$partition.scalable">
   <div class="flex items-center flex-none pl-5 sm:pl-6 pr-4 lg:pr-6 sticky z-10 top-0 -mb-px antialiased w-full">
     <div class="flex space-x-5">
       <script locals>
-    module.exports = {
-      buttons: ['markup', 'script', 'config']
-    }
+        module.exports = {
+          buttons: ['markup', 'script', 'config'],
+        };
       </script>
       <each loop="button in buttons">
       <button type="button"
@@ -47,19 +47,19 @@
     </div>
   </div>
   <div class="flex flex-col flex-auto h-full w-full select-text min-h-[25vh]">
-    <div class="border-t border-gray-200 dark:border-white/10 flex-auto flex -mb-2"
+    <div class="border-t border-gray-200 dark:border-white/10 flex-auto flex"
          x-show="panel === 'markup'">
       <div class="relative flex-auto max-w-full"
            @keyup="update('html')"
            x-init="registerEditor($el, 'html')"></div>
     </div>
-    <div class="border-t border-gray-200 dark:border-white/10 flex-auto flex -mb-2"
+    <div class="border-t border-gray-200 dark:border-white/10 flex-auto flex"
          x-show="panel === 'script'">
       <div class="relative flex-auto max-w-full"
            @keyup.debounce.1000="update('typescript')"
            x-init="registerEditor($el, 'typescript')"></div>
     </div>
-    <div class="border-t border-gray-200 dark:border-white/10 flex-auto -mb-2 text-slate-100 flex flex-col gap-4 py-3 px-4 accent-indigo-800"
+    <div class="border-t border-gray-200 dark:border-white/10 flex-auto text-slate-100 flex flex-col gap-4 py-3 px-4 accent-indigo-800"
          x-show="panel === 'config'">
       <h2 class="sr-only">Configuration Options</h2>
       <div class="flex flex-col gap-2">

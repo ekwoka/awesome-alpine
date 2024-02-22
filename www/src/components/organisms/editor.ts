@@ -22,7 +22,7 @@ const transpile = () =>
 
 export const Editor: PluginCallback = (Alpine) => {
   Alpine.plugin([persist, query]);
-  console.log('setting editor data');
+
   Alpine.data('editor', () => {
     let abortController: AbortController = null;
     return {
@@ -55,7 +55,6 @@ export const Editor: PluginCallback = (Alpine) => {
         this.editor[type] = (await makeEditor())(el, this.value[type], type);
       },
       init() {
-        console.log('Initializing Alpine');
         new RPCReceiver({
           registerSandbox: (event?: MessageEvent<undefined>) => {
             if (event?.source)
@@ -78,20 +77,15 @@ export const Editor: PluginCallback = (Alpine) => {
       },
       async initializeSandbox(sandbox: RPCSender<sandboxActions>) {
         this.sandbox = sandbox;
-        console.log('initializing sandbox');
-        this.sandbox.call.log('Hello from Alpine!');
         await Promise.all([
           effectPromise(async () => {
-            console.log('Loading Tailwind');
             if (this.config.settings.tailwind)
               await this.sandbox.call.loadTailwind();
           }),
           effectPromise(async () => {
             if (abortController) abortController.abort();
             abortController = null;
-            console.log('effect running');
             if (!(JSON.stringify(this.config) && this.value.typescript)) return;
-            console.log('transpiling');
             abortController = new AbortController();
             const signal = abortController.signal;
             const esm = await (

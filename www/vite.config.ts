@@ -45,7 +45,6 @@ const pkgVersions = Object.fromEntries(
     Object.keys(pkg.versions)
       .map((version) => version.split('.').map(Number))
       .filter((version) => {
-        console.log(version, minimumVersion);
         if (version[0] > minimumVersion[0]) return true;
         if (version[0] < minimumVersion[0]) return false;
         if (version[1] > minimumVersion[1]) return true;
@@ -57,7 +56,7 @@ const pkgVersions = Object.fromEntries(
       .reverse(),
   ]),
 );
-console.log(pkgVersions);
+
 export const AlpinePackageData = () => ({
   name: 'alpine-versions',
   resolveId(id: string) {

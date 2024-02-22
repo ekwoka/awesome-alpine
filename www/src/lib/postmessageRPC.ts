@@ -74,7 +74,6 @@ const waitForResponse = <T>(
     window.addEventListener('message', handler);
     if (timeout)
       timeoutid = setTimeout(() => {
-        console.log('timing out');
         window.removeEventListener('message', handler);
         res(undefined);
       }, timeout);

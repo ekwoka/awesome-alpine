@@ -7,7 +7,6 @@ const { build } = (await import('https://esm.sh/build')) as {
 let timeout: NodeJS.Timeout = null;
 const debouncedBuild = (code: string, config: EditorConfig) => {
   clearTimeout(timeout);
-  console.log('debouncedBuild');
   timeout = setTimeout(async () => {
     const esm = await build({
       code,

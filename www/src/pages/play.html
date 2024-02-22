@@ -9,17 +9,15 @@
 </script>
 <main x-data
       x-partition
-      x-effect="console.log($partition)"
       class="flex flex-col md:flex-row flex-auto relative border-t border-gray-200 dark:border-gray-800">
   <include src="components/organisms/editor.html"></include>
   <span role="presentation"
-        x-effect="console.log('handle', $partition.handle)"
-        class="bg-neutral-900 w-1 hover:bg-neutral-700 hover:w-2 transition-all"
+        class="bg-neutral-900 md:w-1 hover:bg-neutral-700 md:hover:w-2 transition-all max-md:h-1 max-md:hover:h-2 max-md:!w-full md:!h-full z-100"
         x-bind="$partition.handle"></span>
   <div class="flex-initial flex flex-col grow border-t border-gray-200 dark:border-white/10 lg:border-0 bg-gray-50 dark:bg-black"
        :class="{ 'pointer-events-none': $partition.dragging }">
     <iframe title="Preview"
-            class="w-full h-full bg-neutral-900"
+            class="w-full h-full bg-neutral-900 grow"
             sandbox="allow-scripts allow-pointer-lock"
             src="/sandbox.html"></iframe>
   </div>
