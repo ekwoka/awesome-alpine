@@ -95,7 +95,7 @@ export default defineConfig({
     assetsInlineLimit: 0,
     target: 'esnext',
     minify: false,
-    outDir: '../dist',
+    outDir: 'dist',
     emptyOutDir: true,
     modulePreload: {
       polyfill: false,
