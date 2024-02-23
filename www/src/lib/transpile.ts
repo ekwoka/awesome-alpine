@@ -10,6 +10,7 @@ const debouncedBuild = (code: string, config: EditorConfig) => {
   timeout = setTimeout(async () => {
     const esm = await build({
       code,
+      source: code,
       loader: config.settings.typescript ? 'ts' : 'js',
       dependencies: {
         alpinejs: config.settings.version,
@@ -31,6 +32,7 @@ const debouncedBuild = (code: string, config: EditorConfig) => {
 
 type BuildInput = {
   code: string;
+  source: string;
   loader?: 'js' | 'jsx' | 'ts' | 'tsx';
   dependencies?: Record<string, string>;
   types?: string;
