@@ -3,24 +3,24 @@ const importFromESM = (
   version: `${number}.${number}.${number}`,
 ) => import(/* @vite-ignore */ `https://esm.sh/@alpinejs/${name}@${version}`);
 export const gatherPlugins = (
-  pluginlist: CorePlugins[],
+  pluginlist: CorePlugin[],
   version: `${number}.${number}.${number}`,
 ) => {
   const plugins = pluginlist.map((plugin) => {
     switch (Number(plugin)) {
-      case CorePlugins.Anchor:
+      case CorePlugin.Anchor:
         return importFromESM('anchor', version);
-      case CorePlugins.Collapse:
+      case CorePlugin.Collapse:
         return importFromESM('collapse', version);
-      case CorePlugins.Focus:
+      case CorePlugin.Focus:
         return importFromESM('focus', version);
-      case CorePlugins.Intersect:
+      case CorePlugin.Intersect:
         return importFromESM('intersect', version);
-      case CorePlugins.Mask:
+      case CorePlugin.Mask:
         return importFromESM('mask', version);
-      case CorePlugins.Morph:
+      case CorePlugin.Morph:
         return importFromESM('morph', version);
-      case CorePlugins.Persist:
+      case CorePlugin.Persist:
         return importFromESM('persist', version);
     }
     return Promise.resolve({ default: () => {} });
@@ -28,7 +28,7 @@ export const gatherPlugins = (
   return Promise.all(plugins.map((plugin) => plugin.then((m) => m.default)));
 };
 
-export enum CorePlugins {
+export enum CorePlugin {
   Anchor = 1 << 0,
   Collapse = 1 << 1,
   Focus = 1 << 2,

@@ -1,42 +1,45 @@
-import { CorePlugins } from '../lib/lazyModules/alpinePlugins';
-import { RPCReceiver, RPCSender } from '../lib/postmessageRPC';
-import { prettify } from '../lib/prettier';
-import { Language } from '../lib/prettier';
-import type { sandboxActions } from '../play/playSandbox';
+import { CorePlugin } from '../../lib/lazyModules/alpinePlugins';
+import { RPCReceiver, RPCSender } from '../../lib/postmessageRPC';
+import { prettify } from '../../lib/prettier';
+import { Language } from '../../lib/prettier';
+import type { sandboxActions } from '../../play/playSandbox';
 // @ts-expect-error - this is a raw template inmport
-import starterHTML from '../play/starter.html?raw';
+import starterHTML from '../../play/starter.html?raw';
 // @ts-expect-error - this is a raw template import
-import starterScript from '../play/starter.js?raw';
-import { bitwiseArray, booleanNumber } from '../plugins/encoding';
+import starterScript from '../../play/starter.js?raw';
+import { bitwiseArray, booleanNumber } from '../../plugins/encoding';
 import persist from '@alpinejs/persist';
 import query, { base64URL } from '@ekwoka/alpine-history';
+import versionData from 'alpine-versions';
 import Alpine, { PluginCallback } from 'alpinejs';
 import type { editor } from 'monaco-editor';
 
 const makeEditor = () =>
-  import('../lib/makeEditor.js').then((m) => m.makeEditor);
+  import('../../lib/makeEditor.js').then((m) => m.makeEditor);
 
-const transpile = () => import('../lib/transpile.js').then((m) => m.transpile);
+const transpile = () =>
+  import('../../lib/transpile.js').then((m) => m.transpile);
 
 export const Editor: PluginCallback = (Alpine) => {
   Alpine.plugin([persist, query]);
-  console.log('setting editor data');
+
   Alpine.data('editor', () => {
     let abortController: AbortController = null;
     return {
-      panel: Alpine.query('html'),
+      panel: Alpine.query('markup'),
       config: {
-        plugins: Alpine.query<CorePlugins[]>([])
+        plugins: Alpine.query<CorePlugin[]>([])
           .as('coreplugins')
           .encoding(bitwiseArray),
         settings: {
           typescript: Alpine.query(false).as('ts').encoding(booleanNumber),
           tailwind: Alpine.query(false).as('tw').encoding(booleanNumber),
-          version:
-            Alpine.query<`${number}.${number}.${number}`>('3.13.5').as('v'),
+          version: Alpine.query<`${number}.${number}.${number}`>(
+            versionData.alpinejs[0],
+          ).as('v'),
         },
       },
-      alpineVersions: [] as string[],
+      versionData,
       value: {
         html: Alpine.query(starterHTML).encoding(base64URL).as('html'),
         typescript: Alpine.query(starterScript)
@@ -52,7 +55,6 @@ export const Editor: PluginCallback = (Alpine) => {
         this.editor[type] = (await makeEditor())(el, this.value[type], type);
       },
       init() {
-        console.log('Initializing Alpine');
         new RPCReceiver({
           registerSandbox: (event?: MessageEvent<undefined>) => {
             if (event?.source)
@@ -62,24 +64,28 @@ export const Editor: PluginCallback = (Alpine) => {
             return true;
           },
         });
+        Alpine.effect(() => {
+          this.config.plugins = this.config.plugins.filter(
+            this.versionExists.bind(this),
+          );
+        });
       },
-
+      versionExists(plugin: CorePlugin) {
+        return versionData[
+          `@alpinejs/${CorePlugin[plugin].toLowerCase()}`
+        ].includes(this.config.settings.version);
+      },
       async initializeSandbox(sandbox: RPCSender<sandboxActions>) {
         this.sandbox = sandbox;
-        console.log('initializing sandbox');
-        this.sandbox.call.log('Hello from Alpine!');
         await Promise.all([
           effectPromise(async () => {
-            console.log('Loading Tailwind');
             if (this.config.settings.tailwind)
               await this.sandbox.call.loadTailwind();
           }),
           effectPromise(async () => {
             if (abortController) abortController.abort();
             abortController = null;
-            console.log('effect running');
             if (!(JSON.stringify(this.config) && this.value.typescript)) return;
-            console.log('transpiling');
             abortController = new AbortController();
             const signal = abortController.signal;
             const esm = await (
@@ -94,11 +100,6 @@ export const Editor: PluginCallback = (Alpine) => {
           await this.sandbox.call.replaceMarkup(this.value.html);
         }),
           this.sandbox.call.start();
-        const alpineRegistry = await import(
-          'registry.npmjs.com/alpinejs?dlx&json'
-        ).then((mod) => mod.default);
-        console.log(alpineRegistry);
-        this.alpineVersions = Object.keys(alpineRegistry.versions).reverse();
       },
       async prettify() {
         for (const type of [Language.HTML, Language.TYPESCRIPT]) {
@@ -112,22 +113,12 @@ export const Editor: PluginCallback = (Alpine) => {
         )?.getValue();
         this.value[type] = await prettify(content, type);
       },
-      CorePlugins: Object.entries(CorePlugins).filter(([key]) => isNaN(+key)),
+      CorePlugins: Object.entries(CorePlugin).filter(([key]) =>
+        isNaN(+key),
+      ) as [string, CorePlugin][],
     };
   });
 };
-
-declare global {
-  interface Window {
-    Alpine: typeof Alpine;
-  }
-}
-
-declare global {
-  interface Window {
-    sandbox: Window;
-  }
-}
 
 const effectPromise = (fn: () => Promise<void>) =>
   new Promise<void>((res) => {

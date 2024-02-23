@@ -1,3 +1,5 @@
+import type { Alpine } from 'alpinejs';
+
 declare module 'monaco-editor/esm/vs/editor/editor.worker?worker' {
   export default class extends Worker {
     constructor();
@@ -28,7 +30,13 @@ declare module 'esbuild-wasm/esbuild.wasm?url' {
   export default esbuildWASM;
 }
 
-declare module 'registry.npmjs.com/alpinejs?dlx&json' {
-  const alpineRegistry: { versions: Record<string, unknown> };
-  export default alpineRegistry;
+declare module 'alpine-versions' {
+  const data: Record<string, `${number}.${number}.${number}`[]>;
+  export default data;
+}
+
+declare module global {
+  interface Window {
+    Alpine: Alpine;
+  }
 }

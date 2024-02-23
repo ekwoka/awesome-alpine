@@ -1,4 +1,4 @@
-import { CorePlugins } from './lazyModules/alpinePlugins';
+import { CorePlugin } from './lazyModules/alpinePlugins';
 
 const { build } = (await import('https://esm.sh/build')) as {
   build: (input: string | BuildInput) => Promise<BuildOutput>;
@@ -7,16 +7,16 @@ const { build } = (await import('https://esm.sh/build')) as {
 let timeout: NodeJS.Timeout = null;
 const debouncedBuild = (code: string, config: EditorConfig) => {
   clearTimeout(timeout);
-  console.log('debouncedBuild');
   timeout = setTimeout(async () => {
     const esm = await build({
       code,
+      source: code,
       loader: config.settings.typescript ? 'ts' : 'js',
       dependencies: {
         alpinejs: config.settings.version,
         ...config.plugins.reduce(
           (acc, plugin) => {
-            acc[`@alpinejs/${CorePlugins[plugin].toLowerCase()}`] =
+            acc[`@alpinejs/${CorePlugin[plugin].toLowerCase()}`] =
               config.settings.version;
             return acc;
           },
@@ -32,6 +32,7 @@ const debouncedBuild = (code: string, config: EditorConfig) => {
 
 type BuildInput = {
   code: string;
+  source: string;
   loader?: 'js' | 'jsx' | 'ts' | 'tsx';
   dependencies?: Record<string, string>;
   types?: string;
@@ -66,8 +67,8 @@ export const transpile = (
   });
   const codeWithPlugins = `
   import Alpine from 'alpinejs';
-  ${config.plugins.map((plugin) => `import ${CorePlugins[plugin]} from '@alpinejs/${CorePlugins[plugin].toLowerCase()}';`).join('\n')}
-  ${config.plugins.map((plugin) => `Alpine.plugin(${CorePlugins[plugin]});`).join('\n')}
+  ${config.plugins.map((plugin) => `import ${CorePlugin[plugin]} from '@alpinejs/${CorePlugin[plugin].toLowerCase()}';`).join('\n')}
+  ${config.plugins.map((plugin) => `Alpine.plugin(${CorePlugin[plugin]});`).join('\n')}
 
   ${code}
 
@@ -78,7 +79,7 @@ export const transpile = (
 };
 
 type EditorConfig = {
-  plugins: CorePlugins[];
+  plugins: CorePlugin[];
   settings: {
     typescript: boolean;
     tailwind: boolean;
