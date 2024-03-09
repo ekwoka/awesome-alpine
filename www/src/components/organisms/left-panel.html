@@ -1,0 +1,49 @@
+<div class="relative grow shrink-0 px-6 lg:pr-0 max-w-full">
+  <include src="components/molecules/blurry-glow.html"></include>
+  <div class="h-full flex justify-center lg:justify-end lg:items-start">
+    <div
+      class="sticky top-0 flex lg:min-w-[32rem] lg:overflow-y-auto lg:overflow-x-hidden lg:pl-[max(4rem,calc(50%-38rem))]">
+      <div
+        class="mx-auto max-w-lg lg:mx-0 lg:flex lg:w-96 lg:max-w-none lg:flex-col lg:before:flex-1 lg:before:pt-6">
+        <div class="pb-16 pt-20 sm:pb-20 sm:pt-32 lg:py-20">
+          <div class="relative">
+            <div>
+              <a
+                href="/"
+                class="text-blue-200 flex gap-4 items-center tracking-widest">
+                <include src="components/atoms/logo.svg"></include> Awesome
+                Alpine
+              </a>
+            </div>
+            <h1
+              class="mt-8 font-display text-4xl/tight tracking-wide text-white">
+              Make your project <span class="text-sky-300">Awesome</span> with
+              <span class="text-sky-300">Alpine</span>
+            </h1>
+            <p class="mt-4 text-base text-gray-300 tracking-wide">
+              Enjoy our free resources and tools, and sign up to be notified
+              when new articles, tools, or courses become available!
+            </p>
+            <form
+              class="relative isolate mt-8 flex items-center rounded-lg p-1 bg-white/2.5 ring-1 ring-white/15 transition focus-within:ring-sky-300 flex-col sm:flex-row sm:pl-0 sm:py-0">
+              <include
+                src="components/atoms/text-input.html"
+                locals='{
+                  "name": "email", "type": "email", "label": "Email Address"
+                }'></include>
+              <include
+                src="components/atoms/button.html"
+                locals='{
+                "type": "submit",
+                "content": "Get Updates →"
+              }'>
+              </include>
+            </form>
+            <div
+              class="mt-8 flex flex-wrap justify-center gap-x-1 gap-y-3 sm:gap-x-2 lg:justify-start"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

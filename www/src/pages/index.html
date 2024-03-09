@@ -1,6 +1,8 @@
-<extends src="layout/main.html" locals='{"title": ""}'>
+<extends src="layout/landing.html" locals='{"title": ""}'>
   <block name="main">
-    <main
-      class="flex flex-col md:flex-row flex-auto relative border-t border-gray-200 dark:border-gray-800"></main>
+    <div class="flex flex-col lg:flex-row w-full max-w-full min-h-screen">
+      <include src="components/organisms/left-panel.html"></include>
+      <include src="components/organisms/timeline.html"></include>
+    </div>
   </block>
 </extends>
