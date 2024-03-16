@@ -27,6 +27,11 @@
   status = 200
 
 [[headers]]
+  for = "/_astro/*"
+  [headers.values]
+    Access-Control-Allow-Origin = '*'
+
+[[headers]]
   for = "/assets/*"
   [headers.values]
     Access-Control-Allow-Origin = '*'
