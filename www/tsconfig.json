@@ -2,6 +2,6 @@
   "extends": "../tsconfig.json",
   "includes": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.astro"],
   "compilerOptions": {
-    "types": ["./env.d.ts", "./types.d.ts"]
+    "types": ["./src/env"]
   }
 }
