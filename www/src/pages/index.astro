@@ -1,0 +1,12 @@
+---
+import LandingPage from '../layout/landing.astro';
+import LeftPanel from '../components/organisms/left-panel.astro';
+import Timeline from '../components/organisms/timeline.astro';
+---
+
+<LandingPage title="Learn Alpine">
+  <div class="flex flex-col lg:flex-row w-full max-w-full min-h-screen">
+    <LeftPanel />
+    <Timeline />
+  </div>
+</LandingPage>

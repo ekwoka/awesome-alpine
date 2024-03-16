@@ -1,0 +1,24 @@
+---
+import '../styles.css';
+interface Props {
+  title: string;
+}
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{Astro.props.title} - AwesomeAlpine</title>
+  </head>
+  <body
+    class="flex min-h-full flex-col bg-white dark:bg-gray-950 max-w-[100vw]">
+    <slot />
+    <script>
+      import Alpine from 'alpinejs';
+      Alpine.start();
+    </script>
+  </body>
+</html>

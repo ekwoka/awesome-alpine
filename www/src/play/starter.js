@@ -43,7 +43,7 @@ Alpine.data('version', () => ({
     let delay = 0;
     const incrementer = () => {
       if (delay) delay--;
-      else delay = Math.ceil((++this.displayCount * 2) ** 3 / 400_000);
+      else delay = Math.ceil((++this.displayCount * 2) ** 3 / 600_000);
       if (this.displayCount === this.versions.length - 1) return;
       this.animationFrame = requestAnimationFrame(incrementer);
     };

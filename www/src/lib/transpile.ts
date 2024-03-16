@@ -1,10 +1,11 @@
 import { CorePlugin } from './lazyModules/alpinePlugins';
 
-const { build } = (await import('https://esm.sh/build')) as {
+/* @ts-expect-error it's a remote import */
+const { build } = (await import(/* @vite-ignore */ process.env.ESM_URL)) as {
   build: (input: string | BuildInput) => Promise<BuildOutput>;
 };
 
-let timeout: NodeJS.Timeout = null;
+let timeout: NodeJS.Timeout;
 const debouncedBuild = (code: string, config: EditorConfig) => {
   clearTimeout(timeout);
   timeout = setTimeout(async () => {
@@ -24,7 +25,7 @@ const debouncedBuild = (code: string, config: EditorConfig) => {
         ),
       },
     });
-    currentPromise.resolve(esm);
+    currentPromise.resolve?.(esm);
     currentPromise.promise = null;
     currentPromise.resolve = null;
   }, 1000);
@@ -74,7 +75,7 @@ export const transpile = (
 
   export default Alpine;
   `;
-  debouncedBuild(codeWithPlugins, config, currentPromise.resolve);
+  debouncedBuild(codeWithPlugins, config);
   return currentPromise.promise;
 };
 

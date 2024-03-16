@@ -1,8 +1,8 @@
 import { format } from 'prettier';
 
-const estree = () => import('prettier/plugins/estree.mjs');
-const html = () => import('prettier/plugins/html.mjs');
-const typescript = () => import('prettier/plugins/typescript.mjs');
+const estree = () => import('prettier/plugins/estree');
+const html = () => import('prettier/plugins/html');
+const typescript = () => import('prettier/plugins/typescript');
 
 export enum Language {
   HTML = 'html',
@@ -37,7 +37,9 @@ const getPlugins = (type: Language) => {
 export const prettify = async (content: string, type: Language) =>
   format(content, {
     parser: coerceLanguage(type),
-    plugins: await Promise.all(getPlugins(type)),
+    plugins: (await Promise.all(getPlugins(type))).map(
+      (plugin) => plugin.default,
+    ),
     singleQuote: true,
     singleAttributePerLine: true,
     printWidth: 60,

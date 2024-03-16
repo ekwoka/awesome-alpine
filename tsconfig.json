@@ -3,13 +3,25 @@
   "compilerOptions": {
     "types": ["vitest/importMeta", "vitest/globals"],
     "allowJs": true,
+    "allowImportingTsExtensions": true,
+    // TypeChecking Options
+    "strict": true,
+
+    // Module Resolution
+    "module": "es2022",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "target": "es2022",
+    "customConditions": ["typescript"],
+    "verbatimModuleSyntax": true,
+
+    // Output Options
+    "noEmit": true,
+    "sourceMap": true,
     "declaration": true,
     "declarationMap": true,
-    "module": "esnext",
-    "moduleResolution": "node",
-    "noImplicitThis": true,
-    "target": "ESNext",
-    "resolveJsonModule": true,
-    "allowSyntheticDefaultImports": true,
-  },
+
+    // features
+    "lib": ["es2022", "dom", "dom.iterable"]
+  }
 }
