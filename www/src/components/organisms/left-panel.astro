@@ -3,6 +3,7 @@ import BlurryGlow from '../molecules/blurry-glow.astro';
 import Logo from '../atoms/logo.astro';
 import Button from '../atoms/button.astro';
 import TextInput from '../atoms/text-input.astro';
+const READY = false;
 ---
 
 <div class="relative grow shrink-0 px-6 lg:pr-0 max-w-full">
@@ -30,11 +31,19 @@ import TextInput from '../atoms/text-input.astro';
               Enjoy our free resources and tools, and sign up to be notified
               when new articles, tools, or courses become available!
             </p>
-            <form
-              class="relative isolate mt-8 flex items-center rounded-lg p-1 bg-white/2.5 ring-1 ring-white/15 transition focus-within:ring-sky-300 flex-col sm:flex-row sm:pl-0 sm:py-0">
-              <TextInput name="email" type="email" label="Email Address" />
-              <Button type="submit" content="Get Updates →" />
-            </form>
+            {
+              READY ? (
+                <form class="relative isolate mt-8 flex items-center rounded-lg p-1 bg-white/10 ring-1 ring-white/15 transition focus-within:ring-sky-300 flex-col sm:flex-row sm:pl-0 sm:py-0">
+                  <TextInput name="email" type="email" label="Email Address" />
+                  <Button type="submit">Get Updates →</Button>
+                </form>
+              ) : (
+                <span class="mt-8 rounded-lg p-1 bg-white/10 text-center ring-1 ring-white/15 w-full text-white tracking-[0.2em] uppercase text-xs flex justify-center items-center gap-2">
+                  <span class="inline-block">Registration is still closed</span>
+                  <span class="inline-block text-lg">😭</span>
+                </span>
+              )
+            }
             <div
               class="mt-8 flex flex-wrap justify-center gap-x-1 gap-y-3 sm:gap-x-2 lg:justify-start">
             </div>
