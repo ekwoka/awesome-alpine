@@ -1,0 +1,19 @@
+---
+interface Props {
+  label: string;
+  type: 'text' | 'password' | 'email';
+  name: string;
+}
+---
+
+<label class="flex-auto w-full">
+  <span class="sr-only">{Astro.props.label}</span>
+  <input
+    required
+    type={Astro.props.type}
+    autocomplete={Astro.props.type === 'text' ? '' : Astro.props.type}
+    placeholder={Astro.props.label}
+    class="bg-transparent px-4 py-2.5 text-base text-white placeholder:text-gray-500 focus:outline-none sm:text-[0.8125rem]/6 w-full"
+    name="{{ name }}"
+  />
+</label>

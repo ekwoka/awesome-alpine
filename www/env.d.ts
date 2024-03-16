@@ -1,5 +1,7 @@
 import type { Alpine } from 'alpinejs';
 
+/// <reference types="astro/client" />
+
 declare module 'monaco-editor/esm/vs/editor/editor.worker?worker' {
   export default class extends Worker {
     constructor();
@@ -30,12 +32,7 @@ declare module 'esbuild-wasm/esbuild.wasm?url' {
   export default esbuildWASM;
 }
 
-declare module 'alpine-versions' {
-  const data: Record<string, `${number}.${number}.${number}`[]>;
-  export default data;
-}
-
-declare module global {
+declare global {
   interface Window {
     Alpine: Alpine;
   }

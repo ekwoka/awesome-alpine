@@ -14,12 +14,12 @@ export type Config = {
 };
 
 const state: {
-  version: null | `${number}.${number}.${number}`;
+  version: `${number}.${number}.${number}`;
   alpineStarted: boolean;
   tailwindLoaded: boolean;
   Alpine: IAlpine | null;
 } = {
-  version: null,
+  version: '3.13.7',
   alpineStarted: false,
   tailwindLoaded: false,
   Alpine: null,
@@ -27,8 +27,8 @@ const state: {
 const resetAlpine = () => {
   if (!state.alpineStarted) return;
 
-  state.Alpine.destroyTree(document.body);
-  state.Alpine.initTree(document.body);
+  state.Alpine?.destroyTree(document.body);
+  state.Alpine?.initTree(document.body);
 };
 const actions = {
   log: (message: string) => console.log(message),
@@ -49,10 +49,10 @@ const actions = {
   removeTailwind: () => state.tailwindLoaded && window.location.reload(),
   start: () => {
     state.alpineStarted = true;
-    state.Alpine.start();
+    state.Alpine?.start();
   },
   loadPlugins: async (plugins: CorePlugin[]) => {
-    state.Alpine.plugin(await gatherPlugins(plugins, state.version));
+    state.Alpine?.plugin(await gatherPlugins(plugins, state.version));
     resetAlpine();
   },
   evaluateScript: async (plugin: string) => {
@@ -66,8 +66,8 @@ const actions = {
       document.createRange().createContextualFragment(markup),
     );
     if (!state.alpineStarted) return;
-    state.Alpine.startObservingMutations();
-    state.Alpine.initTree(document.body);
+    state.Alpine?.startObservingMutations();
+    state.Alpine?.initTree(document.body);
   },
   loadScript: async (script: {
     id: string;
@@ -82,24 +82,28 @@ const actions = {
       script.url
     ).then((mod) => mod.default);
     if (!state.alpineStarted) return;
-    state.Alpine.startObservingMutations();
-    state.Alpine.initTree(document.body);
+    state.Alpine?.startObservingMutations();
+    state.Alpine?.initTree(document.body);
   },
 };
 
 export type sandboxActions = typeof actions;
 
-new RPCReceiver(actions);
+export const initializeSandbox = async () => {
+  new RPCReceiver<sandboxActions>(actions);
 
-let count = 0;
-// eslint-disable-next-line no-constant-condition
-while (count++ < 100) {
-  if (
-    (await new RPCSender<{ registerSandbox: () => void }>(
-      self.top as Window,
-    ).call
-      .registerSandbox()
-      .wait(1000)) !== undefined
-  )
-    break;
-}
+  let count = 0;
+  // eslint-disable-next-line no-constant-condition
+  while (count++ < 100) {
+    console.log('trying to connect to editor');
+    if (
+      (await new RPCSender<{ registerSandbox: () => void }>(
+        self.top as Window,
+      ).call
+        .registerSandbox()
+        .wait(1000)) !== null
+    )
+      break;
+  }
+  console.log('connected to editor');
+};

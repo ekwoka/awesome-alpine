@@ -1,5 +1,12 @@
+---
+import BlurryGlow from '../molecules/blurry-glow.astro';
+import Logo from '../atoms/logo.astro';
+import Button from '../atoms/button.astro';
+import TextInput from '../atoms/text-input.astro';
+---
+
 <div class="relative grow shrink-0 px-6 lg:pr-0 max-w-full">
-  <include src="components/molecules/blurry-glow.html"></include>
+  <BlurryGlow />
   <div class="h-full flex justify-center lg:justify-end lg:items-start">
     <div
       class="sticky top-0 flex lg:min-w-[32rem] lg:overflow-y-auto lg:overflow-x-hidden lg:pl-[max(4rem,calc(50%-38rem))]">
@@ -11,8 +18,7 @@
               <a
                 href="/"
                 class="text-blue-200 flex gap-4 items-center tracking-widest">
-                <include src="components/atoms/logo.svg"></include> Awesome
-                Alpine
+                <Logo /> Awesome Alpine
               </a>
             </div>
             <h1
@@ -26,21 +32,12 @@
             </p>
             <form
               class="relative isolate mt-8 flex items-center rounded-lg p-1 bg-white/2.5 ring-1 ring-white/15 transition focus-within:ring-sky-300 flex-col sm:flex-row sm:pl-0 sm:py-0">
-              <include
-                src="components/atoms/text-input.html"
-                locals='{
-                  "name": "email", "type": "email", "label": "Email Address"
-                }'></include>
-              <include
-                src="components/atoms/button.html"
-                locals='{
-                "type": "submit",
-                "content": "Get Updates →"
-              }'>
-              </include>
+              <TextInput name="email" type="email" label="Email Address" />
+              <Button type="submit" content="Get Updates →" />
             </form>
             <div
-              class="mt-8 flex flex-wrap justify-center gap-x-1 gap-y-3 sm:gap-x-2 lg:justify-start"></div>
+              class="mt-8 flex flex-wrap justify-center gap-x-1 gap-y-3 sm:gap-x-2 lg:justify-start">
+            </div>
           </div>
         </div>
       </div>

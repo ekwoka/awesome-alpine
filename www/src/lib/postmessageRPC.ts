@@ -1,13 +1,10 @@
-// eslint-disable-next-line @typescript-eslint/ban-types
-export class RPCReceiver<
-  A extends Record<keyof A, (...args: unknown[]) => unknown>,
-> {
-  actions: Map<keyof A, A[keyof A]>;
+export class RPCReceiver<A extends FunctionRecord<A>> {
+  actions: ActionsMap<A>;
   async messageHandler(event: MessageEvent<Action<A>>) {
     const { id, name, args } = event.data;
     if (this.actions.has(name)) {
       const result = await this.actions.get(name)?.(...args, event);
-      event.source?.postMessage({ id, value: result }, '*' as undefined);
+      event.source?.postMessage({ id, value: result }, { targetOrigin: '*' });
     }
   }
   constructor(intitalActions: Partial<A> = {}) {
@@ -28,23 +25,45 @@ export class RPCReceiver<
   }
 }
 
-export class RPCSender<
-  A extends Record<keyof A, (...args: unknown[]) => unknown>,
-> {
-  call = new Proxy({} as A, {
-    get: (target, name: string | symbol) => {
-      if (Reflect.has(target, name)) return target[name];
-      return (...args: Parameters<A[keyof A]>) => {
+type ActionsMap<A extends FunctionRecord<A>> = Map<
+  keyof A,
+  WithEventArg<A[keyof A], MessageEvent<Action<A>>>
+>;
+
+type FunctionRecord<A> = Record<
+  keyof A,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  (...args: any[]) => any
+>;
+
+type WithEventArg<
+  F extends (...args: Parameters<F>) => ReturnType<F>,
+  E extends MessageEvent,
+> = (
+  ...args: [...RemoveLastEventArg<Parameters<F>, E>, event: E]
+) => ReturnType<F>;
+
+type RemoveLastEventArg<
+  A extends Array<unknown>,
+  E extends MessageEvent,
+> = A extends [...infer T, infer _E extends E] ? T : A;
+
+export class RPCSender<A extends FunctionRecord<A>> {
+  constructor(private target: Window) {}
+  call = new Proxy({} as CallObject<A>, {
+    get: (target, name: string | symbol, receiver) => {
+      type T = CallReturnsMap<A>;
+      if (Reflect.has(target, name)) return Reflect.get(target, name, receiver);
+      return <K extends keyof A>(...args: Parameters<A[K]>) => {
         const id = callProcedure(name.toString(), args, this.target);
         return {
           wait: waitForResponse.bind(null, id, this.target),
-          then: (res: (value: ReturnType<A[keyof A]>) => void) =>
-            waitForResponse(id, this.target).then(res),
+          then: (res: (value: T[K]) => void) =>
+            waitForResponse<T[K]>(id, this.target).then(res),
         };
       };
     },
   });
-  constructor(private target: Window) {}
 }
 
 const callProcedure = (
@@ -61,9 +80,9 @@ const waitForResponse = <T>(
   id: number,
   source: Window,
   timeout: number = 0,
-): Promise<T> => {
-  return new Promise<T>((res) => {
-    let timeoutid;
+): Promise<T | null> => {
+  return new Promise<T | null>((res) => {
+    let timeoutid: NodeJS.Timeout;
     const handler = (event: MessageEvent<ActionResponse>) => {
       if (event.source === source && event.data.id === id) {
         window.removeEventListener('message', handler);
@@ -75,20 +94,48 @@ const waitForResponse = <T>(
     if (timeout)
       timeoutid = setTimeout(() => {
         window.removeEventListener('message', handler);
-        res(undefined);
+        res(null);
       }, timeout);
   });
 };
 
 // eslint
 
-interface Action<A> {
+interface Action<
+  A extends Record<
+    keyof A,
+    (...args: Parameters<A[keyof A]>) => ReturnType<A[keyof A]>
+  >,
+> {
   id: number;
   name: keyof A;
-  args: unknown[];
+  args: RemoveLastEventArg<Parameters<A[keyof A]>, MessageEvent>;
 }
 
 interface ActionResponse {
   id: number;
   value: unknown;
 }
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type CallReturnsMap<
+  A extends Record<
+    keyof A,
+    (...args: Parameters<A[keyof A]>) => ReturnType<A[keyof A]>
+  >,
+> = {
+  [K in keyof A]: Awaited<ReturnType<A[K]>> | null;
+};
+
+type CallObject<
+  A extends Record<
+    keyof A,
+    (...args: Parameters<A[keyof A]>) => ReturnType<A[keyof A]>
+  >,
+  T extends Record<keyof A, ReturnType<A[keyof A]> | null> = CallReturnsMap<A>,
+> = {
+  [K in keyof A]: (...args: Parameters<A[K]>) => {
+    wait: (ms: number) => Promise<T[K]>;
+    then: (res: (value: T[K]) => void) => Promise<void>;
+  };
+};

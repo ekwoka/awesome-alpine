@@ -3,15 +3,13 @@ import { RPCReceiver, RPCSender } from '../../lib/postmessageRPC';
 import { prettify } from '../../lib/prettier';
 import { Language } from '../../lib/prettier';
 import type { sandboxActions } from '../../play/playSandbox';
-// @ts-expect-error - this is a raw template inmport
 import starterHTML from '../../play/starter.html?raw';
-// @ts-expect-error - this is a raw template import
 import starterScript from '../../play/starter.js?raw';
 import { bitwiseArray, booleanNumber } from '../../plugins/encoding';
+import versionData from './alpine-versions';
 import persist from '@alpinejs/persist';
 import query, { base64URL } from '@ekwoka/alpine-history';
-import versionData from 'alpine-versions';
-import Alpine, { PluginCallback } from 'alpinejs';
+import Alpine, { type PluginCallback } from 'alpinejs';
 import type { editor } from 'monaco-editor';
 
 const makeEditor = () =>
@@ -24,7 +22,7 @@ export const Editor: PluginCallback = (Alpine) => {
   Alpine.plugin([persist, query]);
 
   Alpine.data('editor', () => {
-    let abortController: AbortController = null;
+    let abortController: AbortController | null = null;
     return {
       panel: Alpine.query('markup'),
       config: {
@@ -47,21 +45,30 @@ export const Editor: PluginCallback = (Alpine) => {
           .as('script'),
       },
       editor: {
-        html: null as editor.IStandaloneCodeEditor,
-        typescript: null as editor.IStandaloneCodeEditor,
-      },
+        [Language.HTML]: null as editor.IStandaloneCodeEditor | null,
+        [Language.TYPESCRIPT]: null as editor.IStandaloneCodeEditor | null,
+      } satisfies Record<
+        Language.HTML | Language.TYPESCRIPT,
+        editor.IStandaloneCodeEditor | null
+      >,
       sandbox: null as RPCSender<sandboxActions> | null,
-      async registerEditor(el: HTMLElement, type: Language) {
+      async registerEditor(
+        el: HTMLElement,
+        type: Language.HTML | Language.TYPESCRIPT,
+      ) {
         this.editor[type] = (await makeEditor())(el, this.value[type], type);
       },
       init() {
         new RPCReceiver({
           registerSandbox: (event?: MessageEvent<undefined>) => {
-            if (event?.source)
+            if (event?.source) {
+              console.log('registering sandbox to editor');
               this.initializeSandbox(
                 new RPCSender<sandboxActions>(event.source as Window),
               );
-            return true;
+              return true;
+            }
+            return null;
           },
         });
         Alpine.effect(() => {
@@ -77,12 +84,15 @@ export const Editor: PluginCallback = (Alpine) => {
       },
       async initializeSandbox(sandbox: RPCSender<sandboxActions>) {
         this.sandbox = sandbox;
+        console.log('initializing sandbox');
         await Promise.all([
           effectPromise(async () => {
+            console.log('checking tailwind');
             if (this.config.settings.tailwind)
-              await this.sandbox.call.loadTailwind();
+              await this.sandbox?.call.loadTailwind();
           }),
           effectPromise(async () => {
+            console.log('bundling code');
             if (abortController) abortController.abort();
             abortController = null;
             if (!(JSON.stringify(this.config) && this.value.typescript)) return;
@@ -93,24 +103,26 @@ export const Editor: PluginCallback = (Alpine) => {
             )(this.value.typescript, this.config);
             if (signal.aborted) return;
             abortController = null;
-            await this.sandbox.call.loadScript(esm);
+            console.log('loading script');
+            await this.sandbox?.call.loadScript(esm);
           }),
         ]);
         await effectPromise(async () => {
-          await this.sandbox.call.replaceMarkup(this.value.html);
-        }),
-          this.sandbox.call.start();
+          console.log('replacing markup');
+          await this.sandbox?.call.replaceMarkup(this.value.html);
+        });
+        console.log('starting sandbox');
+        this.sandbox.call.start();
       },
       async prettify() {
-        for (const type of [Language.HTML, Language.TYPESCRIPT]) {
+        for (const type of [Language.HTML, Language.TYPESCRIPT] as const) {
           this.value[type] = await prettify(this.value[type], type as Language);
-          Alpine.raw(await this.editor[type])?.setValue(this.value[type]);
+          await Alpine.raw(this.editor[type])?.setValue(this.value[type]);
         }
       },
       async update(type: Language.HTML | Language.TYPESCRIPT) {
-        const content = Alpine.raw<(typeof this.editor)[typeof type]>(
-          this.editor[type],
-        )?.getValue();
+        const content = Alpine.raw(this.editor[type])?.getValue();
+        if (content === undefined) return;
         this.value[type] = await prettify(content, type);
       },
       CorePlugins: Object.entries(CorePlugin).filter(([key]) =>

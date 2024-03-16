@@ -1,0 +1,34 @@
+---
+import MainLayout from '../layout/main.astro';
+import Header from '../components/header.astro';
+import Editor from '../components/organisms/editor.astro';
+---
+
+<MainLayout title="Alpine Plays">
+  <Header />
+  <script>
+    import { Draggable } from '../components/draggablePartition.ts';
+    import Alpine from 'alpinejs';
+
+    Alpine.plugin(Draggable);
+  </script>
+  <main
+    x-data
+    x-partition
+    class="flex flex-col md:flex-row flex-auto relative border-t border-gray-200 dark:border-gray-800">
+    <Editor />
+    <span
+      role="presentation"
+      class="bg-neutral-900 md:w-1 hover:bg-neutral-700 md:hover:w-2 transition-all max-md:h-1 max-md:hover:h-2 z-100"
+      x-bind="$partition.handle"></span>
+    <div
+      class="flex-initial flex flex-col grow border-t border-gray-200 dark:border-white/10 lg:border-0 bg-gray-50 dark:bg-black"
+      :class="{ 'pointer-events-none': $partition.dragging }">
+      <iframe
+        title="Preview"
+        class="w-full h-full bg-neutral-900 grow"
+        sandbox="allow-scripts allow-pointer-lock"
+        src="/sandbox/"></iframe>
+    </div>
+  </main>
+</MainLayout>
