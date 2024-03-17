@@ -1,8 +1,15 @@
+---
+import { cn } from '../../lib/utilities/classNames';
+interface Props {
+  class?: string;
+}
+---
+
 <svg
   role="img"
   viewBox="0 0 24 24"
   fill="currentColor"
-  class="h-10 w-10"
+  class={cn('h-10 w-10', Astro.props.class)}
   xmlns="http://www.w3.org/2000/svg">
   <title>Alpine.js</title>
   <path

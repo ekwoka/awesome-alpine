@@ -1,4 +1,5 @@
 import viteConfig from './vite.config.ts';
+import mdx from '@astrojs/mdx';
 import tailwind from '@astrojs/tailwind';
 import { defineConfig } from 'astro/config';
 
@@ -11,7 +12,14 @@ export default defineConfig({
       nesting: true,
       applyBaseStyles: false,
     }),
+    mdx({ optimize: true }),
   ],
+  markdown: {
+    shikiConfig: {
+      wrap: true,
+      theme: 'one-dark-pro',
+    },
+  },
   server: {
     headers: {
       'Cross-Origin-Opener-Policy': 'same-origin',

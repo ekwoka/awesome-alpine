@@ -1,12 +1,50 @@
 ---
 import LandingPage from '../layout/landing.astro';
 import LeftPanel from '../components/organisms/left-panel.astro';
+import Logo from '../components/atoms/logo.astro';
+import Button from '../components/atoms/button.astro';
+import TextInput from '../components/atoms/text-input.astro';
 import Timeline from '../components/organisms/timeline.astro';
+const READY = false;
 ---
 
 <LandingPage title="Learn Alpine">
   <div class="flex flex-col lg:flex-row w-full max-w-full min-h-screen">
-    <LeftPanel />
+    <LeftPanel>
+      <div class="relative lg:w-96">
+        <div>
+          <a
+            href="/"
+            class="text-blue-200 flex gap-4 items-center tracking-widest">
+            <Logo /> Awesome Alpine
+          </a>
+        </div>
+        <h1 class="mt-8 font-display text-4xl/tight tracking-wide text-white">
+          Make your project <span class="text-sky-300">Awesome</span> with
+          <span class="text-sky-300">Alpine</span>
+        </h1>
+        <p class="mt-4 text-base text-gray-300 tracking-wide">
+          Enjoy our free resources and tools, and sign up to be notified when
+          new articles, tools, or courses become available!
+        </p>
+        {
+          READY ? (
+            <form class="relative isolate mt-8 flex items-center rounded-lg p-1 bg-white/10 ring-1 ring-white/15 transition focus-within:ring-sky-300 flex-col sm:flex-row sm:pl-0 sm:py-0">
+              <TextInput name="email" type="email" label="Email Address" />
+              <Button type="submit">Get Updates →</Button>
+            </form>
+          ) : (
+            <span class="mt-8 rounded-lg p-1 bg-white/10 text-center ring-1 ring-white/15 w-full text-white tracking-[0.2em] uppercase text-xs flex justify-center items-center gap-2">
+              <span class="inline-block">Registration is still closed</span>
+              <span class="inline-block text-lg">😭</span>
+            </span>
+          )
+        }
+        <div
+          class="mt-8 flex flex-wrap justify-center gap-x-1 gap-y-3 sm:gap-x-2 lg:justify-start">
+        </div>
+      </div>
+    </LeftPanel>
     <Timeline />
   </div>
 </LandingPage>
