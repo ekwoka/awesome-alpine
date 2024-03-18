@@ -5,6 +5,7 @@ import Logo from '../components/atoms/logo.astro';
 interface Props {
   frontmatter: {
     title: string;
+    description?: string;
   };
 }
 ---
@@ -20,8 +21,14 @@ interface Props {
   <body
     class="flex min-h-full flex-col bg-white dark:bg-gray-950 max-w-[100vw]">
     <div class="flex flex-col lg:flex-row w-full max-w-full min-h-screen">
-      <LeftPanel class="lg:min-w-[16rem]">
-        <div class="relative lg:w-48 mr-8">
+      <LeftPanel
+        class={'pr-2 ' +
+          (Astro.props.frontmatter.description
+            ? 'lg:min-w-80'
+            : 'lg:min-w-64')}>
+        <div
+          class={'relative mr-8 ' +
+            (Astro.props.frontmatter.description ? 'lg:w-64' : 'lg:w-48')}>
           <div>
             <a
               href="/"
@@ -30,16 +37,22 @@ interface Props {
             </a>
           </div>
           <h1
-            class="mt-8 font-display text-2xl/tight tracking-wide leading-relaxed text-white">
-            Make your project <span class="text-sky-300">Awesome</span> with
-            <span class="text-sky-300">Alpine</span>
+            class="mt-8 font-display text-3xl/tight tracking-wide leading-relaxed text-white">
+            {Astro.props.frontmatter.title}
           </h1>
+          {
+            Astro.props.frontmatter.description && (
+              <p class="mt-4 text-base text-gray-300 tracking-wide">
+                {Astro.props.frontmatter.description}
+              </p>
+            )
+          }
         </div>
       </LeftPanel>
 
       <div class="p-16 grow-[4]">
-        <article class="prose dark:prose-invert w-full dark:tracking-wider">
-          <h1>{Astro.props.frontmatter.title}</h1>
+        <article
+          class="prose dark:prose-invert w-full dark:tracking-wider prose-headings:font-medium">
           <slot />
         </article>
       </div>

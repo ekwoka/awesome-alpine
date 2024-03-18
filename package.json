@@ -12,6 +12,7 @@
     "lint:staged": "lint-staged",
     "precommit": "run-s lint:staged build size",
     "prepare": "husky install",
+    "serve": "pnpm run --filter www dev",
     "size": "node scripts/getSize.js",
     "size:test": "NODE_ENV=test node scripts/getSize.js",
     "test": "vitest",
