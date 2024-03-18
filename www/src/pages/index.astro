@@ -5,7 +5,15 @@ import Logo from '../components/atoms/logo.astro';
 import Button from '../components/atoms/button.astro';
 import TextInput from '../components/atoms/text-input.astro';
 import Timeline from '../components/organisms/timeline.astro';
+import Article from '../components/molecules/article.astro';
 const READY = false;
+const posts = (await Astro.glob('./posts/*.mdx'))
+  .sort(
+    (a, b) =>
+      new Date(b.frontmatter.date).getTime() -
+      new Date(a.frontmatter.date).getTime(),
+  )
+  .slice(0, 3);
 ---
 
 <LandingPage title="Learn Alpine">
@@ -46,5 +54,9 @@ const READY = false;
       </div>
     </LeftPanel>
     <Timeline />
+    <div class="flex flex-col gap-8 w-full">
+      <h2 class="text-3xl font-display text-white">Latest Articles</h2>
+      {posts.map((post) => <Article post={post} />)}
+    </div>
   </div>
 </LandingPage>
