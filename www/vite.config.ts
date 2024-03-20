@@ -8,7 +8,7 @@ export default defineConfig({
   build: {
     assetsInlineLimit: 0,
     target: 'esnext',
-    minify: false,
+    minify: true,
     outDir: 'dist',
     emptyOutDir: true,
     modulePreload: {
