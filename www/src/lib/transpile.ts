@@ -1,7 +1,7 @@
 import { CorePlugin } from './lazyModules/alpinePlugins';
+import { url } from 'esm.sh/build?urlfollow';
 
-/* @ts-expect-error it's a remote import */
-const { build } = (await import(/* @vite-ignore */ process.env.ESM_URL)) as {
+const { build } = (await import(/* @vite-ignore */ url)) as {
   build: (input: string | BuildInput) => Promise<BuildOutput>;
 };
 

@@ -3,11 +3,8 @@ import { Language } from './prettier';
 // @ts-expect-error - this is a raw types import for monaco
 import dts from '@types/alpinejs/index.d.ts?raw';
 import * as monaco from 'monaco-editor';
-// @ts-expect-error - imports as worker
 import DefaultWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker';
-// @ts-expect-error - imports as worker
 import HTMLWorker from 'monaco-editor/esm/vs/language/html/html.worker?worker';
-// @ts-expect-error - imports as worker
 import TSWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
