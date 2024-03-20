@@ -1,7 +1,6 @@
 {
   "exclude": ["**/node_modules", "**/dist", "scripts"],
   "compilerOptions": {
-    "types": ["vitest/importMeta", "vitest/globals"],
     "allowJs": true,
     "allowImportingTsExtensions": true,
     // TypeChecking Options

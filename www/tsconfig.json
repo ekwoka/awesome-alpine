@@ -1,7 +1,5 @@
 {
-  "extends": "../tsconfig.json",
+  "extends": ["astro/tsconfigs/strict", "../tsconfig.json"],
   "includes": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.astro"],
-  "compilerOptions": {
-    "types": ["./src/env"]
-  }
+  "compilerOptions": {}
 }

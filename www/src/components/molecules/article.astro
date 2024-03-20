@@ -1,8 +1,8 @@
 ---
-import type { MDXInstance } from 'astro';
+import type { CollectionEntry } from 'astro:content';
 
 interface Props {
-  post: MDXInstance<{ date: string; title: string; description: string }>;
+  post: CollectionEntry<'post'>;
 }
 ---
 
@@ -17,7 +17,7 @@ interface Props {
           <time
             datetime="2023-04-06T00:00:00.000Z"
             class="text-indigo-50 block">
-            {new Date(Astro.props.post.frontmatter.date)}
+            {new Date(Astro.props.post.data.date)}
           </time>
         </a>
         <div
@@ -35,10 +35,10 @@ interface Props {
           ></include>
           <h2>
             <a href="#commit-message-suggestions"
-              >{Astro.props.post.frontmatter.title}</a
+              >{Astro.props.post.data.title}</a
             >
           </h2>
-          <p>{Astro.props.post.frontmatter.description}</p>
+          <p>{Astro.props.post.data.description}</p>
         </div>
       </div>
     </div>

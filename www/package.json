@@ -10,7 +10,7 @@
     "@astrojs/tailwind": "5.1.0",
     "@ekwoka/alpine-history": "0.2.0",
     "alpinejs": "3.13.7",
-    "astro": "4.5.5",
+    "astro": "4.5.7",
     "monaco-editor": "0.47.0"
   },
   "scripts": {
@@ -35,12 +35,12 @@
     "autoprefixer": "10.4.18",
     "esbuild": "0.20.2",
     "esbuild-wasm": "0.20.2",
-    "postcss": "8.4.35",
+    "postcss": "8.4.37",
     "posthtml-expressions": "1.11.3",
     "prettier-plugin-astro": "0.13.0",
     "tailwind-merge": "2.2.2",
     "tailwindcss": "3.4.1",
-    "vite": "5.1.6",
+    "vite": "5.2.0",
     "vite-plugin-dts": "3.7.3",
     "vite-plugin-external-deps": "0.0.3",
     "vite-plugin-workspace-source": "0.0.3",
