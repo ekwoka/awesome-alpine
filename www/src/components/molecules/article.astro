@@ -1,32 +1,61 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { formatDate } from '../../lib/utilities/formatDate';
+import ArticleImage from './article-image.astro';
+
+interface Props {
+  post: CollectionEntry<'post'>;
+  top: number;
+  bottom: number;
+}
+---
+
+<header
+  class="sticky"
+  style={{
+    top: `calc(${Astro.props.top * 1.4}rem - var(--sticky-offset,0px) + 4rem)`,
+    bottom: `calc(${Astro.props.bottom * 1.4}rem + var(--sticky-offset,0px) - 4rem)`,
+  }}>
+  <div
+    class="absolute left-8 top-4 z-50 flex h-4 items-center justify-end gap-x-2 lg:left-[unset] lg:right-full w-max opacity-65 text-xs">
+    <a
+      class="inline-flex"
+      href={`#${Astro.props.post.data.title.toLowerCase().trim().replaceAll(' ', '-') + Astro.props.top}`}>
+      <time
+        datetime={Astro.props.post.data.date.toISOString()}
+        class="text-sky-300 block">
+        {
+          formatDate(Astro.props.post.data.date, {
+            month: 'short',
+            day: 'numeric',
+          })
+        }
+      </time>
+    </a>
+    <div class="h-[0.0625rem] w-2 bg-sky-300 xl:bg-sky-200 hidden lg:block">
+    </div>
+  </div>
+</header>
 <article
-  id="commit-message-suggestions"
+  id={`${Astro.props.post.data.title.toLowerCase().trim().replaceAll(' ', '-') + Astro.props.top}`}
   class="scroll-mt-16 max-lg:mx-auto w-full max-w-prose">
   <div>
-    <header class="relative mb-10">
-      <div
-        class="pointer-events-none absolute left-8 top-0 z-50 flex h-4 items-center justify-end gap-x-2 lg:left-[unset] lg:right-full w-max opacity-65 text-sm">
-        <a class="inline-flex" href="#commit-message-suggestions">
-          <time datetime="2023-04-06T00:00:00.000Z" class="text-indigo-50 block"
-            >DATE</time
-          >
-        </a>
-        <div
-          class="h-[0.0625rem] w-3.5 bg-indigo-300 xl:bg-indigo-200 hidden lg:block">
-        </div>
-      </div>
-    </header>
     <div class="max-w-7xl px-6 lg:flex lg:px-8">
       <div class="lg:flex lg:w-full lg:justify-end w-full">
         <div
           class="mx-auto max-w-lg lg:mx-0 lg:max-w-xl lg:flex-auto prose dark:prose-invert flex flex-col w-full">
-          <include
-            src="components/molecules/article-image.html"
-            locals='{ "src": "https://placekitten.com/800/600", "width": 800, "height": 600, "alt": "Cats are cute" }'
-          ></include>
-          <h2>
-            <a href="#commit-message-suggestions">TITLE</a>
+          <ArticleImage
+            src={Astro.props.post.data.image?.src ??
+              'https://placekitten.com/g/800/320'}
+            alt=""
+          />
+          <h2 class="mt-0">
+            <a
+              href={`#${Astro.props.post.data.title.toLowerCase().trim().replaceAll(' ', '-') + Astro.props.top}`}
+              >{Astro.props.post.data.title}</a
+            >
           </h2>
-          <p>CONTENT</p>
+          <p>{Astro.props.post.data.description}</p>
         </div>
       </div>
     </div>

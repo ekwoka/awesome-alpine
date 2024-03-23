@@ -1,18 +1,14 @@
 /// <reference types="vitest" />
 import { AlpinePackageData } from './src/plugins/vite/AlpinePackageData';
-import { DLX } from './src/plugins/vite/DLX';
-import { ESMBuildScript } from './src/plugins/vite/ESMBuildScript';
+import { DLX, URL } from './src/plugins/vite/DLX';
 import { defineConfig } from 'vite';
 
 export default defineConfig({
-  plugins: [DLX(), AlpinePackageData()],
-  define: {
-    'process.env.ESM_URL': JSON.stringify(await ESMBuildScript()),
-  },
+  plugins: [DLX(), URL(), AlpinePackageData()],
   build: {
     assetsInlineLimit: 0,
     target: 'esnext',
-    minify: false,
+    minify: true,
     outDir: 'dist',
     emptyOutDir: true,
     modulePreload: {

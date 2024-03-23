@@ -6,5 +6,6 @@ export default {
   theme: {
     extend: {},
   },
+  darkMode: 'media',
   plugins: [Typography()],
 } satisfies Config;

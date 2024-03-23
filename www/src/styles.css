@@ -2,13 +2,28 @@
 @tailwind components;
 @tailwind utilities;
 
-.font-mono * {
-  font-family: ml !important;
-  font-variant-ligatures: common-ligatures !important;
-  font-feature-settings:
-    'calt' on,
-    'liga' on,
-    'ss02' on;
+@layer utilities {
+  .font-mono {
+    font-family: ml, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+      'Liberation Mono', 'Courier New', monospace !important;
+    font-variant-ligatures: common-ligatures !important;
+    font-feature-settings:
+      'calt' on,
+      'liga' on,
+      'ss02' on;
+  }
+}
+
+:root {
+  @apply scroll-smooth scroll-my-4;
+}
+
+.prose code {
+  @apply block !text-base !font-mono tracking-wide !leading-[0.5];
+
+  & .line {
+    @apply block leading-loose;
+  }
 }
 
 @font-face {

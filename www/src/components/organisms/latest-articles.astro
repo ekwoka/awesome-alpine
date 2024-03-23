@@ -1,0 +1,30 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import Article from '../molecules/article.astro';
+interface Props {
+  posts: Array<CollectionEntry<'post'>>;
+}
+---
+
+<script>
+  import Alpine from 'alpinejs';
+  Alpine.data('stickyOffset', () => ({
+    stickyOffset: 0,
+    updateOffset() {
+      console.log(this.stickyOffset);
+      this.stickyOffset = (window.scrollY / document.body.scrollHeight) * 8;
+    },
+  }));
+</script>
+<div
+  class="flex flex-col gap-4 w-full mt-8 mb-16"
+  x-data="stickyOffset"
+  x-on:scroll.window="updateOffset"
+  x-effect="$el.style.setProperty('--sticky-offset', (stickyOffset) + 'rem')">
+  <h2 class="text-3xl font-display text-white pl-4">Latest Posts</h2>
+  {
+    Astro.props.posts.map((post, idx, posts) => (
+      <Article post={post} top={idx} bottom={posts.length - idx} />
+    ))
+  }
+</div>

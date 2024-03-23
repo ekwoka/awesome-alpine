@@ -12,12 +12,15 @@ interface Props {
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{Astro.props.title} - AwesomeAlpine</title>
+    <script>
+      import Alpine from 'alpinejs';
+      window.Alpine = Alpine;
+    </script>
   </head>
   <body
     class="flex min-h-full flex-col bg-white dark:bg-gray-950 max-w-[100vw]">
     <slot />
-    <script>
-      import Alpine from 'alpinejs';
+    <script is:inline type="module">
       Alpine.start();
     </script>
   </body>
