@@ -8,21 +8,15 @@ declare module '*?worker' {
   }
 }
 
-declare module '*?raw' {
-  const types: string;
-  export default types;
-}
-
 declare module '*?dlx' {
-  export default unknown;
+  const output: unknown;
+  export default output;
 }
 
 declare module '*?urlfollow' {
   export const url: string;
 }
 
-declare global {
-  interface Window {
-    Alpine: import('alpinejs').Alpine;
-  }
+interface Window {
+  Alpine: import('alpinejs').Alpine;
 }
