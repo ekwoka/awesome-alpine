@@ -51,9 +51,27 @@ const posts = (await getCollection('post'))
       </div>
     </LeftPanel>
     <Timeline />
-    <div class="flex flex-col gap-8 w-full">
-      <h2 class="text-3xl font-display text-white">Latest Articles</h2>
-      {posts.map((post) => <Article post={post} />)}
+    <script>
+      import Alpine from 'alpinejs';
+      Alpine.data('stickyOffset', () => ({
+        stickyOffset: 0,
+        updateOffset() {
+          console.log(this.stickyOffset);
+          this.stickyOffset = (window.scrollY / document.body.scrollHeight) * 8;
+        },
+      }));
+    </script>
+    <div
+      class="flex flex-col gap-4 w-full mt-8 mb-16"
+      x-data="stickyOffset"
+      @scroll.window="updateOffset"
+      x-effect="$el.style.setProperty('--sticky-offset', (stickyOffset) + 'rem')">
+      <h2 class="text-3xl font-display text-white pl-4">Latest Posts</h2>
+      {
+        posts.map((post, idx) => (
+          <Article post={post} top={idx} bottom={posts.length - idx} />
+        ))
+      }
     </div>
   </div>
 </LandingPage>

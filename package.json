@@ -34,6 +34,7 @@
     "postcss": "8.4.38",
     "prettier": "3.2.5",
     "pretty-bytes": "6.1.1",
+    "sharp": "0.33.2",
     "tailwindcss": "3.4.1",
     "typescript": "5.4.3",
     "vite": "5.2.3",
@@ -63,14 +64,7 @@
   },
   "pnpm": {
     "overrides": {
-      "typescript": "$typescript",
-      "semver@<7.5.4": ">=7.5.4",
       "@babel/traverse@<7.23.2": ">=7.23.2",
-      "@netlify/zip-it-and-ship-it@<9.30.0": "9.30.0",
-      "esbuild": "$esbuild",
-      "@typescript-eslint/types@<7.3.1": "7.3.1",
-      "@typescript-eslint/visitor-keys@<7.3.1": "7.3.1",
-      "@typescript-eslint/typescript-estree@<7.3.1": "7.3.1",
       "@esbuild/android-arm": "$esbuild",
       "@esbuild/android-arm64": "$esbuild",
       "@esbuild/android-x64": "$esbuild",
@@ -93,8 +87,16 @@
       "@esbuild/win32-arm64": "$esbuild",
       "@esbuild/win32-ia32": "$esbuild",
       "@esbuild/win32-x64": "$esbuild",
-      "vite": "$vite",
-      "follow-redirects@<=1.15.5": ">=1.15.6"
+      "@netlify/zip-it-and-ship-it@<9.30.0": "9.30.0",
+      "@typescript-eslint/types@<7.3.1": "7.3.1",
+      "@typescript-eslint/typescript-estree@<7.3.1": "7.3.1",
+      "@typescript-eslint/visitor-keys@<7.3.1": "7.3.1",
+      "esbuild": "$esbuild",
+      "follow-redirects@<=1.15.5": ">=1.15.6",
+      "semver@<7.5.4": ">=7.5.4",
+      "sharp": "$sharp",
+      "typescript": "$typescript",
+      "vite": "$vite"
     }
   }
 }

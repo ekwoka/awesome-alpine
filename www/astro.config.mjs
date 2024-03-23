@@ -6,6 +6,9 @@ import { defineConfig } from 'astro/config';
 // https://astro.build/config
 export default defineConfig({
   vite: viteConfig,
+  image: {
+    domains: ['placekitten.com'],
+  },
   integrations: [
     tailwind({
       configFile: './tailwind.config.ts',

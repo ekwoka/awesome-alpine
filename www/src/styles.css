@@ -14,6 +14,10 @@
   }
 }
 
+:root {
+  @apply scroll-smooth scroll-my-4;
+}
+
 .prose code {
   @apply block !text-base !font-mono tracking-wide !leading-[0.5];
 

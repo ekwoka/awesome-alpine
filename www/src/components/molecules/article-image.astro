@@ -1,20 +1,19 @@
 ---
+import { Image } from 'astro:assets';
 interface Props {
   src: string;
-  width: number;
-  height: number;
   alt: string;
 }
 ---
 
 <div
-  class="relative mt-8 overflow-hidden rounded-xl bg-gray-50 dark:bg-gray-900 ring-1 ring-inset ring-indigo-900/10 dark:ring-indigo-50/10">
-  <img
+  class="relative overflow-hidden rounded-xl bg-gray-50 dark:bg-gray-900 ring-1 ring-inset ring-indigo-900/10 dark:ring-indigo-50/10 mb-4">
+  <Image
     src={Astro.props.src}
-    width={Astro.props.width}
-    height={Astro.props.height}
+    widths={Array.from({ length: 8 }, (_, i) => (i + 1) * 180)}
+    sizes="(min-width: 1024px) 50vw, (min-width: 32rem) 30rem, 90vw"
     class="w-full h-full object-cover my-0"
-    loading="lazy"
+    inferSize={true}
     alt={Astro.props.alt}
   />
 </div>
