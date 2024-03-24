@@ -5,6 +5,9 @@ import { defineConfig } from 'vite';
 
 export default defineConfig({
   plugins: [DLX(), URL(), AlpinePackageData()],
+  resolve: {
+    conditions: ['typescript', 'import', 'module', 'browser', 'default'],
+  },
   build: {
     assetsInlineLimit: 0,
     target: 'esnext',
