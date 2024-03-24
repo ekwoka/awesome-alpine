@@ -3,24 +3,17 @@ import { defineConfig } from 'vite';
 
 export default defineConfig({
   plugins: [],
-  root: 'www/src',
-  server: {
-    headers: {
-      'Cross-Origin-Opener-Policy': 'same-origin',
-      'Cross-Origin-Embedder-Policy': 'require-corp',
-      'Cross-Origin-Resource-Policy': 'same-site',
-    },
+  build: {
+    target: 'esnext',
   },
-  worker: {
-    format: 'es',
+  resolve: {
+    conditions: ['typescript', 'import', 'module', 'browser', 'default'],
   },
   test: {
     globals: true,
     include: ['./**/*{.spec,.test}.{ts,tsx}'],
     includeSource: ['./**/*.{ts,tsx}'],
     reporters: ['dot'],
-    mockReset: true,
-    restoreMocks: true,
     deps: {},
   },
 });
