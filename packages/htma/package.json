@@ -1,0 +1,75 @@
+{
+  "name": "@awesome-alpine/htma",
+  "version": "0.0.1",
+  "private": true,
+  "description": "HTMX but for Alpine",
+  "author": {
+    "name": "Eric Kwoka",
+    "email": "ninjatheory@gmail.com",
+    "url": "https://thekwoka.net/"
+  },
+  "repository": "github:ekwoka/newthink-ui",
+  "keywords": [
+    "utilities"
+  ],
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "typescript": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "src"
+  ],
+  "type": "module",
+  "sideeffects": false,
+  "scripts": {
+    "build": "vite build",
+    "coverage": "vitest run --coverage",
+    "lint": "eslint --fix ./src; prettier --write ./src --loglevel error",
+    "lint:check": "eslint --max-warnings 10 ./src && prettier --check ./src",
+    "prebuild": "rm -rf dist",
+    "size": "node scripts/esbuild.js",
+    "test": "vitest"
+  },
+  "devDependencies": {
+    "@types/alpinejs": "3.13.9",
+    "@types/alpinejs__intersect": "3.13.4",
+    "alpinejs": "3.13.7",
+    "eslint-plugin-filename-export": "1.0.4"
+  },
+  "prettier": {
+    "singleQuote": true,
+    "bracketSameLine": true,
+    "plugins": [
+      "@trivago/prettier-plugin-sort-imports"
+    ],
+    "importOrder": [
+      "^[./]"
+    ],
+    "importOrderSeparation": true,
+    "importOrderSortSpecifiers": true
+  },
+  "lint-staged": {
+    "*.{js,ts,mjs}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.json": [
+      "prettier --write"
+    ]
+  },
+  "peerDependencies": {
+    "alpinejs": ">=3.0.0"
+  },
+  "optionalDependencies": {
+    "@alpinejs/intersect": "3.13.7",
+    "@alpinejs/morph": "3.13.7"
+  }
+}

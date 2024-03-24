@@ -5,6 +5,7 @@
     "allowImportingTsExtensions": true,
     // TypeChecking Options
     "strict": true,
+    "verbatimModuleSyntax": true,
 
     // Module Resolution
     "module": "es2022",
@@ -12,7 +13,6 @@
     "resolveJsonModule": true,
     "target": "es2022",
     "customConditions": ["typescript"],
-    "verbatimModuleSyntax": true,
 
     // Output Options
     "noEmit": true,
