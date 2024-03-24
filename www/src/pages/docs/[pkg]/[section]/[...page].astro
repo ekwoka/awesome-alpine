@@ -1,0 +1,18 @@
+---
+import Documentation from '../../../../layout/documentation.astro';
+export function getStaticPaths() {
+  return [
+    { params: { pkg: 'testing-library', section: 'api' } },
+    { params: { pkg: 'testing-library', section: 'other' } },
+    { params: { pkg: 'testing-library', section: 'tips' } },
+    { params: { pkg: 'testing-library', section: 'quick-start' } },
+  ];
+}
+
+const { pkg, section } = Astro.params;
+---
+
+<Documentation title={pkg}>
+  {pkg}
+  {section}
+</Documentation>

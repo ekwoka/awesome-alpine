@@ -1,0 +1,150 @@
+---
+import Link from '../atoms/link.astro';
+export type LinkData = {
+  label: string;
+  url: string;
+};
+export type NavigationTree = {
+  link: LinkData;
+  children?: LinkData[];
+};
+export type SectionData = {
+  title: string;
+  links: NavigationTree[];
+};
+interface Props extends SectionData {}
+---
+
+<script>
+  import Alpine from 'alpinejs';
+  import { findLocalLink } from '../../lib/utilities/findLocalLink';
+  const $links = Symbol('links');
+
+  type Links = {
+    top: number | null;
+    height: number;
+  };
+
+  Alpine.addRootSelector(() => '[x-nav-highlight\\:container]');
+  Alpine.directive('nav-highlight', (el, { value }, { cleanup }) => {
+    if (value === 'container') {
+      const localLink = findLocalLink(el)?.closest<HTMLElement>(
+        '[x-nav-highlight\\:item]',
+      );
+      Alpine.addScopeToNode(el, {
+        [$links]: Alpine.reactive({
+          top: localLink?.offsetTop ?? (null as number | null),
+          height: localLink
+            ? localLink.offsetHeight
+            : parseInt(window.getComputedStyle(el).lineHeight),
+        }) as Links,
+      });
+    } else if (value === 'item') {
+      const data = Alpine.$data(el);
+      if (!($links in data)) return;
+      const links = data[$links] as Links;
+      cleanup(
+        Alpine.bind(el, {
+          '@click'() {
+            links.top = el.offsetTop;
+            links.height = el.offsetHeight;
+          },
+        }) as unknown as () => void,
+      );
+    } else if (value === 'highlight') {
+      const data = Alpine.$data(el);
+      if (!($links in data)) return;
+      const links = data[$links] as Links;
+      cleanup(
+        Alpine.bind(el, {
+          ':style'() {
+            return {
+              opacity: links.top === null ? '0' : null,
+              top: (links.top ?? 0) + 'px',
+              height: links.height + 'px',
+            };
+          },
+        }) as unknown as () => void,
+      );
+    }
+  });
+</script>
+<script>
+  import Alpine from 'alpinejs';
+
+  const $accordion = Symbol('accordion');
+  Alpine.addRootSelector(() => '[x-accordion]');
+  Alpine.directive('accordion', (el, { value }, { cleanup }) => {
+    console.log('accordion', value);
+    if (!value) {
+      const data = Alpine.$data(el) as { [$accordion]?: { open: boolean } };
+      data[$accordion] = Alpine.reactive({
+        open: false,
+      });
+
+      cleanup(() => {
+        delete data[$accordion];
+      });
+    } else if (value === 'control') {
+      const data = Alpine.$data(el) as { [$accordion]?: { open: boolean } };
+      if (!($accordion in data)) return;
+      const accordion = data[$accordion] as { open: boolean };
+      cleanup(
+        Alpine.bind(el, {
+          '@click.prevent'() {
+            accordion.open = !accordion.open;
+          },
+        }) as unknown as () => void,
+      );
+    } else if (value === 'content') {
+      const data = Alpine.$data(el) as { [$accordion]?: { open: boolean } };
+      if (!($accordion in data)) return;
+      const accordion = data[$accordion] as { open: boolean };
+      cleanup(
+        Alpine.bind(el, {
+          ':aria-hidden'() {
+            return accordion.open ? 'false' : 'true';
+          },
+          ':open'() {
+            return accordion.open;
+          },
+        }) as unknown as () => void,
+      );
+    }
+  });
+</script>
+<h2>{Astro.props.title}</h2>
+<ul
+  role="list"
+  class="pl-4 border-l border-neutral-600 relative"
+  x-nav-highlight:container>
+  {
+    Astro.props.links.map((tree) => (
+      <li x-nav-highlight:item x-accordion>
+        <h3 x-accordion:control>
+          <Link href={tree.link.url}>{tree.link.label}</Link>
+        </h3>
+        {'children' in tree && (
+          <div
+            x-accordion:content
+            class="overflow-hidden transition-[grid-template-rows] grid grid-rows-[0fr] [&[open]]:grid-rows-[1fr]">
+            <ul role="list" class="pl-4 min-h-0">
+              {tree.children?.map((child) => (
+                <li>
+                  <Link href={child.url}>{child.label}</Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </li>
+    ))
+  }
+  <li aria-hidden="true">
+    <div
+      x-nav-highlight:highlight
+      class="absolute left-0 top-0 w-2 h-[1rem] border-l border-sky-300 transition-[height,top]"
+      style="opacity: 0">
+    </div>
+  </li>
+</ul>

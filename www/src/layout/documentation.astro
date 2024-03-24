@@ -1,0 +1,60 @@
+---
+import '../styles.css';
+import Header from '../components/header.astro';
+import { ViewTransitions } from 'astro:transitions';
+import SectionNavigation from '../components/organisms/section-navigation.astro';
+interface Props {
+  title: string;
+}
+
+const pkgName = Astro.props.title.replaceAll('-', ' ');
+---
+
+<!doctype html>
+<html lang="en" transition:animate="initial">
+  <head>
+    <ViewTransitions fallback="none" />
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{pkgName} - AwesomeAlpine</title>
+    <script>
+      import Alpine from 'alpinejs';
+
+      window.Alpine = Alpine;
+    </script>
+  </head>
+  <body
+    class="w-full min-h-screen bg-neutral-100 dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 flex flex-col">
+    <Header subtitle={pkgName} />
+    <div class="flex flex-row gap-8 grow">
+      <SectionNavigation
+        navigation={[
+          { label: 'API', url: '/docs/testing-library/api' },
+          {
+            title: 'Guide',
+            links: [
+              { link: { label: 'Intro', url: '/docs/testing-library/api' } },
+              {
+                link: {
+                  label: 'Quick Start',
+                  url: '/docs/testing-library/quick-start',
+                },
+                children: [
+                  {
+                    label: 'Installation',
+                    url: '/docs/testing-library/quick-start#installation',
+                  },
+                ],
+              },
+            ],
+          },
+        ]}
+      />
+      <slot />
+    </div>
+    <script is:inline type="module">
+      window.Alpine.start();
+    </script>
+  </body>
+</html>
