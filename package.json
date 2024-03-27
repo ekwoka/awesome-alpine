@@ -23,22 +23,22 @@
   "devDependencies": {
     "@milahu/patch-package": "6.4.14",
     "@trivago/prettier-plugin-sort-imports": "4.3.0",
-    "@typescript-eslint/eslint-plugin": "7.3.1",
-    "@typescript-eslint/parser": "7.3.1",
+    "@typescript-eslint/eslint-plugin": "7.4.0",
+    "@typescript-eslint/parser": "7.4.0",
     "esbuild": "0.20.2",
     "eslint": "8.57.0",
     "husky": "9.0.11",
     "lint-staged": "15.2.2",
-    "netlify-cli": "17.20.1",
+    "netlify-cli": "17.21.1",
     "npm-run-all2": "6.1.2",
     "postcss": "8.4.38",
     "prettier": "3.2.5",
     "pretty-bytes": "6.1.1",
-    "sharp": "0.33.2",
+    "sharp": "0.33.3",
     "tailwindcss": "3.4.1",
     "typescript": "5.4.3",
-    "vite": "5.2.3",
-    "vite-plugin-dts": "3.7.3",
+    "vite": "5.2.6",
+    "vite-plugin-dts": "3.8.0",
     "vite-plugin-external-deps": "0.0.3",
     "vite-plugin-workspace-source": "0.0.3",
     "vitest": "1.4.0"
@@ -96,7 +96,8 @@
       "semver@<7.5.4": ">=7.5.4",
       "sharp": "$sharp",
       "typescript": "$typescript",
-      "vite": "$vite"
+      "vite": "$vite",
+      "express@<4.19.2": ">=4.19.2"
     }
   }
 }
