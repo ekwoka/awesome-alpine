@@ -26,7 +26,7 @@ const intoNavTree = (tree: NavTree, nav: NavDatum): NavTree => {
     const firstHeading = nav.headings.find((h) => h.depth === 1);
     Object.assign(branch, {
       label: firstHeading?.text ?? branch.label,
-      url: `${nav.baseUrl}${head}#${firstHeading?.slug ?? ''}`,
+      url: `${nav.baseUrl}${head}/#${firstHeading?.slug ?? ''}`,
       headings: nav.headings,
     });
   } else

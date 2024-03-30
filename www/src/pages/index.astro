@@ -51,6 +51,6 @@ const posts = (await getCollection('post'))
       </div>
     </LeftPanel>
     <Timeline />
-    {posts.length && <LatestArticles posts={posts} />}
+    {posts.length > 0 && <LatestArticles posts={posts} />}
   </div>
 </LandingPage>
