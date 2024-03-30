@@ -42,8 +42,8 @@ const pkgName = Astro.props.title.replaceAll('-', ' ');
                 },
                 children: [
                   {
-                    label: 'Installation',
-                    url: '/docs/testing-library/quick-start#installation',
+                    label: 'Hello',
+                    url: '/docs/testing-library/quick-start#hello',
                   },
                 ],
               },
@@ -51,7 +51,10 @@ const pkgName = Astro.props.title.replaceAll('-', ' ');
           },
         ]}
       />
-      <slot />
+      <article
+        class="prose dark:prose-invert w-full dark:tracking-wider prose-headings:font-medium">
+        <slot />
+      </article>
     </div>
     <script is:inline type="module">
       window.Alpine.start();

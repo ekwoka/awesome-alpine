@@ -1,18 +1,24 @@
 ---
 import Documentation from '../../../../layout/documentation.astro';
-export function getStaticPaths() {
-  return [
-    { params: { pkg: 'testing-library', section: 'api' } },
-    { params: { pkg: 'testing-library', section: 'other' } },
-    { params: { pkg: 'testing-library', section: 'tips' } },
-    { params: { pkg: 'testing-library', section: 'quick-start' } },
-  ];
+
+import { getCollection } from 'astro:content';
+export async function getStaticPaths() {
+  const postEntries = await getCollection('docs');
+  return postEntries.map((entry) => {
+    const [pkg, section] = entry.slug.split('/');
+    return {
+      params: { pkg, section },
+      props: { entry },
+    };
+  });
 }
 
-const { pkg, section } = Astro.params;
+const { entry } = Astro.props;
+const { pkg, section } = entry.data;
+const { Content, headings } = await entry.render();
 ---
 
 <Documentation title={pkg}>
-  {pkg}
-  {section}
+  <Content />
+  {JSON.stringify(headings, null, 2)}
 </Documentation>
