@@ -1,16 +1,13 @@
 ---
+import type { MarkdownHeading } from 'astro';
 import Link from '../atoms/link.astro';
-export type LinkData = {
+import type { NavTree } from '../../lib/getDocNavigation';
+
+type SectionData = {
   label: string;
   url: string;
-};
-export type NavigationTree = {
-  link: LinkData;
-  children?: LinkData[];
-};
-export type SectionData = {
-  title: string;
-  links: NavigationTree[];
+  headings?: MarkdownHeading[];
+  children?: NavTree;
 };
 interface Props extends SectionData {}
 ---
@@ -150,39 +147,73 @@ interface Props extends SectionData {}
     }
   });
 </script>
-<h2>{Astro.props.title}</h2>
-<ul
-  role="list"
-  class="pl-4 border-l border-neutral-600 relative"
-  x-nav-highlight:container
-  x-accordion:group>
-  {
-    Astro.props.links.map((tree) => (
-      <li x-accordion x-nav-highlight:item>
-        <h3 x-accordion:control>
-          <Link href={tree.link.url}>{tree.link.label}</Link>
-        </h3>
-        {'children' in tree && (
-          <div
-            x-accordion:content
-            class="overflow-hidden transition-[grid-template-rows] grid grid-rows-[0fr] [&[open]]:grid-rows-[1fr]">
-            <ul role="list" class="pl-4 min-h-0">
-              {tree.children?.map((child) => (
-                <li>
-                  <Link href={child.url}>{child.label}</Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
-      </li>
-    ))
-  }
-  <li aria-hidden="true">
-    <div
-      x-nav-highlight:highlight
-      class="absolute left-0 top-0 w-2 h-[1rem] border-l border-sky-300 transition-[height,top] ease-linear"
-      style="opacity: 0">
-    </div>
-  </li>
-</ul>
+<div>
+  <p>
+    {
+      Astro.props.url !== '' ? (
+        <Link href={`${Astro.props.url}`}>{Astro.props.label}</Link>
+      ) : (
+        Astro.props.label
+      )
+    }
+  </p>
+  <ul role="list" class="pl-4">
+    {
+      Astro.props.headings?.map(
+        (child) =>
+          child.depth !== 1 && (
+            <li class="pl-2">
+              <Link href={`${Astro.props.url.split('#')[0]}#${child.slug}`}>
+                {child.text}
+              </Link>
+            </li>
+          ),
+      )
+    }
+  </ul>
+  <ul
+    role="list"
+    class="pl-2 border-l border-neutral-600 relative"
+    x-nav-highlight:container
+    x-accordion:group>
+    {
+      Astro.props.children &&
+        Array.from(Astro.props.children.values()).map((nav) => (
+          <li x-accordion x-nav-highlight:item>
+            <h3 x-accordion:control>
+              {nav.url ? (
+                <Link href={`${nav.url}`}>{nav.label}</Link>
+              ) : (
+                nav.label
+              )}
+            </h3>
+            {'headings' in nav && (
+              <div
+                x-accordion:content
+                class="overflow-hidden transition-[grid-template-rows] grid grid-rows-[0fr] [&[open]]:grid-rows-[1fr]">
+                <ul role="list" class="pl-4 min-h-0">
+                  {nav.headings?.map(
+                    (child) =>
+                      child.depth !== 1 && (
+                        <li class="pl-2">
+                          <Link href={`${nav.url.split('#')[0]}#${child.slug}`}>
+                            {child.text}
+                          </Link>
+                        </li>
+                      ),
+                  )}
+                </ul>
+              </div>
+            )}
+          </li>
+        ))
+    }
+    <li aria-hidden="true">
+      <div
+        x-nav-highlight:highlight
+        class="absolute left-0 top-0 w-2 h-[1rem] border-l border-sky-300 transition-[height,top] ease-linear"
+        style="opacity: 0">
+      </div>
+    </li>
+  </ul>
+</div>

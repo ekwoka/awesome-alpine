@@ -1,28 +1,27 @@
 ---
-import type { Code } from 'astro:components';
 import Link from '../atoms/link.astro';
-import NavigationSection, {
-  type LinkData,
-  type SectionData,
-} from '../molecules/navigation-section.astro';
+import NavigationSection from '../molecules/navigation-section.astro';
+import type { NavTree } from '../../lib/getDocNavigation';
 
 interface Props {
-  navigation: (LinkData | SectionData)[];
+  navigation: NavTree;
 }
 ---
 
 <nav
   class="block w-1/5 overflow-y-auto border-r border-zinc-900/10 px-6 pb-8 pt-4 xl:w-80 dark:border-white/10 min-w-max flex-none"
   transition:persist>
-  <ul role="list">
+  <ul role="list" class="capitalize" x-accordion:group>
     {
-      Astro.props.navigation.map((nav) =>
-        'title' in nav ? (
-          <NavigationSection {...nav} />
-        ) : (
-          <Link href={nav.url}>{nav.label}</Link>
-        ),
-      )
+      Array.from(Astro.props.navigation.values()).map((data) => (
+        <li>
+          {'children' in data || 'headings' in data ? (
+            <NavigationSection {...data} />
+          ) : (
+            <Link href={data.url ?? '#'}>{data.label}</Link>
+          )}
+        </li>
+      ))
     }
   </ul>
 </nav>
