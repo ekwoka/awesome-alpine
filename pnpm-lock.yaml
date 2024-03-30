@@ -51,8 +51,8 @@ importers:
         specifier: 4.3.0
         version: 4.3.0(prettier@3.2.5)
       '@types/alpinejs':
-        specifier: 3.13.9
-        version: 3.13.9
+        specifier: 3.13.10
+        version: 3.13.10
       '@typescript-eslint/eslint-plugin':
         specifier: 7.4.0
         version: 7.4.0(@typescript-eslint/parser@7.4.0)(eslint@8.57.0)(typescript@5.4.3)
@@ -127,8 +127,8 @@ importers:
         version: 3.13.7
     devDependencies:
       '@types/alpinejs':
-        specifier: 3.13.9
-        version: 3.13.9
+        specifier: 3.13.10
+        version: 3.13.10
       '@types/alpinejs__intersect':
         specifier: 3.13.4
         version: 3.13.4
@@ -2448,14 +2448,10 @@ packages:
     resolution: {integrity: sha512-ah53tF6mWuuwerpDE7EHwbZErNDJQlsLISPqJhYj2RZ9nuTYbRknSkqebUd3igkhLIZKkPa7IiXjSn9qsU9O2w==}
     dev: true
 
-  /@types/alpinejs@3.13.9:
-    resolution: {integrity: sha512-R6Xy2K+S7811EuXz4CekBaQKtrAJsLm+Hw8kke0R9IwfoMxJsrEqG2TAkMqQa8gAKZb2hClOcNdPql5vH+ku3g==}
-    dev: true
-
   /@types/alpinejs__intersect@3.13.4:
     resolution: {integrity: sha512-yoX6WO7AleeULOQvPz7rrx7FJmu6l033bM7QiGcWyvZjqF2KIut99ByUZO6OWUQuYmbRjxsKthGiUYNaAywHiA==}
     dependencies:
-      '@types/alpinejs': 3.13.9
+      '@types/alpinejs': 3.13.10
     dev: true
 
   /@types/alpinejs__persist@3.13.4:
