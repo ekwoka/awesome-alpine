@@ -18,13 +18,14 @@ interface Props extends SectionData {}
 <script>
   import Alpine from 'alpinejs';
   import { findLocalLink } from '../../lib/utilities/findLocalLink';
-  const $links = Symbol('links');
 
   type Links = {
+    observer: ResizeObserver;
     top: number | null;
     height: number;
   };
 
+  const $links = Symbol('links');
   Alpine.addRootSelector(
     () => `[${Alpine.prefixed('nav-highlight')}\\:container]`,
   );
@@ -33,13 +34,19 @@ interface Props extends SectionData {}
       const localLink = findLocalLink(el)?.closest<HTMLElement>(
         `[${Alpine.prefixed('nav-highlight')}\\:item]`,
       );
+      const links: Links = Alpine.reactive({
+        observer: new ResizeObserver((entry) => {
+          const el = entry[0].target as HTMLElement;
+          links.top = el.offsetTop;
+          links.height = el.offsetHeight;
+        }),
+        top: localLink?.offsetTop ?? (null as number | null),
+        height: localLink
+          ? localLink.offsetHeight
+          : parseInt(window.getComputedStyle(el).lineHeight),
+      });
       Alpine.addScopeToNode(el, {
-        [$links]: Alpine.reactive({
-          top: localLink?.offsetTop ?? (null as number | null),
-          height: localLink
-            ? localLink.offsetHeight
-            : parseInt(window.getComputedStyle(el).lineHeight),
-        }) as Links,
+        [$links]: links,
       });
     } else if (value === 'item') {
       const data = Alpine.$data(el);
@@ -50,6 +57,8 @@ interface Props extends SectionData {}
           '@click'() {
             links.top = el.offsetTop;
             links.height = el.offsetHeight;
+            links.observer.disconnect();
+            links.observer.observe(el);
           },
         }) as unknown as () => void,
       );
@@ -75,14 +84,43 @@ interface Props extends SectionData {}
   import Alpine from 'alpinejs';
 
   const $accordion = Symbol('accordion');
-  Alpine.addRootSelector(() => '[x-accordion]');
-  Alpine.directive('accordion', (el, { value }, { cleanup }) => {
-    console.log('accordion', value);
+  const $accordionGroup = Symbol('accordionGroup');
+  Alpine.addRootSelector(
+    () =>
+      `[${Alpine.prefixed('accordion')}], [${Alpine.prefixed('accordion')}\\:group]`,
+  );
+  Alpine.directive('accordion', (el, { value }, { effect, cleanup }) => {
     if (!value) {
+      const accordion = Alpine.reactive({
+        open: false,
+      });
       Alpine.addScopeToNode(el, {
-        [$accordion]: Alpine.reactive({
-          open: false,
-        }),
+        [$accordion]: accordion,
+      });
+      const data = Alpine.$data(el) as {
+        [$accordionGroup]: {
+          accordions: { open: boolean }[];
+          addAccordion(accordion: { open: boolean }): void;
+        };
+      };
+      if ($accordionGroup in data)
+        data[$accordionGroup].addAccordion(accordion);
+    } else if (value === 'group') {
+      const group = Alpine.reactive({
+        accordions: [] as { open: boolean }[],
+        addAccordion(accordion: { open: boolean }) {
+          this.accordions.push(accordion);
+          effect(() => {
+            if (accordion.open)
+              this.accordions.forEach(
+                (a) => a !== accordion && (a.open = false),
+              );
+          });
+          return accordion;
+        },
+      });
+      Alpine.addScopeToNode(el, {
+        [$accordionGroup]: group,
       });
     } else if (value === 'control') {
       const data = Alpine.$data(el) as { [$accordion]?: { open: boolean } };
@@ -91,7 +129,7 @@ interface Props extends SectionData {}
       cleanup(
         Alpine.bind(el, {
           '@click'() {
-            accordion.open = !accordion.open;
+            accordion.open = true;
           },
         }) as unknown as () => void,
       );
@@ -116,11 +154,12 @@ interface Props extends SectionData {}
 <ul
   role="list"
   class="pl-4 border-l border-neutral-600 relative"
-  x-nav-highlight:container>
+  x-nav-highlight:container
+  x-accordion:group>
   {
     Astro.props.links.map((tree) => (
-      <li x-accordion>
-        <h3 x-nav-highlight:item x-accordion:control>
+      <li x-accordion x-nav-highlight:item>
+        <h3 x-accordion:control>
           <Link href={tree.link.url}>{tree.link.label}</Link>
         </h3>
         {'children' in tree && (
@@ -142,7 +181,7 @@ interface Props extends SectionData {}
   <li aria-hidden="true">
     <div
       x-nav-highlight:highlight
-      class="absolute left-0 top-0 w-2 h-[1rem] border-l border-sky-300 transition-[height,top]"
+      class="absolute left-0 top-0 w-2 h-[1rem] border-l border-sky-300 transition-[height,top] ease-linear"
       style="opacity: 0">
     </div>
   </li>
