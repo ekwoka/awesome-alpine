@@ -1,0 +1,16 @@
+---
+import { cn } from '../../lib/utilities/classNames';
+
+interface Props {
+  href: string;
+  class?: string;
+}
+---
+
+<a
+  href={Astro.props.href}
+  class={cn(
+    'text-neutral-800 hover:text-neutral-600 dark:text-neutral-500 dark:hover:text-neutral-200',
+    Astro.props.class,
+  )}><slot /></a
+>

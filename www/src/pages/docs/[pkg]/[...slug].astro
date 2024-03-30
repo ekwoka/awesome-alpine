@@ -1,0 +1,26 @@
+---
+import Documentation from '../../../layout/documentation.astro';
+
+import { getCollection } from 'astro:content';
+import { getDocNavigation } from '../../../lib/getDocNavigation';
+export async function getStaticPaths() {
+  const postEntries = await getCollection('docs');
+  return postEntries.map((entry) => {
+    const [pkg, ...slug] = entry.slug.split('/');
+    return {
+      params: { pkg, slug: slug.join('/') },
+      props: { entry },
+    };
+  });
+}
+
+const { entry } = Astro.props;
+const { pkg } = entry.data;
+const nav = await getDocNavigation(Astro.params.pkg);
+
+const { Content, headings } = await entry.render();
+---
+
+<Documentation title={pkg} navigation={nav}>
+  <Content />
+</Documentation>

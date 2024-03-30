@@ -1,0 +1,219 @@
+---
+import type { MarkdownHeading } from 'astro';
+import Link from '../atoms/link.astro';
+import type { NavTree } from '../../lib/getDocNavigation';
+
+type SectionData = {
+  label: string;
+  url: string;
+  headings?: MarkdownHeading[];
+  children?: NavTree;
+};
+interface Props extends SectionData {}
+---
+
+<script>
+  import Alpine from 'alpinejs';
+  import { findLocalLink } from '../../lib/utilities/findLocalLink';
+
+  type Links = {
+    observer: ResizeObserver;
+    top: number | null;
+    height: number;
+  };
+
+  const $links = Symbol('links');
+  Alpine.addRootSelector(
+    () => `[${Alpine.prefixed('nav-highlight')}\\:container]`,
+  );
+  Alpine.directive('nav-highlight', (el, { value }, { cleanup }) => {
+    if (value === 'container') {
+      const localLink = findLocalLink(el)?.closest<HTMLElement>(
+        `[${Alpine.prefixed('nav-highlight')}\\:item]`,
+      );
+      const links: Links = Alpine.reactive({
+        observer: new ResizeObserver((entry) => {
+          const el = entry[0].target as HTMLElement;
+          links.top = el.offsetTop;
+          links.height = el.offsetHeight;
+        }),
+        top: localLink?.offsetTop ?? (null as number | null),
+        height: localLink
+          ? localLink.offsetHeight
+          : parseInt(window.getComputedStyle(el).lineHeight),
+      });
+      Alpine.addScopeToNode(el, {
+        [$links]: links,
+      });
+    } else if (value === 'item') {
+      const data = Alpine.$data(el);
+      if (!($links in data)) return;
+      const links = data[$links] as Links;
+      cleanup(
+        Alpine.bind(el, {
+          '@click'() {
+            links.top = el.offsetTop;
+            links.height = el.offsetHeight;
+            links.observer.disconnect();
+            links.observer.observe(el);
+          },
+        }) as unknown as () => void,
+      );
+    } else if (value === 'highlight') {
+      const data = Alpine.$data(el);
+      if (!($links in data)) return;
+      const links = data[$links] as Links;
+      cleanup(
+        Alpine.bind(el, {
+          ':style'() {
+            return {
+              opacity: links.top === null ? '0' : null,
+              top: (links.top ?? 0) + 'px',
+              height: links.height + 'px',
+            };
+          },
+        }) as unknown as () => void,
+      );
+    }
+  });
+</script>
+<script>
+  import Alpine from 'alpinejs';
+
+  const $accordion = Symbol('accordion');
+  const $accordionGroup = Symbol('accordionGroup');
+  Alpine.addRootSelector(
+    () =>
+      `[${Alpine.prefixed('accordion')}], [${Alpine.prefixed('accordion')}\\:group]`,
+  );
+  Alpine.directive('accordion', (el, { value }, { effect, cleanup }) => {
+    if (!value) {
+      const accordion = Alpine.reactive({
+        open: false,
+      });
+      Alpine.addScopeToNode(el, {
+        [$accordion]: accordion,
+      });
+      const data = Alpine.$data(el) as {
+        [$accordionGroup]: {
+          accordions: { open: boolean }[];
+          addAccordion(accordion: { open: boolean }): void;
+        };
+      };
+      if ($accordionGroup in data)
+        data[$accordionGroup].addAccordion(accordion);
+    } else if (value === 'group') {
+      const group = Alpine.reactive({
+        accordions: [] as { open: boolean }[],
+        addAccordion(accordion: { open: boolean }) {
+          this.accordions.push(accordion);
+          effect(() => {
+            if (accordion.open)
+              this.accordions.forEach(
+                (a) => a !== accordion && (a.open = false),
+              );
+          });
+          return accordion;
+        },
+      });
+      Alpine.addScopeToNode(el, {
+        [$accordionGroup]: group,
+      });
+    } else if (value === 'control') {
+      const data = Alpine.$data(el) as { [$accordion]?: { open: boolean } };
+      if (!($accordion in data)) return;
+      const accordion = data[$accordion] as { open: boolean };
+      cleanup(
+        Alpine.bind(el, {
+          '@click'() {
+            accordion.open = true;
+          },
+        }) as unknown as () => void,
+      );
+    } else if (value === 'content') {
+      const data = Alpine.$data(el) as { [$accordion]?: { open: boolean } };
+      if (!($accordion in data)) return;
+      const accordion = data[$accordion] as { open: boolean };
+      cleanup(
+        Alpine.bind(el, {
+          ':aria-hidden'() {
+            return accordion.open ? 'false' : 'true';
+          },
+          ':open'() {
+            return accordion.open;
+          },
+        }) as unknown as () => void,
+      );
+    }
+  });
+</script>
+<div>
+  <p>
+    {
+      Astro.props.url !== '' ? (
+        <Link href={`${Astro.props.url}`}>{Astro.props.label}</Link>
+      ) : (
+        Astro.props.label
+      )
+    }
+  </p>
+  <ul role="list" class="pl-4">
+    {
+      Astro.props.headings?.map(
+        (child) =>
+          child.depth !== 1 && (
+            <li class="pl-2">
+              <Link href={`${Astro.props.url.split('#')[0]}#${child.slug}`}>
+                {child.text}
+              </Link>
+            </li>
+          ),
+      )
+    }
+  </ul>
+  <ul
+    role="list"
+    class="pl-2 border-l border-neutral-600 relative"
+    x-nav-highlight:container
+    x-accordion:group>
+    {
+      Astro.props.children &&
+        Array.from(Astro.props.children.values()).map((nav) => (
+          <li x-accordion x-nav-highlight:item>
+            <h3 x-accordion:control>
+              {nav.url ? (
+                <Link href={`${nav.url}`}>{nav.label}</Link>
+              ) : (
+                nav.label
+              )}
+            </h3>
+            {'headings' in nav && (
+              <div
+                x-accordion:content
+                class="overflow-hidden transition-[grid-template-rows] grid grid-rows-[0fr] [&[open]]:grid-rows-[1fr]">
+                <ul role="list" class="pl-4 min-h-0">
+                  {nav.headings?.map(
+                    (child) =>
+                      child.depth !== 1 && (
+                        <li class="pl-2">
+                          <Link href={`${nav.url.split('#')[0]}#${child.slug}`}>
+                            {child.text}
+                          </Link>
+                        </li>
+                      ),
+                  )}
+                </ul>
+              </div>
+            )}
+          </li>
+        ))
+    }
+    <li aria-hidden="true">
+      <div
+        x-nav-highlight:highlight
+        class="absolute left-0 top-0 w-2 h-[1rem] border-l border-sky-300 transition-[height,top] ease-linear"
+        style="opacity: 0">
+      </div>
+    </li>
+  </ul>
+</div>

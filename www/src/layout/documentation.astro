@@ -1,0 +1,45 @@
+---
+import '../styles.css';
+import Header from '../components/header.astro';
+import { ViewTransitions } from 'astro:transitions';
+import SectionNavigation from '../components/organisms/section-navigation.astro';
+import type { NavTree } from '../lib/getDocNavigation';
+interface Props {
+  title: string;
+  navigation: NavTree;
+}
+
+const pkgName = Astro.props.title.replaceAll('-', ' ');
+---
+
+<!doctype html>
+<html lang="en" transition:animate="initial">
+  <head>
+    <ViewTransitions fallback="none" />
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{pkgName} - AwesomeAlpine</title>
+    <script>
+      import Alpine from 'alpinejs';
+
+      window.Alpine = Alpine;
+    </script>
+  </head>
+  <body
+    class="w-full min-h-screen bg-neutral-100 dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 flex flex-col">
+    <Header subtitle={pkgName} />
+    <div class="flex flex-row grow">
+      <SectionNavigation navigation={Astro.props.navigation} />
+      <div class="p-8 md:p-16 grow">
+        <article
+          class="prose dark:prose-invert w-full dark:tracking-wider prose-headings:font-medium">
+          <slot />
+        </article>
+      </div>
+      <script is:inline type="module">
+        window.Alpine.start();
+      </script>
+    </div>
+  </body>
+</html>
