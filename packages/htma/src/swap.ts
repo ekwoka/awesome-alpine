@@ -1,6 +1,6 @@
 import type { Alpine } from 'alpinejs';
 
-enum SwapMethod {
+export enum SwapMethod {
   None = 0, // Do nothing
   Delete = 1 << 0, // Delete the target
   Replace = 1 << 1, // Replace the target Outer
@@ -13,14 +13,6 @@ enum SwapMethod {
 }
 
 const forEach = Array.prototype.forEach;
-
-export const swap = (
-  target: HTMLElement,
-  source: HTMLElement,
-  method: SwapMethod = SwapMethod.Replace,
-) => {
-  console.log(target, source, method);
-};
 
 const skipClean = (
   method: SwapMethod,
@@ -52,6 +44,24 @@ export class Swap {
     public source: HTMLElement,
     public method: SwapMethod,
   ) {}
+  swap(Alpine: Alpine) {
+    if (this.method === SwapMethod.None) return;
+    if (this.method === SwapMethod.Delete) return this.target.remove();
+    if (this.method === SwapMethod.Replace)
+      return this.target.replaceWith(this.source);
+    if (this.method === SwapMethod.ReplaceChildren) {
+      return this.target.replaceChildren(this.source);
+    }
+    if (this.method === SwapMethod.Before)
+      return this.target.before(this.source);
+    if (this.method === SwapMethod.Prepend)
+      return this.target.prepend(this.source);
+    if (this.method === SwapMethod.Append)
+      return this.target.append(this.source);
+    if (this.method === SwapMethod.After) return this.target.after(this.source);
+    if (this.method === SwapMethod.Morph)
+      Alpine.morph(this.target, this.source);
+  }
   clean(Alpine: Alpine) {
     if (skipClean(this.method)) return;
     if (this.method === SwapMethod.ReplaceChildren)

@@ -1,5 +1,6 @@
 import type { Alpine, PluginCallback } from 'alpinejs';
 
+import { Swap, SwapMethod } from './swap.ts';
 import { callIfFunc, type maybeFunc } from './utils/maybeFunc.ts';
 import { parseDom } from './utils/parseDom.ts';
 
@@ -7,7 +8,7 @@ export const $htma = Symbol('htma');
 
 const _hasHTMA = (el: object): el is { [$htma]: HXBinding } => $htma in el;
 
-export const HTMA: PluginCallback = (Alpine: Alpine) => {
+export const HTMA: PluginCallback = (Alpine) => {
   const elementMap = new WeakMap<HTMLElement, HXBinding>();
   Alpine.addInitSelector(() => '[hx-get], [hx-post], [hx-put], [hx-delete]');
   Alpine.mapAttributes((attr) => {
@@ -35,7 +36,7 @@ export const HTMA: PluginCallback = (Alpine: Alpine) => {
   });
   Alpine.directive('hxswap', (el, { expression }, _extras) => {
     const hxData = elementMap.get(el);
-    if (hxData) hxData.swap = expression;
+    if (hxData) hxData.swap = Number(expression);
   });
 };
 
@@ -50,7 +51,7 @@ enum Verb {
 class HXBinding {
   public target: HTMLElement;
   public select: string = 'body';
-  public swap: string = 'innerHTML';
+  public swap = SwapMethod.Replace;
   constructor(
     public el: HTMLElement,
     public method = Verb.GET,
@@ -80,18 +81,11 @@ class HXBinding {
     const node = doc.querySelector<HTMLElement>(this.select);
     console.log(node);
     if (!node) return console.error(new Error('No matching element found'));
+    const swap = new Swap(this.target, node, this.swap);
     this.alp.mutateDom(() => {
-      this.alp.destroyTree(this.target);
-      this.target[
-        swapMethodMap[this.swap as keyof typeof swapMethodMap] ?? this.swap
-      ](node);
-      this.alp.initTree(node);
+      swap.clean(this.alp);
+      swap.swap(this.alp);
+      swap.initialize(this.alp);
     });
   }
 }
-
-const swapMethodMap = {
-  innerHTML: 'replaceChildren',
-  outerHTML: 'replaceWith',
-  replace: 'replaceWith',
-} as const;
