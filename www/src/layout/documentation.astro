@@ -1,7 +1,6 @@
 ---
 import '../styles.css';
 import Header from '../components/header.astro';
-import { ViewTransitions } from 'astro:transitions';
 import SectionNavigation from '../components/organisms/section-navigation.astro';
 import type { NavTree } from '../lib/getDocNavigation';
 interface Props {
@@ -15,7 +14,6 @@ const pkgName = Astro.props.title.replaceAll('-', ' ');
 <!doctype html>
 <html lang="en" transition:animate="initial">
   <head>
-    <ViewTransitions fallback="none" />
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -31,12 +29,12 @@ const pkgName = Astro.props.title.replaceAll('-', ' ');
     <Header subtitle={pkgName} />
     <div class="flex flex-row grow">
       <SectionNavigation navigation={Astro.props.navigation} />
-      <div class="p-8 md:p-16 grow">
+      <main id="documentation-main" class="p-8 md:p-16 grow">
         <article
           class="prose dark:prose-invert w-full dark:tracking-wider prose-headings:font-medium">
           <slot />
         </article>
-      </div>
+      </main>
       <script is:inline type="module">
         window.Alpine.start();
       </script>

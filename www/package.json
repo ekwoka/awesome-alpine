@@ -8,6 +8,7 @@
     "@astrojs/check": "0.5.10",
     "@astrojs/mdx": "2.2.4",
     "@astrojs/tailwind": "5.1.0",
+    "@awesome-alpine/htma": "workspace:*",
     "@ekwoka/alpine-history": "0.2.0",
     "alpinejs": "3.13.8",
     "astro": "4.5.16",

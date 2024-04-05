@@ -9,6 +9,7 @@ export const $htma = Symbol('htma');
 const _hasHTMA = (el: object): el is { [$htma]: HXBinding } => $htma in el;
 
 export const HTMA: PluginCallback = (Alpine) => {
+  console.log('adding HTMA');
   const elementMap = new WeakMap<HTMLElement, HXBinding>();
   Alpine.addInitSelector(() => '[hx-get], [hx-post], [hx-put], [hx-delete]');
   Alpine.mapAttributes((attr) => {
@@ -18,21 +19,35 @@ export const HTMA: PluginCallback = (Alpine) => {
   });
 
   Alpine.directive('hxget', (el, { expression }, _extras) => {
+    console.log('hxget', expression || el.getAttribute('href') || '#');
     const hxData =
       elementMap.get(el) ||
       elementMap
         .set(
           el,
-          Alpine.reactive(new HXBinding(el, Verb.GET, expression, Alpine)),
+          Alpine.reactive(
+            new HXBinding(
+              el,
+              Verb.GET,
+              expression || el.getAttribute('href') || '#',
+              Alpine,
+            ),
+          ),
         )
         .get(el)!;
-    el.addEventListener('click', () => {
+    el.addEventListener('click', (e) => {
+      e.preventDefault();
       hxData.fetch();
     });
   }).before('bind');
   Alpine.directive('hxselect', (el, { expression }, _extras) => {
     const hxData = elementMap.get(el);
     if (hxData) hxData.select = expression;
+  });
+  Alpine.directive('hxtarget', (el, { expression }, _extras) => {
+    console.log('target', expression);
+    const hxData = elementMap.get(el);
+    if (hxData) hxData.target = () => document.querySelector(expression);
   });
   Alpine.directive('hxswap', (el, { expression }, _extras) => {
     const hxData = elementMap.get(el);
@@ -49,7 +64,7 @@ enum Verb {
 }
 
 class HXBinding {
-  public target: HTMLElement;
+  public target: () => HTMLElement | null;
   public select: string = 'body';
   public swap = SwapMethod.Replace;
   constructor(
@@ -58,27 +73,35 @@ class HXBinding {
     public action: maybeFunc<string> = '',
     private alp: Alpine,
   ) {
-    this.target = el;
+    this.target = () => el;
   }
   get GET() {
     return callIfFunc(this.action);
   }
   async fetch() {
+    console.log('fetching', this.action);
     try {
-      const response = await fetch(callIfFunc(this.action), {
+      const path = callIfFunc(this.action);
+      const response = await fetch(path, {
         method: this.method,
       });
       if (!response.ok) return new Error(response.statusText);
       const html = await response.text();
-      return this.performSwap(parseDom(html));
+      this.performSwap(parseDom(html));
+      console.log(path);
+      history.pushState({}, '', path);
     } catch (error) {
       console.error(error);
     }
   }
   performSwap(doc: Document) {
+    console.log('swapping', this.target, this.select, this.swap);
     const node = doc.querySelector<HTMLElement>(this.select);
     if (!node) return new Error('No matching element found');
-    const swap = new Swap(this.target, node, this.swap);
+    const targetNode = this.target();
+    if (!targetNode) return new Error('No target node found');
+    console.log('swapping', targetNode, node);
+    const swap = new Swap(targetNode, node, this.swap);
     this.alp.mutateDom(() => {
       swap.clean(this.alp);
       swap.swap(this.alp);

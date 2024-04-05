@@ -18,7 +18,13 @@ interface Props {
           {'children' in data || 'headings' in data ? (
             <NavigationSection {...data} />
           ) : (
-            <Link href={data.url ?? '#'}>{data.label}</Link>
+            <Link
+              hx-get=""
+              hx-select="#documentation-main"
+              hx-target="#documentation-main"
+              href={data.url ?? '#'}>
+              {data.label}
+            </Link>
           )}
         </li>
       ))
