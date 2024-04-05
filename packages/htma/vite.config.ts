@@ -1,5 +1,6 @@
 /// <reference types="vitest" />
 import { resolve } from 'node:path';
+import { alpineTestingPlugin } from 'testing-library-alpine';
 import { defineConfig } from 'vite';
 import dts from 'vite-plugin-dts';
 import ExternalDeps from 'vite-plugin-external-deps';
@@ -7,6 +8,7 @@ import ExternalDeps from 'vite-plugin-external-deps';
 export default defineConfig({
   root: resolve(__dirname),
   plugins: [
+    alpineTestingPlugin(),
     dts({
       entryRoot: resolve(__dirname, 'src'),
       tsconfigPath: resolve(__dirname, 'tsconfig.json'),
