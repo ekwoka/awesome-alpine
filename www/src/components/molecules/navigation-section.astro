@@ -158,7 +158,8 @@ interface Props extends SectionData {}
       Astro.props.url !== '' ? (
         <Link
           hx-get=""
-          hx-select="#documentation-main"
+          hx-select="#documentation-main>*"
+          hx-swap={4}
           hx-target="#documentation-main"
           href={`${Astro.props.url}`}>
           {Astro.props.label}
@@ -176,7 +177,8 @@ interface Props extends SectionData {}
             <li class="pl-2">
               <Link
                 hx-get=""
-                hx-select="#documentation-main"
+                hx-select="#documentation-main>*"
+                hx-swap={4}
                 hx-target="#documentation-main"
                 href={`${Astro.props.url.split('#')[0]}#${child.slug}`}>
                 {child.text}
@@ -199,7 +201,8 @@ interface Props extends SectionData {}
               {nav.url ? (
                 <Link
                   hx-get=""
-                  hx-select="#documentation-main"
+                  hx-select="#documentation-main>*"
+                  hx-swap={4}
                   hx-target="#documentation-main"
                   href={`${nav.url}`}>
                   {nav.label}
@@ -219,7 +222,8 @@ interface Props extends SectionData {}
                         <li class="pl-2">
                           <Link
                             hx-get=""
-                            hx-select="#documentation-main"
+                            hx-select="#documentation-main>*"
+                            hx-swap={4}
                             hx-target="#documentation-main"
                             href={`${nav.url.split('#')[0]}#${child.slug}`}>
                             {child.text}

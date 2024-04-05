@@ -20,7 +20,8 @@ interface Props {
           ) : (
             <Link
               hx-get=""
-              hx-select="#documentation-main"
+              hx-select="#documentation-main>*"
+              hx-swap={4}
               hx-target="#documentation-main"
               href={data.url ?? '#'}>
               {data.label}

@@ -29,7 +29,9 @@ const pkgName = Astro.props.title.replaceAll('-', ' ');
     <Header subtitle={pkgName} />
     <div class="flex flex-row grow">
       <SectionNavigation navigation={Astro.props.navigation} />
-      <main id="documentation-main" class="p-8 md:p-16 grow">
+      <main
+        id="documentation-main"
+        class="p-8 md:p-16 grow [&[hx-swapping]]:opacity-50 [&[hx-swapping]]:grayscale transition-all duration-1000">
         <article
           class="prose dark:prose-invert w-full dark:tracking-wider prose-headings:font-medium">
           <slot />

@@ -65,7 +65,9 @@ export class Swap {
   clean(Alpine: Alpine) {
     if (skipClean(this.method)) return;
     if (this.method === SwapMethod.ReplaceChildren)
-      return forEach.call(this.target.children, Alpine.destroyTree);
+      forEach.call(this.target.children, (child: HTMLElement) =>
+        Alpine.destroyTree(child),
+      );
     return Alpine.destroyTree(this.target);
   }
   initialize(Alpine: Alpine) {

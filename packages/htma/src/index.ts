@@ -9,7 +9,6 @@ export const $htma = Symbol('htma');
 const _hasHTMA = (el: object): el is { [$htma]: HXBinding } => $htma in el;
 
 export const HTMA: PluginCallback = (Alpine) => {
-  console.log('adding HTMA');
   const elementMap = new WeakMap<HTMLElement, HXBinding>();
   Alpine.addInitSelector(() => '[hx-get], [hx-post], [hx-put], [hx-delete]');
   Alpine.mapAttributes((attr) => {
@@ -19,7 +18,6 @@ export const HTMA: PluginCallback = (Alpine) => {
   });
 
   Alpine.directive('hxget', (el, { expression }, _extras) => {
-    console.log('hxget', expression || el.getAttribute('href') || '#');
     const hxData =
       elementMap.get(el) ||
       elementMap
@@ -45,7 +43,6 @@ export const HTMA: PluginCallback = (Alpine) => {
     if (hxData) hxData.select = expression;
   });
   Alpine.directive('hxtarget', (el, { expression }, _extras) => {
-    console.log('target', expression);
     const hxData = elementMap.get(el);
     if (hxData) hxData.target = () => document.querySelector(expression);
   });
@@ -79,7 +76,7 @@ class HXBinding {
     return callIfFunc(this.action);
   }
   async fetch() {
-    console.log('fetching', this.action);
+    this.target()?.setAttribute('hx-swapping', '');
     try {
       const path = callIfFunc(this.action);
       const response = await fetch(path, {
@@ -88,24 +85,24 @@ class HXBinding {
       if (!response.ok) return new Error(response.statusText);
       const html = await response.text();
       this.performSwap(parseDom(html));
-      console.log(path);
+
       history.pushState({}, '', path);
     } catch (error) {
       console.error(error);
     }
   }
   performSwap(doc: Document) {
-    console.log('swapping', this.target, this.select, this.swap);
     const node = doc.querySelector<HTMLElement>(this.select);
     if (!node) return new Error('No matching element found');
     const targetNode = this.target();
     if (!targetNode) return new Error('No target node found');
-    console.log('swapping', targetNode, node);
+
     const swap = new Swap(targetNode, node, this.swap);
     this.alp.mutateDom(() => {
       swap.clean(this.alp);
       swap.swap(this.alp);
       swap.initialize(this.alp);
     });
+    if (targetNode.isConnected) targetNode.removeAttribute('hx-swapping');
   }
 }

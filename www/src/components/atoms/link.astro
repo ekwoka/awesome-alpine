@@ -6,6 +6,7 @@ interface Props {
   'hx-get'?: string;
   'hx-select'?: string;
   'hx-target'?: string;
+  'hx-swap'?: number;
   class?: string;
 }
 ---
@@ -15,6 +16,7 @@ interface Props {
   hx-get={Astro.props['hx-get']}
   hx-select={Astro.props['hx-select']}
   hx-target={Astro.props['hx-target']}
+  hx-swap={Astro.props['hx-swap']}
   class={cn(
     'text-neutral-800 hover:text-neutral-600 dark:text-neutral-500 dark:hover:text-neutral-200',
     Astro.props.class,
