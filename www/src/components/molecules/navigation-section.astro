@@ -147,11 +147,23 @@ interface Props extends SectionData {}
     }
   });
 </script>
+<script>
+  import Alpine from 'alpinejs';
+  import { HTMA } from '@awesome-alpine/htma';
+  Alpine.plugin(HTMA);
+</script>
 <div>
   <p>
     {
       Astro.props.url !== '' ? (
-        <Link href={`${Astro.props.url}`}>{Astro.props.label}</Link>
+        <Link
+          hx-get=""
+          hx-select="#documentation-main>*"
+          hx-swap={4}
+          hx-target="#documentation-main"
+          href={`${Astro.props.url}`}>
+          {Astro.props.label}
+        </Link>
       ) : (
         Astro.props.label
       )
@@ -163,7 +175,12 @@ interface Props extends SectionData {}
         (child) =>
           child.depth !== 1 && (
             <li class="pl-2">
-              <Link href={`${Astro.props.url.split('#')[0]}#${child.slug}`}>
+              <Link
+                hx-get=""
+                hx-select="#documentation-main>*"
+                hx-swap={4}
+                hx-target="#documentation-main"
+                href={`${Astro.props.url.split('#')[0]}#${child.slug}`}>
                 {child.text}
               </Link>
             </li>
@@ -182,7 +199,14 @@ interface Props extends SectionData {}
           <li x-accordion x-nav-highlight:item>
             <h3 x-accordion:control>
               {nav.url ? (
-                <Link href={`${nav.url}`}>{nav.label}</Link>
+                <Link
+                  hx-get=""
+                  hx-select="#documentation-main>*"
+                  hx-swap={4}
+                  hx-target="#documentation-main"
+                  href={`${nav.url}`}>
+                  {nav.label}
+                </Link>
               ) : (
                 nav.label
               )}
@@ -196,7 +220,12 @@ interface Props extends SectionData {}
                     (child) =>
                       child.depth !== 1 && (
                         <li class="pl-2">
-                          <Link href={`${nav.url.split('#')[0]}#${child.slug}`}>
+                          <Link
+                            hx-get=""
+                            hx-select="#documentation-main>*"
+                            hx-swap={4}
+                            hx-target="#documentation-main"
+                            href={`${nav.url.split('#')[0]}#${child.slug}`}>
                             {child.text}
                           </Link>
                         </li>
