@@ -1,8 +1,9 @@
 /// <reference types="vitest" />
+import { alpineTestingPlugin } from 'testing-library-alpine';
 import { defineConfig } from 'vite';
 
 export default defineConfig({
-  plugins: [],
+  plugins: [alpineTestingPlugin()],
   build: {
     target: 'esnext',
   },

@@ -68,8 +68,7 @@ class HXBinding {
       const response = await fetch(callIfFunc(this.action), {
         method: this.method,
       });
-      if (!response.ok) return console.error(new Error(response.statusText));
-      console.log(this.select);
+      if (!response.ok) return new Error(response.statusText);
       const html = await response.text();
       return this.performSwap(parseDom(html));
     } catch (error) {
@@ -77,10 +76,8 @@ class HXBinding {
     }
   }
   performSwap(doc: Document) {
-    console.log(doc);
     const node = doc.querySelector<HTMLElement>(this.select);
-    console.log(node);
-    if (!node) return console.error(new Error('No matching element found'));
+    if (!node) return new Error('No matching element found');
     const swap = new Swap(this.target, node, this.swap);
     this.alp.mutateDom(() => {
       swap.clean(this.alp);
