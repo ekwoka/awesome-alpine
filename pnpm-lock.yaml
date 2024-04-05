@@ -143,6 +143,9 @@ importers:
       '@types/alpinejs__intersect':
         specifier: 3.13.4
         version: 3.13.4
+      '@types/alpinejs__morph':
+        specifier: 3.13.4
+        version: 3.13.4
       alpinejs:
         specifier: 3.13.8
         version: 3.13.8
@@ -2468,6 +2471,12 @@ packages:
 
   /@types/alpinejs__intersect@3.13.4:
     resolution: {integrity: sha512-yoX6WO7AleeULOQvPz7rrx7FJmu6l033bM7QiGcWyvZjqF2KIut99ByUZO6OWUQuYmbRjxsKthGiUYNaAywHiA==}
+    dependencies:
+      '@types/alpinejs': 3.13.10
+    dev: true
+
+  /@types/alpinejs__morph@3.13.4:
+    resolution: {integrity: sha512-7A7YfX1EjWSPgOK677AFTW0iJNxYh+uaF952nwGiPxspej2Ch9lPAdctj7BDtyvZYM7GDtmx7DRqH6xTjtIe3A==}
     dependencies:
       '@types/alpinejs': 3.13.10
     dev: true

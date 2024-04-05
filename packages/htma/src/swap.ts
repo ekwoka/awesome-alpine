@@ -59,8 +59,8 @@ export class Swap {
     if (this.method === SwapMethod.Append)
       return this.target.append(this.source);
     if (this.method === SwapMethod.After) return this.target.after(this.source);
-    if (this.method === SwapMethod.Morph)
-      Alpine.morph(this.target, this.source);
+    if (this.method === SwapMethod.Morph && 'morph' in Alpine)
+      Alpine.morph(this.target, this.source, {});
   }
   clean(Alpine: Alpine) {
     if (skipClean(this.method)) return;
