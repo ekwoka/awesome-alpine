@@ -27,13 +27,13 @@ const intoNavTree = (tree: NavTree, nav: NavDatum): NavTree => {
     Object.assign(branch, {
       label: firstHeading?.text ?? branch.label,
       url: `${nav.baseUrl}${head}/#${firstHeading?.slug ?? ''}`,
-      headings: nav.headings,
+      headings: nav.headings.filter((h) => h.depth === 2),
     });
   } else
     branch.children = intoNavTree(branch.children ?? new Map(), {
       path: tail,
       baseUrl: `${nav.baseUrl}${head}/`,
-      headings: nav.headings,
+      headings: nav.headings.filter((h) => h.depth === 2),
     });
   return tree;
 };

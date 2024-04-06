@@ -171,21 +171,18 @@ interface Props extends SectionData {}
   </p>
   <ul role="list" class="pl-4">
     {
-      Astro.props.headings?.map(
-        (child) =>
-          child.depth !== 1 && (
-            <li class="pl-2">
-              <Link
-                hx-get=""
-                hx-select="#documentation-main>*"
-                hx-swap={4}
-                hx-target="#documentation-main"
-                href={`${Astro.props.url.split('#')[0]}#${child.slug}`}>
-                {child.text}
-              </Link>
-            </li>
-          ),
-      )
+      Astro.props.headings?.map((child) => (
+        <li class="pl-2">
+          <Link
+            hx-get=""
+            hx-select="#documentation-main>*"
+            hx-swap={4}
+            hx-target="#documentation-main"
+            href={`${Astro.props.url.split('#')[0]}#${child.slug}`}>
+            {child.text}
+          </Link>
+        </li>
+      ))
     }
   </ul>
   <ul
@@ -216,21 +213,18 @@ interface Props extends SectionData {}
                 x-accordion:content
                 class="overflow-hidden transition-[grid-template-rows] grid grid-rows-[0fr] [&[open]]:grid-rows-[1fr]">
                 <ul role="list" class="pl-4 min-h-0">
-                  {nav.headings?.map(
-                    (child) =>
-                      child.depth !== 1 && (
-                        <li class="pl-2">
-                          <Link
-                            hx-get=""
-                            hx-select="#documentation-main>*"
-                            hx-swap={4}
-                            hx-target="#documentation-main"
-                            href={`${nav.url.split('#')[0]}#${child.slug}`}>
-                            {child.text}
-                          </Link>
-                        </li>
-                      ),
-                  )}
+                  {nav.headings?.map((child) => (
+                    <li class="pl-2">
+                      <Link
+                        hx-get=""
+                        hx-select="#documentation-main>*"
+                        hx-swap={4}
+                        hx-target="#documentation-main"
+                        href={`${nav.url.split('#')[0]}#${child.slug}`}>
+                        {child.text}
+                      </Link>
+                    </li>
+                  ))}
                 </ul>
               </div>
             )}

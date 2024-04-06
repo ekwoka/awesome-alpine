@@ -1,12 +1,12 @@
 {
   "htma": {
     "minified": {
-      "pretty": "2.48 kB",
-      "raw": 2476
+      "pretty": "2.56 kB",
+      "raw": 2556
     },
     "brotli": {
-      "pretty": "885 B",
-      "raw": 885
+      "pretty": "912 B",
+      "raw": 912
     }
   }
 }
