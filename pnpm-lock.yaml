@@ -39,7 +39,7 @@ overrides:
   typescript: 5.4.4
   vite: 5.2.8
   vitest: 1.4.0
-  happy-dom: 14.5.1
+  happy-dom: 14.6.2
   express@<4.19.2: '>=4.19.2'
 
 importers:
@@ -74,8 +74,8 @@ importers:
         specifier: 8.57.0
         version: 8.57.0
       happy-dom:
-        specifier: 14.5.1
-        version: 14.5.1
+        specifier: 14.6.2
+        version: 14.6.2
       husky:
         specifier: 9.0.11
         version: 9.0.11
@@ -105,7 +105,7 @@ importers:
         version: 3.4.3
       testing-library-alpine:
         specifier: 0.0.1-alpha.0
-        version: 0.0.1-alpha.0(alpinejs@3.13.8)(happy-dom@14.5.1)(vitest@1.4.0)
+        version: 0.0.1-alpha.0(alpinejs@3.13.8)(happy-dom@14.6.2)(vitest@1.4.0)
       typescript:
         specifier: 5.4.4
         version: 5.4.4
@@ -123,7 +123,7 @@ importers:
         version: 0.0.3
       vitest:
         specifier: 1.4.0
-        version: 1.4.0(@types/node@20.11.30)(happy-dom@14.5.1)
+        version: 1.4.0(@types/node@20.11.30)(happy-dom@14.6.2)
       vitest-environment-alpine:
         specifier: 0.0.2-alpha.1
         version: 0.0.2-alpha.1(alpinejs@3.13.8)(testing-library-alpine@0.0.1-alpha.0)(vitest@1.4.0)
@@ -230,7 +230,7 @@ importers:
         version: 3.8.1(@types/node@20.11.30)(typescript@5.4.4)(vite@5.2.8)
       vitest:
         specifier: 1.4.0
-        version: 1.4.0(@types/node@20.11.30)(happy-dom@14.5.1)
+        version: 1.4.0(@types/node@20.11.30)(happy-dom@14.6.2)
       vituum:
         specifier: 1.1.0
         version: 1.1.0(@types/node@20.11.30)
@@ -774,7 +774,7 @@ packages:
     peerDependencies:
       testing-library-alpine: ^0.0.1-alpha.0
     dependencies:
-      testing-library-alpine: 0.0.1-alpha.0(alpinejs@3.13.8)(happy-dom@14.5.1)(vitest@1.4.0)
+      testing-library-alpine: 0.0.1-alpha.0(alpinejs@3.13.8)(happy-dom@14.6.2)(vitest@1.4.0)
     dev: true
 
   /@emmetio/abbreviation@2.3.3:
@@ -1076,7 +1076,7 @@ packages:
     resolution: {integrity: sha512-3T8LkOmg45BV5FICb15QQMsyUSWrQ8AygVfC7ZG32zOalnqrilm018ZVCw0eapXux8FtA33q8PSRSstjee3jSg==}
     engines: {node: '>=10.10.0'}
     dependencies:
-      '@humanwhocodes/object-schema': 2.0.2
+      '@humanwhocodes/object-schema': 2.0.3
       debug: 4.3.4(supports-color@9.4.0)
       minimatch: 3.1.2
     transitivePeerDependencies:
@@ -1093,8 +1093,8 @@ packages:
     engines: {node: '>=10.10.0'}
     dev: true
 
-  /@humanwhocodes/object-schema@2.0.2:
-    resolution: {integrity: sha512-6EwiSjwWYP7pTckG6I5eyFANjPhmPjUX9JRLUSfNPC7FX7zK9gyZAfUEaECL6ALTpGX5AjnBq3C9XmVWPitNpw==}
+  /@humanwhocodes/object-schema@2.0.3:
+    resolution: {integrity: sha512-93zYdMES/c1D69yZiKDBj0V24vqNzB/koF26KPaagAfd3P/4gUlh3Dys5ogAK+Exi9QyzlD8x/08Zt7wIKcDcA==}
     dev: true
 
   /@iarna/toml@2.2.5:
@@ -6225,8 +6225,8 @@ packages:
       - uWebSockets.js
     dev: true
 
-  /happy-dom@14.5.1:
-    resolution: {integrity: sha512-nCmCszZnhHHvcY3gDqLNZrU71QzCT1sI2OUQy2YSn3omMYWe+QHSTO1PfS/1r6fds6zt6GI7L1tRIxo7RgC8lg==}
+  /happy-dom@14.6.2:
+    resolution: {integrity: sha512-yiaVI0Da/tGrBD6QwmXkJZH9RPW1/TCxqadbwkp0MgwRTTDNyBC09Ow+nppVLhbG4Ws2Z6t29Vzbbd6C0y7LCQ==}
     engines: {node: '>=16.0.0'}
     dependencies:
       entities: 4.5.0
@@ -11142,17 +11142,17 @@ packages:
       supports-hyperlinks: 2.3.0
     dev: true
 
-  /testing-library-alpine@0.0.1-alpha.0(alpinejs@3.13.8)(happy-dom@14.5.1)(vitest@1.4.0):
+  /testing-library-alpine@0.0.1-alpha.0(alpinejs@3.13.8)(happy-dom@14.6.2)(vitest@1.4.0):
     resolution: {integrity: sha512-u03NLvpMlhnF9ZX3uviUr6aR32Tj4RdUKKPjl8YdihKgL0ZE3U9le8RBhjHo9D5Y43B5ZfXcMhQL7dN9+X1e6Q==}
     peerDependencies:
       alpinejs: ^3.0.0
-      happy-dom: 14.5.1
+      happy-dom: 14.6.2
       vitest: 1.4.0
     dependencies:
       '@ekwoka/alpine-testing-library-utilities': 0.0.1-alpha.0(testing-library-alpine@0.0.1-alpha.0)
       alpinejs: 3.13.8
-      happy-dom: 14.5.1
-      vitest: 1.4.0(@types/node@20.11.30)(happy-dom@14.5.1)
+      happy-dom: 14.6.2
+      vitest: 1.4.0(@types/node@20.11.30)(happy-dom@14.6.2)
       vitest-environment-alpine: 0.0.2-alpha.1(alpinejs@3.13.8)(testing-library-alpine@0.0.1-alpha.0)(vitest@1.4.0)
     dev: true
 
@@ -12014,15 +12014,15 @@ packages:
       vitest: 1.4.0
     dependencies:
       alpinejs: 3.13.8
-      happy-dom: 14.5.1
-      vitest: 1.4.0(@types/node@20.11.30)(happy-dom@14.5.1)
+      happy-dom: 14.6.2
+      vitest: 1.4.0(@types/node@20.11.30)(happy-dom@14.6.2)
     optionalDependencies:
       '@ekwoka/alpine-testing-library-utilities': 0.0.1-alpha.0(testing-library-alpine@0.0.1-alpha.0)
     transitivePeerDependencies:
       - testing-library-alpine
     dev: true
 
-  /vitest@1.4.0(@types/node@20.11.30)(happy-dom@14.5.1):
+  /vitest@1.4.0(@types/node@20.11.30)(happy-dom@14.6.2):
     resolution: {integrity: sha512-gujzn0g7fmwf83/WzrDTnncZt2UiXP41mHuFYFrdwaLRVQ6JYQEiME2IfEjU3vcFL3VKa75XhI3lFgn+hfVsQw==}
     engines: {node: ^18.0.0 || >=20.0.0}
     hasBin: true
@@ -12031,7 +12031,7 @@ packages:
       '@types/node': ^18.0.0 || >=20.0.0
       '@vitest/browser': 1.4.0
       '@vitest/ui': 1.4.0
-      happy-dom: 14.5.1
+      happy-dom: 14.6.2
       jsdom: '*'
     peerDependenciesMeta:
       '@edge-runtime/vm':
@@ -12057,7 +12057,7 @@ packages:
       chai: 4.4.1
       debug: 4.3.4(supports-color@9.4.0)
       execa: 8.0.1
-      happy-dom: 14.5.1
+      happy-dom: 14.6.2
       local-pkg: 0.5.0
       magic-string: 0.30.8
       pathe: 1.1.2

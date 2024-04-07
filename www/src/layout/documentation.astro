@@ -31,9 +31,9 @@ const pkgName = Astro.props.title.replaceAll('-', ' ');
       <SectionNavigation navigation={Astro.props.navigation} />
       <main
         id="documentation-main"
-        class="p-8 md:p-16 grow [&[hx-swapping]]:opacity-50 [&[hx-swapping]]:grayscale transition-all duration-1000">
+        class="p-4 sm:p-8 lg:p-16 grow [&[hx-swapping]]:opacity-50 [&[hx-swapping]]:grayscale transition-all duration-500 max-w-full scroll-mt-16">
         <article
-          class="prose dark:prose-invert w-full dark:tracking-wider prose-headings:font-medium">
+          class="prose dark:prose-invert w-full dark:tracking-wider prose-headings:font-medium pb-16">
           <slot />
         </article>
       </main>

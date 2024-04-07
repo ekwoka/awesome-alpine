@@ -15,15 +15,34 @@
 }
 
 :root {
-  @apply scroll-smooth scroll-my-4;
+  @apply scroll-smooth scroll-pt-16 scroll-pb-32;
 }
 
-.prose code {
+.prose pre code {
   @apply block !text-base !font-mono tracking-wide !leading-[0.5];
 
   & .line {
-    @apply block leading-loose;
+    @apply block leading-loose pl-[4ch] -indent-[4ch];
+
+    & span[style*='color:#ABB2BF']:before {
+      content: ' ';
+      font-size: 0;
+      word-break: break-all;
+    }
   }
+}
+
+.prose
+  :where(blockquote p:first-of-type):not(
+    :where([class~='not-prose'], [class~='not-prose'] *)
+  )::before {
+  content: 'Note: ';
+}
+.prose
+  :where(blockquote p:first-of-type):not(
+    :where([class~='not-prose'], [class~='not-prose'] *)
+  )::after {
+  content: '';
 }
 
 @font-face {

@@ -85,8 +85,11 @@ class HXBinding {
       if (!response.ok) return new Error(response.statusText);
       const html = await response.text();
       this.performSwap(parseDom(html));
-
-      history.pushState({}, '', path);
+      const newUrl = new URL(path, window.location.href);
+      const hash = newUrl.hash;
+      newUrl.hash = '';
+      history.pushState({}, '', newUrl);
+      window.location.hash = hash;
     } catch (error) {
       console.error(error);
     }

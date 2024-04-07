@@ -31,7 +31,7 @@
     "alpinejs": "3.13.8",
     "esbuild": "0.20.2",
     "eslint": "8.57.0",
-    "happy-dom": "14.5.1",
+    "happy-dom": "14.6.2",
     "husky": "9.0.11",
     "lint-staged": "15.2.2",
     "netlify-cli": "17.21.2",
