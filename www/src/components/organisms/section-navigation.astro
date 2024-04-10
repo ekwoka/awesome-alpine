@@ -8,10 +8,86 @@ interface Props {
 }
 ---
 
+<script>
+  import Alpine, { type PluginCallback } from 'alpinejs';
+
+  const $smartstick = Symbol('smartstick');
+  const scrollPadding = 100;
+
+  const SmartStick: PluginCallback = (Alpine) => {
+    Alpine.addRootSelector(() => `[${Alpine.prefixed('smartstick')}]`);
+    Alpine.directive('smartstick', (el, _directive, { cleanup }) => {
+      let padding = getScrollPadding(el, scrollPadding);
+
+      const stickyCTX = Alpine.reactive({
+        top: 0,
+        get topString() {
+          return `${-1 * this.top + padding.top}px`;
+        },
+      });
+
+      let height = 0;
+      let lastPosition = window.scrollY;
+      const updatePosition = () => {
+        const scrollTop = window.scrollY;
+        const diff = scrollTop - lastPosition;
+        stickyCTX.top = Math.min(height, Math.max(0, stickyCTX.top + diff));
+        lastPosition = scrollTop;
+      };
+
+      const resizeHandler = () => {
+        padding = getScrollPadding(el, padding.top, padding.bottom);
+        console.table(padding);
+        height = Math.max(
+          0,
+          el.clientHeight - window.innerHeight + padding.top + padding.bottom,
+        );
+      };
+      const observer = new ResizeObserver(resizeHandler);
+      observer.observe(el);
+      window.addEventListener('resize', resizeHandler);
+      const matches = window.matchMedia('(min-width: 1024px)');
+      const toggleListener = (match: MediaQueryListEvent | MediaQueryList) =>
+        window[match.matches ? 'addEventListener' : 'removeEventListener'](
+          'scroll',
+          updatePosition,
+          { passive: true },
+        );
+      matches.addEventListener('change', toggleListener);
+      toggleListener(matches);
+
+      const effect = Alpine.effect(() => (el.style.top = stickyCTX.topString));
+      cleanup(() => {
+        Alpine.release(effect);
+        observer.disconnect();
+        matches.removeEventListener('change', toggleListener);
+        window.removeEventListener('resize', resizeHandler);
+        window.removeEventListener('scroll', updatePosition);
+      });
+    });
+  };
+
+  Alpine.plugin(SmartStick);
+
+  const getScrollPadding = (
+    el: HTMLElement,
+    defTop: number,
+    defBottom: number = defTop,
+  ) => {
+    const { scrollPaddingTop, scrollPaddingBottom } =
+      window.getComputedStyle(el);
+    return {
+      top: parseOr(scrollPaddingTop, defTop),
+      bottom: parseOr(scrollPaddingBottom, defBottom),
+    };
+  };
+
+  const parseOr = (val: string, def: number) =>
+    val !== 'auto' ? parseInt(val) : def;
+</script>
 <nav
-  class="w-full md:w-1/5 overflow-y-auto border-r border-zinc-900/10 px-6 pb-8 pt-4 xl:w-80 dark:border-white/10 min-w-max flex-none block"
-  transition:persist>
-  <ul role="list" class="capitalize" x-accordion:group>
+  class="w-full md:w-1/5 border-r border-zinc-900/10 px-6 pb-8 pt-4 xl:w-80 dark:border-white/10 min-w-max flex-none block">
+  <ul role="list" class="capitalize sticky" x-accordion:group x-smartstick>
     {
       Array.from(Astro.props.navigation.values()).map((data) => (
         <li>
