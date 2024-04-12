@@ -26,9 +26,13 @@ const pkgName = Astro.props.title.replaceAll('-', ' ');
   </head>
   <body
     class="w-full min-h-screen bg-neutral-100 dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 flex flex-col">
-    <Header subtitle={pkgName} />
-    <div class="flex flex-row grow">
+    <Header subtitle={pkgName}>
       <SectionNavigation navigation={Astro.props.navigation} />
+    </Header>
+    <div class="flex flex-row grow">
+      <div class="hidden md:contents">
+        <SectionNavigation navigation={Astro.props.navigation} />
+      </div>
       <main
         id="documentation-main"
         class="p-4 sm:p-8 lg:p-16 grow [&[hx-swapping]]:opacity-50 [&[hx-swapping]]:grayscale transition-all duration-500 max-w-full scroll-mt-16">
