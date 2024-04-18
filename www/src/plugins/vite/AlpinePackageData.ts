@@ -11,6 +11,7 @@ const ALPINE_PACKAGES = [
   '@alpinejs/focus',
   '@alpinejs/collapse',
   '@alpinejs/anchor',
+  '@alpinejs/sort',
 ];
 
 const getPackageData = async (): Promise<PackageInfo[]> => {

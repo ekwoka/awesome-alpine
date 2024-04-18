@@ -79,7 +79,7 @@ const actions = {
 
     state.Alpine = await import(
       /* @vite-ignore */
-      script.url
+      script.bundleUrl
     ).then((mod) => mod.default);
     if (!state.alpineStarted) return;
     state.Alpine?.startObservingMutations();

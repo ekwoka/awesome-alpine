@@ -36,4 +36,5 @@ export enum CorePlugin {
   Mask = 1 << 4,
   Morph = 1 << 5,
   Persist = 1 << 6,
+  Sort = 1 << 7,
 }
