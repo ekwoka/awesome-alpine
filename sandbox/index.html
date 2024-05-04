@@ -6,21 +6,36 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>AlpineTS Sandbox</title>
     <script type="module">
-      import { HTMA } from '../packages/htma/src/index.ts';
+      import { Toast } from '../packages/toasts/src/index.ts';
       import Alpine from 'alpinejs';
 
       window.Alpine = Alpine;
-      Alpine.plugin(HTMA);
+      Alpine.plugin(Toast);
       Alpine.start();
+      let i = 15;
+      while (i--) {
+        await new Promise((resolve) => setTimeout(resolve, 1500));
+        Alpine.$toasts.show('This is a test message', 'info');
+      }
     </script>
   </head>
-  <body>
-    <div
-      id="hello"
-      hx-get="/other"
-      hx-select="#hello"
-      style="background-color: red; padding: 2rem">
-      <input type="text" value="otherthing" @click.stop />
-    </div>
+  <body x-data="{}">
+    <template x-for="toast in $toasts.queue" :key="toast.id">
+      <div
+        x-show="toast.show"
+        x-transition.duration.800ms
+        @transitionend="if (!toast.show) $toasts.clearFromQueue(toast)">
+        <div class="flex-1 p-4 space-y-4 text-sm">
+          <p x-html="toast.message"></p>
+          <p x-text="toast.id"></p>
+          <button
+            x-show="toast.dismissible"
+            type="button"
+            @click="$toasts.dismiss(toast)">
+            Close
+          </button>
+        </div>
+      </div>
+    </template>
   </body>
 </html>

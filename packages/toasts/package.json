@@ -1,8 +1,8 @@
 {
-  "name": "@awesome-alpine/htma",
+  "name": "@awesome-alpine/toasts",
   "version": "0.0.1-alpha.1",
   "private": true,
-  "description": "HTMX but for Alpine",
+  "description": "Simple Toast Manager",
   "author": {
     "name": "Eric Kwoka",
     "email": "ninjatheory@gmail.com",
@@ -10,7 +10,9 @@
   },
   "repository": "github:ekwoka/awesome-alpine",
   "keywords": [
-    "utilities"
+    "utilities",
+    "alpine",
+    "toasts"
   ],
   "main": "dist/index.js",
   "module": "dist/index.js",
@@ -40,8 +42,6 @@
   },
   "devDependencies": {
     "@types/alpinejs": "3.13.10",
-    "@types/alpinejs__intersect": "3.13.4",
-    "@types/alpinejs__morph": "3.13.4",
     "alpinejs": "3.13.10",
     "eslint-plugin-filename-export": "1.0.4"
   },
@@ -69,8 +69,5 @@
   "peerDependencies": {
     "alpinejs": ">=3.0.0"
   },
-  "optionalDependencies": {
-    "@alpinejs/intersect": "3.13.10",
-    "@alpinejs/morph": "3.13.10"
-  }
+  "optionalDependencies": {}
 }

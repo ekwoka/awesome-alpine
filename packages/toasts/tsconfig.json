@@ -1,0 +1,11 @@
+{
+  "extends": "../../tsconfig.json",
+  "include": ["./src/**/*.ts", "./tests/**/*.ts"],
+  "compilerOptions": {
+    "types": [
+      "@types/alpinejs__morph",
+      "vitest/globals",
+      "testing-library-alpine/globals"
+    ]
+  }
+}
