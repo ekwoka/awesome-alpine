@@ -1,8 +1,10 @@
 import type { PluginCallback } from 'alpinejs';
 
-export const Toast: PluginCallback = (Alpine) => {
+import { Toast } from './Toast.ts';
+
+export const Toasts: PluginCallback = (Alpine) => {
   let toastId = 0;
-  const toasterTimeout = 5000;
+  const toasterTimeout = 1000;
 
   const toastManager = Alpine.reactive<ToastManager>({
     queue: [] as Toast[],
@@ -11,41 +13,32 @@ export const Toast: PluginCallback = (Alpine) => {
      * @param {String} message
      * @param {String} type = 'info | success | warning | error'
      * @param {Number} timeout = '0 | n' (milliseconds) 0 means permanent
-     * @param {Boolean} dismissible
+     * @returns {Toast | void} Toast object if successful
      */
-    async show(
+    show(
       message: string,
       type: string = 'info',
       timeout: number = toasterTimeout,
-      dismissible: boolean = true,
-    ) {
+    ): Toast | void {
       if (!message) {
-        return console.error('function showToast requires a message');
+        return console.error('$toasts.show requires a message');
       }
 
-      const toastData = Alpine.reactive({
-        id: toastId++,
-        message,
-        type,
-        show: false,
-        timeout,
-        dismissible,
-      });
+      const toast = Alpine.reactive(new Toast(toastId++, message, type));
 
-      this.queue.push(toastData);
-      await Alpine.nextTick();
-      toastData.show = true;
-      this.hide(toastData);
-      return toastData;
+      this.queue.push(toast);
+      Alpine.nextTick(() => toast.show().hide(timeout));
+      return toast;
     },
 
     /**
      * Clears a toast from the queue
-     * @param {Toast} toast
+     * @param {Toast} toast to dismiss
      * @returns {Boolean} true if toast was removed
      */
     clearFromQueue(toast: Toast): boolean {
-      if (toast.show) return false;
+      if (toast.shown) return false;
+      toast.clear();
       const toastIndex = this.queue.indexOf(toast);
       if (toastIndex > -1) this.queue.splice(toastIndex, 1);
       return true;
@@ -56,11 +49,7 @@ export const Toast: PluginCallback = (Alpine) => {
      * @returns {Number | void} TimeoutId if timeout present
      */
     hide(toast: Toast): ReturnType<typeof setTimeout> | void {
-      if (toast.timeout > 0) {
-        return (toast.timeoutId = setTimeout(() => {
-          toast.show = false;
-        }, toast.timeout));
-      }
+      toast.hide(toasterTimeout);
     },
 
     /**
@@ -68,13 +57,14 @@ export const Toast: PluginCallback = (Alpine) => {
      * @param {Toast} toast
      */
     dismiss(toast: Toast) {
-      clearTimeout(toast.timeoutId);
-      toast.show = false;
+      toast.dismiss();
     },
   });
   Alpine.$toasts = toastManager;
   Alpine.magic('toasts', () => toastManager);
 };
+
+export default Toasts;
 
 declare module 'alpinejs' {
   interface Alpine {
@@ -82,24 +72,9 @@ declare module 'alpinejs' {
   }
 }
 
-type Toast = {
-  id: number;
-  message: string;
-  type: string;
-  show: boolean;
-  timeout: number;
-  timeoutId?: ReturnType<typeof setTimeout>;
-  dismissible: boolean;
-};
-
 type ToastManager = {
   queue: Toast[];
-  show: (
-    message: string,
-    type?: string,
-    timeout?: number,
-    dismissible?: boolean,
-  ) => Promise<Toast | void>;
+  show: (message: string, type?: string, timeout?: number) => Toast | void;
   clearFromQueue: (toast: Toast) => boolean;
   hide: (toast: Toast) => ReturnType<typeof setTimeout> | void;
   dismiss: (toast: Toast) => void;
@@ -107,13 +82,7 @@ type ToastManager = {
 
 /* Initialize Toast Queue with any loading toasts from queryParams */
 export const InitializeParams: PluginCallback = (Alpine) => {
-  const toastParamKeys = [
-    'message',
-    'type',
-    'timeout',
-    'dismissible',
-    'hasCopyAction',
-  ];
+  const toastParamKeys = ['message', 'type', 'timeout'];
   const params = new URLSearchParams(window.location.search);
 
   if (!params.has('toast.message')) return;
