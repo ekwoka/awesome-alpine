@@ -5,7 +5,7 @@ describe('Alpine Toasts', () => {
     it('Should display/remove a toast', async () => {
       await render(`<div></div>`).withPlugin(Toasts);
       const $toasts = Alpine.$toasts;
-      const toast = $toasts.show('Hello, world!', 'info', 0)!;
+      const toast = $toasts.show('Hello, world!')!;
       expect(toast).toBeDefined();
       expect(toast.message).toBe('Hello, world!');
       expect(toast.shown).toBe(false);
@@ -16,6 +16,26 @@ describe('Alpine Toasts', () => {
       expect($toasts.queue).toContain(toast);
       $toasts.clearFromQueue(toast);
       expect($toasts.queue).not.toContain(toast);
+    });
+    it('should provide details', async () => {
+      await render(`<div></div>`).withPlugin(Toasts);
+      const $toasts = Alpine.$toasts;
+      const toast = $toasts.show('Hello, world!', { timeout: 1000 })!;
+      expect(toast.details).toEqual({ timeout: 1000 });
+    });
+    it('should allow default details', async () => {
+      await render(`<div></div>`).withPlugin(Toasts({ type: 'info' }));
+      const $toasts = Alpine.$toasts;
+      const toast = $toasts.show('Hello, world!')!;
+      expect(toast.details).toEqual({ type: 'info' });
+    });
+    it('merges default details with provided details', async () => {
+      await render(`<div></div>`).withPlugin(
+        Toasts({ type: 'info', timeout: 500 }),
+      );
+      const $toasts = Alpine.$toasts;
+      const toast = $toasts.show('Hello, world!', { timeout: 1000 })!;
+      expect(toast.details).toEqual({ timeout: 1000, type: 'info' });
     });
   });
 
@@ -32,7 +52,7 @@ describe('Alpine Toasts', () => {
       ).withPlugin(Toasts);
       expect(node.children).toHaveLength(1);
       const $toasts = Alpine.$toasts;
-      const toast = $toasts.show('Hello, world!', 'info', 0)!;
+      const toast = $toasts.show('Hello, world!')!;
       await Alpine.nextTick();
       expect(node.children).toHaveLength(2);
       expect(node.children[1]).toHaveTextContent('Hello, world!');

@@ -1,41 +1,56 @@
-import type { PluginCallback } from 'alpinejs';
+import type { Alpine, PluginCallback } from 'alpinejs';
 
 import { Toast, type ToastDetails } from './Toast.ts';
 
-export const Toasts: PluginCallback = (Alpine) => {
-  let toastId = 0;
-  const toasterTimeout = 1000;
+export const Toasts = ((AlpineOrDefaults: Alpine | ToastDetails) => {
+  const defaults = isAlpine(AlpineOrDefaults) ? {} : AlpineOrDefaults;
+  const plugin = (Alpine: Alpine) => {
+    let toastId = 0;
+    const toasterTimeout = 1000;
 
-  const toastManager = Alpine.reactive<ToastManager>({
-    queue: [] as Toast[],
+    const toastManager = Alpine.reactive<ToastManager>({
+      queue: [] as Toast[],
 
-    show(message: string, details?: ToastDetails): Toast | void {
-      if (!message) {
-        return console.error('$toasts.show requires a message');
-      }
+      show(message: string, details: ToastDetails = {}): Toast | void {
+        if (!message) {
+          return console.error('$toasts.show requires a message');
+        }
 
-      const toast = Alpine.reactive(new Toast(toastId++, message, details));
-      this.queue.push(toast);
-      Alpine.nextTick(() => toast.show().hide(details?.timeout ?? 0));
-      return toast;
-    },
-    clearFromQueue(toast: Toast): boolean {
-      if (toast.shown) return false;
-      toast.clear();
-      const toastIndex = this.queue.indexOf(toast);
-      if (toastIndex > -1) this.queue.splice(toastIndex, 1);
-      return true;
-    },
-    hide(toast: Toast): ReturnType<typeof setTimeout> | void {
-      toast.hide(toasterTimeout);
-    },
-    dismiss(toast: Toast) {
-      toast.dismiss();
-    },
-  });
-  Alpine.$toasts = toastManager;
-  Alpine.magic('toasts', () => toastManager);
+        const toast = Alpine.reactive(
+          new Toast(toastId++, message, Object.assign({}, defaults, details)),
+        );
+        this.queue.push(toast);
+        Alpine.nextTick(() => toast.show().hide(details?.timeout ?? 0));
+        return toast;
+      },
+      clearFromQueue(toast: Toast): boolean {
+        if (toast.shown) return false;
+        toast.clear();
+        const toastIndex = this.queue.indexOf(toast);
+        if (toastIndex > -1) this.queue.splice(toastIndex, 1);
+        return true;
+      },
+      hide(toast: Toast): ReturnType<typeof setTimeout> | void {
+        toast.hide(toasterTimeout);
+      },
+      dismiss(toast: Toast) {
+        toast.dismiss();
+      },
+    });
+    Alpine.$toasts = toastManager;
+    Alpine.magic('toasts', () => toastManager);
+  };
+  if (isAlpine(AlpineOrDefaults)) return plugin(AlpineOrDefaults);
+  return plugin;
+}) as {
+  (Alpine: Alpine): void;
+  (defaults: ToastDetails): PluginCallback;
 };
+
+const isAlpine = (MaybeAlpine: unknown): MaybeAlpine is Alpine =>
+  typeof MaybeAlpine === 'object' &&
+  MaybeAlpine !== null &&
+  `version` in MaybeAlpine;
 
 export default Toasts;
 
