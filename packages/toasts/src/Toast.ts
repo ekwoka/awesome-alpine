@@ -4,16 +4,19 @@ export class Toast implements ToastControls {
    * @type {Boolean}
    */
   shown: boolean = false;
+
   /**
    * Timeout ID for hiding the toast
    * @type {Number}
    */
   timeoutId?: ReturnType<typeof setTimeout>;
+
   constructor(
     public id: number,
     public message: string,
-    public type: string,
+    public details: ToastDetails = {},
   ) {}
+
   /**
    * Shows the Toast
    * @returns {Toast} this
@@ -22,6 +25,7 @@ export class Toast implements ToastControls {
     this.shown = true;
     return this;
   }
+
   /**
    * Begins timer to hide Toast if timeout is greater than 0
    * @param {Number} timeout
@@ -35,6 +39,7 @@ export class Toast implements ToastControls {
     }
     return this;
   }
+
   /**
    * Hides the toast
    * @returns {Toast} this
@@ -44,6 +49,7 @@ export class Toast implements ToastControls {
     this.shown = false;
     return this;
   }
+
   /**
    * Clears the timeout for hiding the toast
    */
@@ -58,3 +64,12 @@ interface ToastControls {
   hide(timeout: number): this;
   dismiss(): this;
 }
+
+export type ToastDetails = {
+  /**
+   * Timeout for hiding the toast automatically
+   * @type {Number}
+   */
+  timeout?: number;
+  [key: string]: unknown;
+};
