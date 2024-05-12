@@ -8,5 +8,15 @@
       "pretty": "912 B",
       "raw": 912
     }
+  },
+  "toasts": {
+    "minified": {
+      "pretty": "1.22 kB",
+      "raw": 1219
+    },
+    "brotli": {
+      "pretty": "583 B",
+      "raw": 583
+    }
   }
 }
