@@ -1,12 +1,12 @@
 ---
 import { getCollection } from 'astro:content';
-import LandingPage from '../layout/landing.astro';
-import LeftPanel from '../components/organisms/left-panel.astro';
-import Logo from '../components/atoms/logo.astro';
 import Button from '../components/atoms/button.astro';
+import Logo from '../components/atoms/logo.astro';
 import TextInput from '../components/atoms/text-input.astro';
-import Timeline from '../components/organisms/timeline.astro';
 import LatestArticles from '../components/organisms/latest-articles.astro';
+import LeftPanel from '../components/organisms/left-panel.astro';
+import Timeline from '../components/organisms/timeline.astro';
+import LandingPage from '../layout/landing.astro';
 const READY = false;
 const posts = (await getCollection('post'))
   .sort((a, b) => b.data.date.getTime() - a.data.date.getTime())

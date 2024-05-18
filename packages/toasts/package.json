@@ -9,11 +9,7 @@
     "url": "https://thekwoka.net/"
   },
   "repository": "github:ekwoka/awesome-alpine",
-  "keywords": [
-    "utilities",
-    "alpine",
-    "toasts"
-  ],
+  "keywords": ["utilities", "alpine", "toasts"],
   "main": "dist/index.js",
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -25,46 +21,30 @@
     },
     "./package.json": "./package.json"
   },
-  "files": [
-    "dist",
-    "src"
-  ],
+  "files": ["dist", "src"],
   "type": "module",
   "sideeffects": false,
   "scripts": {
     "build": "vite build",
     "coverage": "vitest run --coverage",
-    "lint": "eslint --fix ./src; prettier --write ./src --loglevel error",
-    "lint:check": "eslint --max-warnings 10 ./src && prettier --check ./src",
+    "lint": "run-s lint:*",
+    "lint:biome": "biome check --apply ./**/src/**/*.{json,js,ts,astro}",
+    "lint:prettier": "prettier --write ./**/src/**/*.{json,mdx,html,css}",
     "prebuild": "rm -rf dist",
     "size": "node scripts/esbuild.js",
     "test": "vitest"
   },
   "devDependencies": {
     "@types/alpinejs": "3.13.10",
-    "alpinejs": "3.13.10",
-    "eslint-plugin-filename-export": "1.0.4"
+    "alpinejs": "3.13.10"
+  },
+  "lint-staged": {
+    "*.{json,js,ts,astro}": ["biome check --apply"],
+    "*.{mdx,html,css}": ["prettier --write"]
   },
   "prettier": {
     "singleQuote": true,
-    "bracketSameLine": true,
-    "plugins": [
-      "@trivago/prettier-plugin-sort-imports"
-    ],
-    "importOrder": [
-      "^[./]"
-    ],
-    "importOrderSeparation": true,
-    "importOrderSortSpecifiers": true
-  },
-  "lint-staged": {
-    "*.{js,ts,mjs}": [
-      "eslint --fix",
-      "prettier --write"
-    ],
-    "*.json": [
-      "prettier --write"
-    ]
+    "bracketSameLine": true
   },
   "peerDependencies": {
     "alpinejs": ">=3.0.0"

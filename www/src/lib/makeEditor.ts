@@ -1,13 +1,13 @@
-import oneDark from './oneDarkPro.json';
-import { Language } from './prettier';
 // @ts-expect-error - this is a raw types import for monaco
 import dts from '@types/alpinejs/index.d.ts?raw';
 import * as monaco from 'monaco-editor';
 import DefaultWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker';
 import HTMLWorker from 'monaco-editor/esm/vs/language/html/html.worker?worker';
 import TSWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker';
+import oneDark from './oneDarkPro.json';
+import { Language } from './prettier';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+// biome-ignore lint/suspicious/noExplicitAny: Not Worth Correctly typing
 monaco.editor.defineTheme('onedark', oneDark as any);
 monaco.languages.typescript.typescriptDefaults.addExtraLib(
   `

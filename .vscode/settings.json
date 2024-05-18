@@ -1,7 +1,4 @@
 {
   "typescript.tsdk": "node_modules/typescript/lib",
-  "editor.defaultFormatter": "esbenp.prettier-vscode",
-  "[astro]": {
-    "editor.defaultFormatter": "astro-build.astro-vscode"
-  }
+  "editor.defaultFormatter": "biomejs.biome"
 }

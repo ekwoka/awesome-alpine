@@ -21,8 +21,8 @@
     "dev": "astro dev",
     "doctor": "run-s lint test:run build",
     "lint": "run-s lint:*",
-    "lint:eslint": "eslint --fix ./src/**/*.ts",
-    "lint:prettier": "prettier --write ./src/**/*.{html,ts,css}",
+    "lint:biome": "biome check --apply ./**/src/**/*.{json,js,ts,astro}",
+    "lint:prettier": "prettier --write ./**/src/**/*.{json,mdx,html,css}",
     "netlify": "netlify",
     "test": "vitest",
     "test:run": "vitest --run"
@@ -47,23 +47,11 @@
     "vituum": "1.1.0"
   },
   "lint-staged": {
-    "*.{js,ts,mjs}": [
-      "eslint --fix",
-      "prettier --write"
-    ],
-    "*.{json,md,html,css,astro}": [
-      "prettier --write"
-    ]
+    "*.{json,js,ts,astro}": ["biome check --apply"],
+    "*.{mdx,html,css}": ["prettier --write"]
   },
   "prettier": {
     "singleQuote": true,
-    "bracketSameLine": true,
-    "plugins": [
-      "@trivago/prettier-plugin-sort-imports",
-      "prettier-plugin-astro"
-    ],
-    "importOrder": [],
-    "importOrderSeparation": true,
-    "importOrderSortSpecifiers": true
+    "bracketSameLine": true
   }
 }

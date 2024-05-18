@@ -23,6 +23,7 @@ export const gatherPlugins = (
       case CorePlugin.Persist:
         return importFromESM('persist', version);
     }
+    // biome-ignore lint/suspicious/noEmptyBlockStatements: Returns empty module
     return Promise.resolve({ default: () => {} });
   });
   return Promise.all(plugins.map((plugin) => plugin.then((m) => m.default)));
