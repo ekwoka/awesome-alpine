@@ -1,7 +1,7 @@
+import { defineConfig } from 'vite';
 /// <reference types="vitest" />
 import { AlpinePackageData } from './src/plugins/vite/AlpinePackageData';
 import { DLX, URL } from './src/plugins/vite/DLX';
-import { defineConfig } from 'vite';
 
 export default defineConfig({
   plugins: [DLX(), URL(), AlpinePackageData()],

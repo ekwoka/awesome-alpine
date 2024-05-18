@@ -1,5 +1,5 @@
-import { Toasts } from '../packages/toasts/src/index';
 import Alpine from 'alpinejs';
+import { Toasts } from '../packages/toasts/src/index';
 
 Alpine.plugin(Toasts);
 
