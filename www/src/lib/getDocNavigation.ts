@@ -1,5 +1,5 @@
-import type { MarkdownHeading } from 'astro';
 import { type CollectionEntry, getCollection } from 'astro:content';
+import type { MarkdownHeading } from 'astro';
 
 export const getDocNavigation = async (pkg: string) => {
   const related = await getCollection('docs', ({ slug }) =>

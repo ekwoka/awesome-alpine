@@ -43,6 +43,7 @@ export class Swap {
     public target: HTMLElement,
     public source: HTMLElement,
     public method: SwapMethod,
+    // biome-ignore lint/suspicious/noEmptyBlockStatements: Not Actually Empty
   ) {}
   swap(Alpine: Alpine) {
     if (this.method === SwapMethod.None) return;

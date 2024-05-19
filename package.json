@@ -7,11 +7,11 @@
     "build": "pnpm -r run build",
     "doctor": "run-s lint test:run build size",
     "lint": "run-s lint:*",
-    "lint:eslint": "eslint --fix ./**/src/**/*.ts",
-    "lint:prettier": "prettier --write ./**/src/**/*.{html,ts,css}",
+    "lint:biome": "biome check --apply ./**/src/**/*.{json,js,ts,astro}",
+    "lint:prettier": "prettier --write ./**/src/**/*.{json,mdx,html,css}",
     "lint:staged": "lint-staged",
     "precommit": "run-s lint:staged build size",
-    "prepare": "husky install",
+    "prepare": "husky",
     "sandbox": "vite ./sandbox",
     "serve": "pnpm run --filter www dev",
     "size": "node scripts/getSize.js",
@@ -22,24 +22,22 @@
     "netlify": "netlify dev"
   },
   "devDependencies": {
+    "@biomejs/biome": "1.7.3",
     "@ekwoka/alpine-testing-library-utilities": "0.0.1-alpha.2",
     "@milahu/patch-package": "6.4.14",
     "@trivago/prettier-plugin-sort-imports": "4.3.0",
     "@types/alpinejs": "3.13.10",
-    "@typescript-eslint/eslint-plugin": "7.8.0",
-    "@typescript-eslint/parser": "7.8.0",
     "alpinejs": "3.13.10",
-    "esbuild": "0.21.1",
-    "eslint": "8.57.0",
-    "happy-dom": "14.10.1",
+    "esbuild": "0.21.3",
+    "happy-dom": "14.11.0",
     "husky": "9.0.11",
     "lint-staged": "15.2.2",
-    "netlify-cli": "17.23.2",
-    "npm-run-all2": "6.1.2",
+    "netlify-cli": "17.23.5",
+    "npm-run-all2": "6.2.0",
     "postcss": "8.4.38",
     "prettier": "3.2.5",
     "pretty-bytes": "6.1.1",
-    "sharp": "0.33.3",
+    "sharp": "0.33.4",
     "tailwindcss": "3.4.3",
     "testing-library-alpine": "0.0.1-alpha.2",
     "typescript": "5.4.5",
@@ -51,42 +49,21 @@
     "vitest-environment-alpine": "0.0.2-alpha.2"
   },
   "lint-staged": {
-    "*.{js,ts,mjs}": [
-      "eslint --fix",
-      "prettier --write"
-    ],
-    "*.{json,md,html,css}": [
-      "prettier --write"
-    ]
+    "*.{json,js,ts,astro}": ["biome check --apply"],
+    "*.{mdx,html,css}": ["prettier --write"]
   },
   "prettier": {
     "singleQuote": true,
-    "bracketSameLine": true,
-    "plugins": [
-      "@trivago/prettier-plugin-sort-imports"
-    ],
-    "importOrder": [],
-    "importOrderSeparation": true,
-    "importOrderSortSpecifiers": true
+    "bracketSameLine": true
   },
   "pnpm": {
     "overrides": {
-      "eslint": "$eslint",
-      "@babel/traverse@<7.23.2": ">=7.23.2",
-      "@netlify/zip-it-and-ship-it@<9.30.0": "9.30.0",
-      "@typescript-eslint/types@<7.3.1": "7.3.1",
-      "@typescript-eslint/typescript-estree@<7.3.1": "7.3.1",
-      "@typescript-eslint/visitor-keys@<7.3.1": "7.3.1",
       "esbuild": "$esbuild",
-      "follow-redirects@<=1.15.5": ">=1.15.6",
-      "semver@<7.5.4": ">=7.5.4",
       "sharp": "$sharp",
       "typescript": "$typescript",
       "vite": "$vite",
       "vitest": "$vitest",
-      "happy-dom": "$happy-dom",
-      "express@<4.19.2": ">=4.19.2",
-      "tar@<6.2.1": ">=6.2.1"
+      "happy-dom": "$happy-dom"
     }
   }
 }

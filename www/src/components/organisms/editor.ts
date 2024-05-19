@@ -1,3 +1,7 @@
+import persist from '@alpinejs/persist';
+import query, { base64URL } from '@ekwoka/alpine-history';
+import Alpine, { type PluginCallback } from 'alpinejs';
+import type { editor } from 'monaco-editor';
 import { CorePlugin } from '../../lib/lazyModules/alpinePlugins';
 import { RPCReceiver, RPCSender } from '../../lib/postmessageRPC';
 import { prettify } from '../../lib/prettier';
@@ -7,10 +11,6 @@ import starterHTML from '../../play/starter.html?raw';
 import starterScript from '../../play/starter.js?raw';
 import { bitwiseArray, booleanNumber } from '../../plugins/encoding';
 import versionData from './alpine-versions';
-import persist from '@alpinejs/persist';
-import query, { base64URL } from '@ekwoka/alpine-history';
-import Alpine, { type PluginCallback } from 'alpinejs';
-import type { editor } from 'monaco-editor';
 
 const makeEditor = () =>
   import('../../lib/makeEditor.js').then((m) => m.makeEditor);
@@ -98,9 +98,10 @@ export const Editor: PluginCallback = (Alpine) => {
             if (!(JSON.stringify(this.config) && this.value.typescript)) return;
             abortController = new AbortController();
             const signal = abortController.signal;
-            const esm = await (
-              await transpile()
-            )(this.value.typescript, this.config);
+            const esm = await (await transpile())(
+              this.value.typescript,
+              this.config,
+            );
             if (signal.aborted) return;
             abortController = null;
             console.log('loading script');

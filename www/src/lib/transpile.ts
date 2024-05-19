@@ -1,5 +1,5 @@
-import { CorePlugin } from './lazyModules/alpinePlugins';
 import { url } from 'esm.sh/build?urlfollow';
+import { CorePlugin } from './lazyModules/alpinePlugins';
 
 const { build } = (await import(/* @vite-ignore */ url)) as {
   build: (input: string | BuildInput) => Promise<BuildOutput>;
@@ -68,8 +68,17 @@ export const transpile = (
   });
   const codeWithPlugins = `
   import Alpine from 'alpinejs';
-  ${config.plugins.map((plugin) => `import ${CorePlugin[plugin]} from '@alpinejs/${CorePlugin[plugin].toLowerCase()}';`).join('\n')}
-  ${config.plugins.map((plugin) => `Alpine.plugin(${CorePlugin[plugin]});`).join('\n')}
+  ${config.plugins
+    .map(
+      (plugin) =>
+        `import ${CorePlugin[plugin]} from '@alpinejs/${CorePlugin[
+          plugin
+        ].toLowerCase()}';`,
+    )
+    .join('\n')}
+  ${config.plugins
+    .map((plugin) => `Alpine.plugin(${CorePlugin[plugin]});`)
+    .join('\n')}
 
   ${code}
 

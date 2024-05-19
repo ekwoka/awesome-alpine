@@ -2,8 +2,7 @@
   "recommendations": [
     "unifiedjs.vscode-mdx",
     "astro-build.astro-vscode",
-    "dbaeumer.vscode-eslint",
-    "esbenp.prettier-vscode",
+    "biomejs.biome",
     "bradlc.vscode-tailwindcss",
     "vitest.explorer",
     "vscode-icons-team.vscode-icons"

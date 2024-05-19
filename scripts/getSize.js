@@ -1,6 +1,6 @@
-import { build } from 'esbuild';
 import { readFile, readdir, writeFile } from 'node:fs/promises';
 import { brotliCompressSync } from 'node:zlib';
+import { build } from 'esbuild';
 import prettyBytes from 'pretty-bytes';
 
 const packages = await readdir('packages');

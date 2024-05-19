@@ -5,13 +5,13 @@
   "type": "module",
   "dependencies": {
     "@alpinejs/persist": "3.13.10",
-    "@astrojs/check": "0.6.0",
+    "@astrojs/check": "0.7.0",
     "@astrojs/mdx": "3.0.0",
     "@astrojs/tailwind": "5.1.0",
     "@awesome-alpine/htma": "workspace:*",
     "@ekwoka/alpine-history": "0.2.0",
     "alpinejs": "3.13.10",
-    "astro": "4.8.2",
+    "astro": "4.8.6",
     "monaco-editor": "0.48.0"
   },
   "scripts": {
@@ -21,21 +21,21 @@
     "dev": "astro dev",
     "doctor": "run-s lint test:run build",
     "lint": "run-s lint:*",
-    "lint:eslint": "eslint --fix ./src/**/*.ts",
-    "lint:prettier": "prettier --write ./src/**/*.{html,ts,css}",
+    "lint:biome": "biome check --apply ./**/src/**/*.{json,js,ts,astro}",
+    "lint:prettier": "prettier --write ./**/src/**/*.{json,mdx,html,css}",
     "netlify": "netlify",
     "test": "vitest",
     "test:run": "vitest --run"
   },
   "devDependencies": {
-    "@netlify/functions": "2.6.3",
+    "@netlify/functions": "2.7.0",
     "@tailwindcss/typography": "0.5.13",
     "@types/alpinejs": "3.13.10",
     "@types/alpinejs__persist": "3.13.4",
     "@vituum/vite-plugin-posthtml": "1.1.0",
     "autoprefixer": "10.4.19",
-    "esbuild": "0.21.1",
-    "esbuild-wasm": "0.21.1",
+    "esbuild": "0.21.3",
+    "esbuild-wasm": "0.21.3",
     "postcss": "8.4.38",
     "posthtml-expressions": "1.11.3",
     "prettier-plugin-astro": "0.13.0",
@@ -47,23 +47,11 @@
     "vituum": "1.1.0"
   },
   "lint-staged": {
-    "*.{js,ts,mjs}": [
-      "eslint --fix",
-      "prettier --write"
-    ],
-    "*.{json,md,html,css,astro}": [
-      "prettier --write"
-    ]
+    "*.{json,js,ts,astro}": ["biome check --apply"],
+    "*.{mdx,html,css}": ["prettier --write"]
   },
   "prettier": {
     "singleQuote": true,
-    "bracketSameLine": true,
-    "plugins": [
-      "@trivago/prettier-plugin-sort-imports",
-      "prettier-plugin-astro"
-    ],
-    "importOrder": [],
-    "importOrderSeparation": true,
-    "importOrderSortSpecifiers": true
+    "bracketSameLine": true
   }
 }

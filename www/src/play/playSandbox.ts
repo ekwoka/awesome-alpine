@@ -1,8 +1,9 @@
+import type { Alpine as IAlpine } from 'alpinejs';
 import { CorePlugin, gatherPlugins } from '../lib/lazyModules/alpinePlugins';
 import { loadTailwind } from '../lib/lazyModules/tailwind';
 import { RPCReceiver, RPCSender } from '../lib/postmessageRPC';
-import type { Alpine as IAlpine } from 'alpinejs';
 
+// biome-ignore lint/suspicious/noEmptyBlockStatements: Needed to get AsyncFunction
 const AsyncFunction = Object.getPrototypeOf(async function () {}).constructor;
 
 export type Config = {
@@ -93,7 +94,6 @@ export const initializeSandbox = async () => {
   new RPCReceiver<sandboxActions>(actions);
 
   let count = 0;
-  // eslint-disable-next-line no-constant-condition
   while (count++ < 100) {
     console.log('trying to connect to editor');
     if (

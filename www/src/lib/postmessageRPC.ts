@@ -32,7 +32,7 @@ type ActionsMap<A extends FunctionRecord<A>> = Map<
 
 type FunctionRecord<A> = Record<
   keyof A,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // biome-ignore lint/suspicious/noExplicitAny: Very Generic Typing
   (...args: any[]) => any
 >;
 
@@ -49,6 +49,7 @@ type RemoveLastEventArg<
 > = A extends [...infer T, infer _E extends E] ? T : A;
 
 export class RPCSender<A extends FunctionRecord<A>> {
+  // biome-ignore lint/suspicious/noEmptyBlockStatements: Not actually empty
   constructor(private target: Window) {}
   call = new Proxy({} as CallObject<A>, {
     get: (target, name: string | symbol, receiver) => {
@@ -99,8 +100,6 @@ const waitForResponse = <T>(
   });
 };
 
-// eslint
-
 interface Action<
   A extends Record<
     keyof A,
@@ -117,7 +116,6 @@ interface ActionResponse {
   value: unknown;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type CallReturnsMap<
   A extends Record<
     keyof A,
