@@ -5,7 +5,7 @@ export enum SwapMethod {
   Delete = 1 << 0, // Delete the target
   Replace = 1 << 1, // Replace the target Outer
   ReplaceChildren = 1 << 2, // Replace the target Inner
-  Before = 1 << 3, // Sourrce is Prepend
+  Before = 1 << 3, // Source goes before the target
   Prepend = 1 << 4, // Source goes at the start of the target
   Append = 1 << 5, // Source goes outside the target
   After = 1 << 6, // Source goes at the end of the target
