@@ -1,0 +1,121 @@
+---
+pkg: 'HTMAlpine'
+page: directives
+description: All the Directives available in HTMA
+date: 2024-06-08
+---
+
+# Directives
+
+HTMA provides a multitude of directives to manipulate the behavior of your hypermedia elements. Primarily, you'll need to use `hx-[HTTP METHOD]` (ex: `hx-get`) to handle defining a hypermedia element, There are some other ways, but that's the the start of it.
+
+> HTMA directives do not follow the standard AlpineJS directive naming of `x-*`, but instead can be does with simply `hx-*`. This is to keep in line with HTMX naming. If you want to use `x-*`, these directives can all be used as `x-hx*`.
+
+## HTTP Methods
+
+These define the HTTP method to be used when handling a hypermedia interaction, as well as define the URL to be used, and target of other hooks.
+
+These are all quite similar, but have some differences in how they are used.
+
+### `hx-get`
+
+Defines a `GET` request.
+
+### `hx-post`
+
+Defines a `POST` request.
+
+### `hx-put`
+
+Defines a `PUT` request.
+
+### `hx-patch`
+
+Defines a `PATCH` request.
+
+### `hx-delete`
+
+Defines a `DELETE` request.
+
+### Usage
+
+```html
+<a href="/user" hx-get>User</button>
+```
+
+The expression passed to `hx-get` can be a URL to define where the request will be made.
+
+```html
+<button type="button" hx-get="/user">User</button>
+```
+
+If no URL is provided, the attributes `href` or `action` attribute will be used in its place.
+
+```html
+<form action="/updateUser" hx-post>...</form>
+```
+
+## Content Swapping
+
+When hypermedia requests complete, the goal is generally that some kind of content is swapped on the page. By default, the entire returned HTML content is placed inside of the element defined by an HTTP method directive. However, you can define more specific behavior with the following directives.
+
+### `hx-target`
+
+```yaml
+default: self
+```
+
+Defines the element on the current page to be used as the swap target. The expression should be a valid CSS selector.
+
+```html
+<button type="button" hx-get="/search" hx-target="#search-results">
+  Search
+</button>
+```
+
+### `hx-select`
+
+```yaml
+default: body
+```
+
+Defines the element in the returned content to be swapped into the current document. The expression should be a valid CSS selector.
+
+```html
+<button
+  type="button"
+  hx-get="/search"
+  hx-target="#search-results"
+  hx-select="#search-results">
+  Search
+</button>
+```
+
+### `hx-swap`
+
+Defines the swap behavior to be used when the request is successful. There are a few options that can be used:
+
+```yaml
+none: Do Nothing
+delete: Remove the target element only
+replace: Replace the target element with the selected content
+replacechildren: Replace the children of the target element with the children of the selected content
+before: Insert the selected content before the target element
+prepend: Insert the selected content as the first child of the target element
+append: Insert the selected content as the last child of the target element
+after: Insert the selected content after the target element
+morth: Uses Alpine Morph to inline modify the content, preserving Alpine states
+```
+
+These all appropriately manage Alpine states, destroying and cleaning up removed elements and initializing new elements.
+
+```html
+<button
+  type="button"
+  hx-get="/search"
+  hx-target="#search-results"
+  hx-select="#search-results"
+  hx-swap="replacehildren">
+  Search
+</button>
+```
