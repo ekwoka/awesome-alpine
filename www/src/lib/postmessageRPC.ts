@@ -49,7 +49,6 @@ type RemoveLastEventArg<
 > = A extends [...infer T, infer _E extends E] ? T : A;
 
 export class RPCSender<A extends FunctionRecord<A>> {
-  // biome-ignore lint/suspicious/noEmptyBlockStatements: Not actually empty
   constructor(private target: Window) {}
   call = new Proxy({} as CallObject<A>, {
     get: (target, name: string | symbol, receiver) => {

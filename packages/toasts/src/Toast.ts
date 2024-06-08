@@ -15,7 +15,6 @@ export class Toast implements ToastControls {
     public id: number,
     public message: string,
     public details: ToastDetails = {},
-    // biome-ignore lint/suspicious/noEmptyBlockStatements: Not Actually Empty
   ) {}
 
   /**
