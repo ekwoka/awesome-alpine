@@ -7,7 +7,7 @@ import viteConfig from './vite.config.ts';
 export default defineConfig({
   vite: viteConfig,
   image: {
-    domains: ['placekitten.com'],
+    domains: ['loremflickr.com'],
   },
   integrations: [
     tailwind({

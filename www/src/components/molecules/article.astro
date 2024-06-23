@@ -20,7 +20,7 @@ interface Props {
     class="absolute left-8 top-4 z-50 flex h-4 items-center justify-end gap-x-2 lg:left-[unset] lg:right-full w-max opacity-65 text-xs">
     <a
       class="inline-flex"
-      href={`#${Astro.props.post.data.title.toLowerCase().trim().replaceAll(' ', '-') + Astro.props.top}`}>
+      href={`#${Astro.props.post.slug}`}>
       <time
         datetime={Astro.props.post.data.date.toISOString()}
         class="text-sky-300 block">
@@ -37,21 +37,20 @@ interface Props {
   </div>
 </header>
 <article
-  id={`${Astro.props.post.data.title.toLowerCase().trim().replaceAll(' ', '-') + Astro.props.top}`}
+  id={`${Astro.props.post.slug}`}
   class="scroll-mt-16 max-lg:mx-auto w-full max-w-prose">
   <div>
     <div class="max-w-7xl px-6 lg:flex lg:px-8">
       <div class="lg:flex lg:w-full lg:justify-end w-full">
         <div
           class="mx-auto max-w-lg lg:mx-0 lg:max-w-xl lg:flex-auto prose dark:prose-invert flex flex-col w-full">
-          <ArticleImage
-            src={Astro.props.post.data.image?.src ??
-              'https://placekitten.com/g/800/320'}
+          {Astro.props.post.data.image && <ArticleImage
+            src={Astro.props.post.data.image.src}
             alt=""
-          />
+          />}
           <h2 class="mt-0">
             <a
-              href={`#${Astro.props.post.data.title.toLowerCase().trim().replaceAll(' ', '-') + Astro.props.top}`}
+              href={`/posts/${Astro.props.post.slug}`}
               >{Astro.props.post.data.title}</a
             >
           </h2>

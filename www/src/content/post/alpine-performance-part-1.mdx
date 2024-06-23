@@ -1,0 +1,361 @@
+---
+title: 'Alpine Performance: The DataStack'
+author: 'Eric Kwoka'
+description: "As time goes on, all of our blazingly fast and lightweight tools will trend towards slowness and bloat. It is just the nature of serving many different people's needs and goals. We're going to fix this."
+date: 2024-06-23
+published: true
+---
+
+Over this summer, I've set myself the goal of opening (and hopefully merging) a PR to AlpineJS. But not just bug fixes or new features, of which I do quite regularly anyway, but specifically to improve the performance of AlpineJS. This means increased runtime speed, reduced memory usage, and reduced code size! Ideally all three at the same time!
+
+## The Problem
+
+Naturally, any new thing (library, runtime, framework) will be ligtweight and fast. Often because they just don't do many things the older tools do. Sometimes this is good, that those things are just not needed, or less good, that they might be needed but not present.
+
+But as time goes on, to support more and more users needs, or fill in the gaps, these tools will add more and more code, have more and more extra cases to handle, and just generally get slower and bigger.
+
+Alpine is no exception. It's been growing pretty steadily in size and complexity. Of course, Alpine never really billed itself as being fast (Alpine has certain fundamental things that it needs to do to be what it is that will simply be slower than other UI frameworks), but it has claimed to be lightweight. And this has changed a bit over time.
+
+```sh
+AlpineJS gzipped size over time:
+3.11.0: 14.04KB
+3.12.2: 14.24KB
+3.12.3: 14.39KB
+3.13.0: 14.51KB
+3.13.8: 14.97KB
+3.14.0: 15.17KB
+```
+
+Pretty consistently, every release has been a bit bigger than the last. It's still quite small, but it's not getting smaller. Let's fix it.
+
+### The Opportunities
+
+In depth JavaScript performance optimizations are often in the realm of wizardry. The variances in runtimes, and browsers, as well as just the complexity of the usages of the library, make it very difficult to make sweeping changes that will improve performance for everyone.
+
+Luckily, even without deep knowledge and profiling, we can still make some decent guesses at places that could be made better.
+
+Of course, things that loop a lot are great candidates for optimization (`x-for` for example), as well as areas that do quite a lot of work (`morph` plugin), and places that are just so central to the logic that they are used a ton (`datastack`).
+
+If we can identify places where memory is being used inefficiently, or where we are doing more work than we need to, we can make some pretty big improvements! And we can use profiling and other benchmarking to validate that we are on a good path.
+
+## Tackling the DataStack Proxy
+
+This is actually a bit of an older PR from [last September](https://github.com/alpinejs/alpine/pull/3722), but I wanted to use this as an initial article, especially since it has some good follow up that was needed.
+
+The Datastack is a major part of Alpine, and is, as the name implies, an object that represents the cascading data (or stack) that is available to a specific element/expression based on it's location in the dom.
+
+```html
+<div x-data="{ count: 1 }">
+  <div x-data="{ clicked: false }">
+    <button type="button" @click="clicked = true">Can access clicked!</button>
+    <span x-text="count"> Can access count </span>
+  </div>
+  <button type="button" @click="clicked = false">
+    OH NO! This can't access clicked!
+  </button>
+</div>
+```
+
+Components deeper in the dom tree can access all the data from the components up the tree, but not the data in children or siblings. Overall quite simple.
+
+How Alpine exposes the values to the expression is through the use of creating a new proxy object that contains the datastack and exposes it as if it was one single object.
+
+This is a critical part of Alpine. EVERY single data access in every expression, and the vast majority of every data access on `this` in a component moves through this data stack. It's a big deal! Alpine also doesn't track the existing stack up front, so this proxy is created as needed per expression!
+
+Most of the time, this isn't too much extra work, but during initial startup, or major actions like a long `x-for` loop, this can be quite a lot of additional work.
+
+## The Old Code
+
+Here's a version of the code for this before I started tweaking it (simplified with comments added for clarity):
+
+```js
+// This accepts an array of reactive data objects, arranged from closest to furthest.
+export function mergeProxies(objects) {
+  // Creates the new proxy with all unique handlers every time
+  let thisProxy = new Proxy(
+    {},
+    {
+      // returns all the unique keys from all the objects
+      ownKeys: () => {
+        return Array.from(new Set(objects.flatMap((i) => Object.keys(i))));
+      },
+
+      // returns true if any of the objects have the key being accessed
+      has: (target, name) => {
+        return objects.some((obj) => obj.hasOwnProperty(name));
+      },
+
+      // finds and gets the value in the first object that has the key
+      get: (target, name) => {
+        return (objects.find((obj) => {
+          if (obj.hasOwnProperty(name)) {
+            // ...Code here for rebinding getter and setter functions
+            return true;
+          }
+
+          return false;
+        }) || {})[name];
+      },
+
+      // handles setting the value on the first object that has the provided key
+      set: (target, name, value) => {
+        let closestObjectWithKey = objects.find((obj) =>
+          obj.hasOwnProperty(name),
+        );
+
+        if (closestObjectWithKey) {
+          closestObjectWithKey[name] = value;
+        } else {
+          // Sets value on the highest object in the stack
+          objects[objects.length - 1][name] = value;
+        }
+
+        return true;
+      },
+    },
+  );
+
+  return thisProxy;
+}
+```
+
+Overall pretty simple. If you're unfamiliar with [Proxy Objects](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy) then it might be a bit startling, but it's just a way to intercept and modify the behavior of objects in JavaScript.
+
+### Benchmarking Before
+
+It's a bit difficult to benchmark these kinds of deep internals, as it is quite challenging to isolate the performance, so I instead wrote up a simple script that would create a new proxy from object stacks of different depths (10 and 26) and keys, and then access all of the keys. Do this enough times (1,000,000 and 100,000 respectively) and just call then a decent baseline.
+
+> I also did benchmarks on the JS Framework Benchmark suite, but the data there is murkier and not easy to isolate. It was done mainly to sanity check changes.
+
+I did not keep the actual time, but will share the relative improvements later on!
+
+## Use Reflection
+
+With a lot of the accessing of values is done through normal property accesses (`object[key]`). But there are some things that the `Proxy` API also added to simplify things like handling getters/setters and anything else that might be concerced with the lexical `this`.
+
+Mainly [Reflection](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Reflect)
+
+Instead of neeing to manually bind getters and setters, we can use `Reflect.get` and `Reflect.set` to handle these for us.
+
+not the `get` trap can just be
+
+```js
+get: (target, name) => {
+  if (name == 'toJSON') return collapseProxies;
+  return Reflect.get(
+    objects.find((obj) => Object.prototype.hasOwnProperty.call(obj, name)) ??
+      {},
+    name,
+    thisProxy,
+  );
+};
+```
+
+Now, getters will accurately be provided the correct `this` context, and we don't need to worry about it.
+
+> Later on, we'll talk about a bug in Vue that this exposed, and how we can fix it.
+
+This can also be applied to the `set` trap
+
+```js
+set: (target, name, value) => {
+  return Reflect.set(
+    objects.find((obj) => Object.prototype.hasOwnProperty.call(obj, name)) ??
+      objects[objects.length - 1],
+    name,
+    value,
+  );
+};
+```
+
+These changes actually removed 32 lines (-43 +14)! Just needed to do less work!
+
+Of course, running less code is good, but also defering to built-ins is often a great idea, even if the performance is worse in a specific use case, since the built-ins are often optimized over time, and likely will reach into native code for maximum performance.
+
+## Short Circuiting
+
+Above we tackled core issues with the `get` and `set` traps, but the `has` trap also has some room for improvement. This one requires a bit more background into some esoteric JavaScript features.
+
+Alpine exposes data to the expressions primarily through use of the `with` statement. `with` has been around since [the very first versions of Chrome](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/with) and can be seen as a bit controversial. In fact, it's been deprecated longer than it was not, but it's still alive and kicking.
+
+The `with` statement is a way to expose all of the keyed values on an object to a scope of code, so that properties can be accessed on it without referencing the object itself. Generally, it's use is not recommended, due to how it can really make code quite unreadable, and can lead to some very difficult to debug issues.
+
+```js
+const data = {
+  clicked: false,
+  count: 1,
+};
+
+with (data) {
+  if (clicked)
+    // same as data.clicked
+    count++; // same as data.count++
+}
+```
+
+This being said, how Alpine uses it is quite restrained and wouldn't really have the same issues as general concerns about this statement, especially considering there isn't really a better way to do what Alpine is specifically trying to do.
+
+But, it still does come with some performance implications.
+
+Every property access, whether on the objects or not, will have to go through this `has` trap, iterating over all of the objects, and checking if they have the property.
+
+And even more, this happens TWICE for every property! When using `with`, the JS engine will also look for the `@@unscopables` symbol on the object, so as to [limit what is exposed](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Symbol/unscopables) with `with`.
+
+We can be pretty sure that there is never going to be a data object with the `@@unscopables` symbol, so we can just short circuit this check and say right away "we don't have that".
+
+```js
+has: (target, name) => {
+  if (name == Symbol.unscopables) return false;
+  return objects.some((obj) => obj.hasOwnProperty(name));
+};
+```
+
+This is a small change but can have an outsized impact on performance, especially on extremely deep stacks.
+
+## Extract Traps
+
+Another thing that you may have noticed in the original code, is that every time that `mergeProxies` was called, a new object of new functions was created for the `Proxy` traps. The traps are always the same, but just point at different objects.
+
+In total, there were 7 objects being created, everytime the function was called. We can get that down to 2, by just creating the traps once, and then using them as needed.
+
+If you noticed, we have the `target` passed to every trap, which can be used to access that individual Proxies wrapped values. So instead of refering to the enclosed `objects` array, we can just use the `target` object.
+
+```js
+export function mergeProxies(objects) {
+  // We put the objects array into the target object
+  const thisProxy = new Proxy({ objs: objects }, mergeTraps);
+  return thisProxy;
+}
+
+const mergeTraps = {
+  has({ objs }, name) {
+    if (name == Symbol.unscopables) return false;
+    return objs.some((obj) => Object.prototype.hasOwnProperty.call(obj, name));
+  },
+  ...otherTraps, // omitted to keep block short
+};
+```
+
+Now, we can reuse the same traps, and only need to make a new `Proxy` and our `target` object. Only 2 objects instead of 7!
+
+Not all objects are created equal, and of course, `Proxy` may do some rearranging of data in a way that makes it not just literally 2/7ths of the memory, but we can benchmark that
+
+## The Results
+
+These changes proved to be quite successful!
+
+### The Memory
+
+To benchmark the memory, this code was isolated and, in node, we just generated a TON of proxies (to make sure any other system memory is negligible) and then checked how much memory was being used. Very inexact, but it's a good enough measure for our purposes.
+
+Results for _1,000,000_ proxies:
+
+- Before: **449.75MB** (**471.6B** per)
+- After: **110.75MB** (**116.1B** per)
+
+That's a **~75%** reduction in memory usage!
+
+> These were also timed for posterity, and the after took less than 33% of the time to run! Less memory often means faster!
+
+### The Performance
+
+As mentioned, I do not still have the raw numbers, but those aren't really important, since the benchmark scenario was not reflective of a real application in a way where such a time is meaningful, but I do have the relative times, running in _three different runtimes_:
+
+10 Depth, 1,000,000 Iterations (Factor of Before):
+
+- Node (v8): **1.20x**
+- Deno (v8): **1.20x**
+- Bun (JavaScriptCore): **1.49x**
+
+26 Depth, 100,000 Iterations (Factor of Before):
+
+- Node (v8): **1.32x**
+- Deno (v8): **1.32x**
+- Bun (JavaScriptCore): **1.42x**
+
+It makes sense that Node and Deno had similar improvements, since they are both using the V8 engine, so that does help validate the idea!
+
+That is definitely a significant improvement, and I'm quite happy with it! **~75% less memory** and **20+% faster** property access is a great start!
+
+### The Bugs
+
+You need to break a few eggs to make an omelette, and this was no exception.
+
+### Setters Regression
+
+About the month after this PR, a [bug was reported](https://github.com/alpinejs/alpine/discussions/3804) in cases where a `setter` was accessing `this`, but was not accompanied by a `getter`.
+
+This was a proper regression, in the sense that the code wasn't bugged and was working as expected, but that it did not fully maintain the same behavior as before. Behavior that some code in the wild was relying on, but was not covered in tests or clarified expected behavior.
+
+The original behavior was that a lone `setter` would have `this` refer only to that same data object, while `setter` that have an accompanying `getter` would refer to the DataStack. The new behavior was that `this` in all setters would refer to the local object only. Having all `setter` refer to the DataStack was causing tons of existing tests to fail, but this behavior was not (due to lack of test coverage).
+
+This caused issues when a `setter` existed but referred to a value on `this` that was not present on that object itself.
+
+[A small change was necessary](https://github.com/alpinejs/alpine/pull/3807) to get the setter working again.
+
+```js
+set({ objects }, name, value, thisProxy) {
+    const target = objects.find((obj) =>
+            Object.prototype.hasOwnProperty.call(obj, name)
+        ) || objects[objects.length - 1];
+    const descriptor = Object.getOwnPropertyDescriptor(target, name);
+    if (descriptor?.set && descriptor?.get)
+        return Reflect.set(target, name, value, thisProxy);
+    return Reflect.set(target, name, value);
+},
+```
+
+In a perfect world, maybe we would design this to have a more consistent behavior, but that would be best left to Alpine v4!
+
+### The Vue Bug
+
+Turns out, that wasn't the last code I'd write fixing the `set` trap!
+
+Just a week ago as of this writing (about 8 months after the original code), a new bug was identified.
+
+Apparently, when `@vue/reactivity` was checking for equality on the reactive proxy to determine if a value had changed, it was incorrectly ignoring the context of the `this` in the `setter` trap! This meant that `setter` functions that were accompanied by a `getter` that were accessing data up the stack would be checked against `undefined`.
+
+Most of the time this wouldn't be an issue, EXCEPT if the setter itself was accessing a nested property like
+
+```js
+{
+  set count(val) {
+    this.data.count = val
+  }
+}
+```
+
+`this.data` would evaluate to `undefined` causing the whole process to error out.
+
+I [had a fix ready](https://github.com/alpinejs/alpine/pull/4265) quite quickly, and do intend to see if it is possible to fix in `@vue/reactitity` as well, but Alpine is not able to use newer versions of `@vue/reactivity` regardless, so it's a moot point for Alpine.
+
+The final version (for now)
+
+```js
+set({ objects }, name, value, thisProxy) {
+    const target =
+        objects.find((obj) =>
+            Object.prototype.hasOwnProperty.call(obj, name)
+        ) || objects[objects.length - 1];
+    const descriptor = Object.getOwnPropertyDescriptor(target, name);
+    if (descriptor?.set && descriptor?.get)
+        return descriptor.set.call(thisProxy, value) || true;
+    return Reflect.set(target, name, value);
+}
+```
+
+## Other Related PRs
+
+As a follow up, I made a PR that [enabled the use of Class instances](https://github.com/alpinejs/alpine/pull/4038) which pretty much immediately had a bug where [setting values was causing a dependecy registration](https://github.com/alpinejs/alpine/pull/4081).
+
+Oof!!
+
+You can spend a lot of time crafting and thinking through code, and writing tests to cover as much as you can think of, and still immediately be slapped by real users when they step in to use it.
+
+## Reflections
+
+After everything, the performance was still way up, and the line count was down 14% in the related feature code. With more features (oh, I didn't mention that I also made `JSON.stringify`-ing the DataStack actually produce the flattened Object).
+
+Might just need to really spend more time trying to break things, so regressions don't make it into a release.
+
+I'd call that a success!
