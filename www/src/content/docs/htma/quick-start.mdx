@@ -1,0 +1,35 @@
+---
+pkg: 'HTMAlpine'
+page: quick-start
+description: Quick start guide for HTMA
+date: 2024-06-02
+---
+
+# Getting started with HTMA
+
+HTMA is a plugin for AlpineJS that basically handles HTMX attributes. This leverages the power of AlpineJS core and improved the ease of integration between HTMX and AlpineJS, where normally they would exist as separately scoped attributes.
+
+## Installation
+
+In your terminal of choice:
+
+```sh
+pnpm add @awesome-alpine/htma
+```
+
+In your AlpineJS setup module:
+
+```js
+import Alpine from 'alpinejs';
+import HTMA from '@awesome-alpine/htma';
+
+Alpine.plugin(HTMA);
+
+Alpine.start();
+```
+
+And you're off to the races!
+
+If you're migrating from HTMX, you would also need to remove the HTMX script, but otherwise all your same attributes should _just work_!
+
+> At the time of writing, most features aren't implement....so....good luck!

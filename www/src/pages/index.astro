@@ -9,6 +9,7 @@ import Timeline from '../components/organisms/timeline.astro';
 import LandingPage from '../layout/landing.astro';
 const READY = false;
 const posts = (await getCollection('post'))
+  .filter((post) => post.data.published)
   .sort((a, b) => b.data.date.getTime() - a.data.date.getTime())
   .slice(0, 3);
 ---

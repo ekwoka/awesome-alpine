@@ -28,7 +28,7 @@
     "build": "vite build",
     "coverage": "vitest run --coverage",
     "lint": "run-s lint:*",
-    "lint:biome": "biome check --apply ./**/src/**/*.{json,js,ts,astro}",
+    "lint:biome": "biome check --write ./**/src/**/*.{json,js,ts,astro}",
     "lint:prettier": "prettier --write ./**/src/**/*.{json,mdx,html,css}",
     "prebuild": "rm -rf dist",
     "size": "node scripts/esbuild.js",
@@ -38,10 +38,10 @@
     "@types/alpinejs": "3.13.10",
     "@types/alpinejs__intersect": "3.13.4",
     "@types/alpinejs__morph": "3.13.4",
-    "alpinejs": "3.14.0"
+    "alpinejs": "3.14.1"
   },
   "lint-staged": {
-    "*.{json,js,ts,astro}": ["biome check --apply"],
+    "*.{json,js,ts,astro}": ["biome check --write"],
     "*.{mdx,html,css}": ["prettier --write"]
   },
   "prettier": {
@@ -52,7 +52,7 @@
     "alpinejs": ">=3.0.0"
   },
   "optionalDependencies": {
-    "@alpinejs/intersect": "3.14.0",
-    "@alpinejs/morph": "3.14.0"
+    "@alpinejs/intersect": "3.14.1",
+    "@alpinejs/morph": "3.14.1"
   }
 }

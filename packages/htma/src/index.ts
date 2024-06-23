@@ -27,7 +27,10 @@ export const HTMA: PluginCallback = (Alpine) => {
             new HXBinding(
               el,
               Verb.GET,
-              expression || el.getAttribute('href') || '#',
+              expression ||
+                el.getAttribute('href') ||
+                el.getAttribute('action') ||
+                '#',
               Alpine,
             ),
           ),
