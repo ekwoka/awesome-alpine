@@ -7,6 +7,9 @@ import ExternalDeps from 'vite-plugin-external-deps';
 
 export default defineConfig({
   root: resolve(__dirname),
+  resolve: {
+    conditions: ['typescript', 'import', 'module', 'browser', 'default'],
+  },
   plugins: [
     alpineTestingPlugin(),
     dts({
@@ -40,6 +43,7 @@ export default defineConfig({
   },
   test: {
     globals: true,
+    pool: 'threads',
     include: ['./**/*{.spec,.test}.{ts,tsx}'],
     includeSource: ['./**/*.{ts,tsx}'],
     reporters: ['dot'],
