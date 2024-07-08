@@ -5,13 +5,13 @@
   "type": "module",
   "dependencies": {
     "@alpinejs/persist": "3.14.1",
-    "@astrojs/check": "0.7.0",
-    "@astrojs/mdx": "3.1.1",
+    "@astrojs/check": "0.8.0",
+    "@astrojs/mdx": "3.1.2",
     "@astrojs/tailwind": "5.1.0",
     "@awesome-alpine/htma": "workspace:^",
     "@ekwoka/alpine-history": "0.2.0",
     "alpinejs": "3.14.1",
-    "astro": "4.11.0",
+    "astro": "4.11.5",
     "monaco-editor": "0.50.0"
   },
   "scripts": {
@@ -28,23 +28,21 @@
     "test:run": "vitest --run"
   },
   "devDependencies": {
-    "@netlify/functions": "2.8.0",
+    "@netlify/functions": "2.8.1",
     "@tailwindcss/typography": "0.5.13",
     "@types/alpinejs": "3.13.10",
     "@types/alpinejs__persist": "3.13.4",
-    "@vituum/vite-plugin-posthtml": "1.1.0",
     "autoprefixer": "10.4.19",
-    "esbuild": "0.21.5",
-    "esbuild-wasm": "0.21.5",
-    "postcss": "8.4.38",
+    "esbuild": "0.23.0",
+    "esbuild-wasm": "0.23.0",
+    "postcss": "8.4.39",
     "posthtml-expressions": "1.11.3",
     "prettier-plugin-astro": "0.14.0",
-    "tailwind-merge": "2.3.0",
+    "tailwind-merge": "2.4.0",
     "tailwindcss": "3.4.4",
-    "vite": "5.3.1",
+    "vite": "5.3.3",
     "vite-plugin-dts": "3.9.1",
-    "vitest": "1.6.0",
-    "vituum": "1.1.0"
+    "vitest": "2.0.0"
   },
   "lint-staged": {
     "*.{json,js,ts,astro}": ["biome check --write"],

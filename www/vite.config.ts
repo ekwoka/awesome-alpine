@@ -30,6 +30,7 @@ export default defineConfig({
   },
   test: {
     globals: true,
+    pool: 'threads',
     include: ['./**/*{.spec,.test}.{ts,tsx}'],
     includeSource: ['./**/*.{ts,tsx}'],
     reporters: ['dot'],
