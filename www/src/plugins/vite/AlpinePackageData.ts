@@ -1,3 +1,5 @@
+import type { Plugin } from 'vite';
+import { cache } from './cache';
 const NPM = 'https://registry.npmjs.com/';
 
 const MIN_VERSION = '3.11.0';
@@ -17,9 +19,17 @@ const ALPINE_PACKAGES = [
 const getPackageData = async (): Promise<PackageInfo[]> => {
   const packages = await Promise.all(
     ALPINE_PACKAGES.map(async (pkg) => {
+      try {
+        const cached = await cache.get(pkg);
+        return JSON.parse(cached) as PackageInfo;
+      } catch (_) {
+        // Ignore cache errors
+      }
       const res = await fetch(NPM + pkg);
       if (!res.ok) return null;
-      return (await res.json()) as PackageInfo;
+      const result = (await res.json()) as PackageInfo;
+      await cache.set(pkg, JSON.stringify(result));
+      return result;
     }),
   );
   return packages.filter((pkg): pkg is PackageInfo => Boolean(pkg));
@@ -27,7 +37,7 @@ const getPackageData = async (): Promise<PackageInfo[]> => {
 const toVersionArray = (version: SEMVER<string>): SEMVER<number> =>
   version.split('.').map(Number) as [number, number, number];
 
-export const AlpinePackageData = () => ({
+export const AlpinePackageData = (): Plugin => ({
   name: 'alpine-versions',
   resolveId(id: string) {
     if (['./alpine-versions', 'alpine-versions'].includes(id)) {

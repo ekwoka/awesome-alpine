@@ -1,4 +1,7 @@
-export const DLX = () => ({
+import type { Plugin } from 'vite';
+import { cache } from './cache';
+
+export const DLX = (): Plugin => ({
   name: 'dlx',
   resolveId(id: string) {
     if (id.includes('?dlx')) {
@@ -7,19 +10,26 @@ export const DLX = () => ({
   },
   async load(id: string) {
     if (id.includes('?dlx')) {
-      console.log('downloading script from', id, '...');
+      try {
+        return await cache.get(id);
+      } catch (_) {
+        this.info('Cache miss for ' + id);
+      }
+      this.info(`downloading script from ${id}...`);
       const res = await fetch('https://' + id);
       const text = await res.text();
-      console.log('downloaded script from', id, '...');
-      console.log('size:', text.length, 'bytes');
-      if (id.includes('&json'))
-        return `export default JSON.parse(${JSON.stringify(text)})`;
-      return text;
+      this.info(`downloaded script from ${id}...`);
+      this.info(`size: ${text.length} bytes`);
+      const result = id.includes('&json')
+        ? `export default JSON.parse(${JSON.stringify(text)})`
+        : text;
+      await cache.set(id, result);
+      return result;
     }
   },
 });
 
-export const URL = () => ({
+export const URL = (): Plugin => ({
   name: 'dlx',
   resolveId(id: string) {
     if (id.includes('?urlfollow')) {
@@ -29,7 +39,12 @@ export const URL = () => ({
   async load(id: string) {
     if (id.includes('?urlfollow')) {
       id = id.replace('?urlfollow', '');
-      console.log('getting current url for ', id, '...');
+      try {
+        return await cache.get(id);
+      } catch (_) {
+        this.info('Cache miss for ' + id);
+      }
+      this.info(`getting current url for ${id}...`);
       const response = await fetch('https://' + id, {
         redirect: 'manual',
       });
@@ -37,11 +52,15 @@ export const URL = () => ({
         const redirect = response.headers.get('location');
         if (redirect) {
           console.log('Using Redirected location for: ', id, ' at: ', redirect);
-          return `export const url = '${redirect}'`;
+          const result = `export const url = '${redirect}'`;
+          await cache.set(id, result);
+          return result;
         }
       }
       console.log('url not redirected. Using default:', id);
-      return `export const url = 'https://${id}'`;
+      const result = `export const url = 'https://${id}'`;
+      await cache.set(id, result);
+      return result;
     }
   },
 });
