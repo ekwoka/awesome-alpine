@@ -10,11 +10,17 @@ Everyones going on an on about `@click`, `x-text`, and `$store`, but what about 
 
 > I maintain the [`@types/alpinejs`](https://www.npmjs.com/package/@types/alpinejs) package. I've worked hard to properly Type and even document the Alpine API. Even if you're not using TypeScript, installing this package can give you helpful explanations of the API as you use these methods.
 
-## `Alpine.reactive<T>(obj: T): T`
+## `Alpine.reactive`
+
+```ts
+interface Alpine {
+  reactive<T>(obj: T): T;
+}
+```
 
 Underneath Alpine is the powerful `@vue/reactivity` package. When you make new components, or stores, or add values to existing components, Alpine wraps them in reactive proxies. You've probably seen this when trying to log an object from a component.
 
-Well, you can use `Alpine.reactive` to make your own reactive objects! This is useful mainly for plugins that might want to hook into reactively without waiting for values to exist in a component.
+Well, you can use `Alpine.reactive` to make your own reactive objects! This is useful mainly for plugins that might want to hook into reactivity without waiting for values to exist in a component.
 
 ```js
 import Alpine from 'alpinejs';
@@ -28,15 +34,31 @@ data.count++;
 
 > `Alpine.effect` is also a way to register a reactive effect, like `x-effect` does.
 
-### Bonus: `Alpine.raw<T>(obj: T): T`
+### Bonus: `Alpine.raw`
+
+```ts
+interface Alpine {
+  raw<T>(obj: T): T;
+}
+```
 
 To clean up those Proxies in those logs, `Alpine.raw` does the opposite of `reactive`! It lets you simply access the internal object without concern for proxy wrapper. Can really make console debugging a lot easier.
 
 ```html
-<button type="button" @click="console.log(Alpine.raw(cartItems))"></button>
+<button
+  type="button"
+  @click="
+    console.log(Alpine.raw(cartItems))
+  "></button>
 ```
 
-## `Alpine.addRootSelector(selectorCallback: () => string): void`
+## `Alpine.addRootSelector`
+
+```ts
+interface Alpine {
+  addRootSelector(selectorCallback: () => string): void;
+}
+```
 
 Ever make a fancy clean Headless Alpine component (like in `@alpinejs/ui`) but not enjoy the process of adding the `x-data` attribute to the elements, just to make them work? `addRootSelector` is here to help!
 
@@ -49,16 +71,34 @@ Alpine.addRootSelector(() => `[${Alpine.prefixed('dialog')}]`);
 ```
 
 ```html
-<dialog x-dialog>Alpine sure is cool!</dialog>
+<dialog x-dialog>
+  Alpine sure is cool!
+</dialog>
 ```
 
 > `Alpine.prefixed` is a helper to transform the attribute name to respect `Alpine.prefix` configuration.
 
-### Bonus: `Alpine.addInitSelector(selectorCallback: () => string): void`
+### Bonus: `Alpine.addInitSelector`
+
+```ts
+interface Alpine {
+  addInitSelector(selectorCallback: () => string): void;
+}
+```
 
 Like `addRootSelector`, but for elements that you only want to evaluate as standalone actions. This is like `x-init`! `x-init` can be used [without being inside an `x-data`](https://alpinejs.dev/directives/init#standalone-x-init) to help run simple startup expressions.
 
-## `Alpine.addScopeToNode(node: Element, data: Record<string, unknown>, referenceNode?: Element): () => void`
+## `Alpine.addScopeToNode`
+
+```ts
+interface Alpine {
+  addScopeToNode(
+    node: Element,
+    data: Record<string, unknown>,
+    referenceNode?: Element,
+  ): () => void;
+}
+```
 
 `addScopeToNode` is the JavaScript API equivalent to `x-data`! It allows your code to add new data to an element, for directives or children to access.
 
@@ -77,7 +117,13 @@ document.body.append(newPage);
 
 > Note: `addScopeToNode` returns a function that can be called to remove the scope from the element. This is useful for cleanup in Single Page Applications.
 
-### Bonus: `Alpine.$data(node: Element): void`
+### Bonus: `Alpine.$data`
+
+```ts
+interface Alpine {
+  $data(node: Element): void;
+}
+```
 
 This gets the data context of the element! It's the same way expressions access the data context. You get a flattened object of the entire data stack that expressions on that element can access.
 
@@ -94,7 +140,13 @@ el.addEventListener('click', () => {
 
 ## Honourable Mentions
 
-### `Alpine.throttle(callback: Function, wait: number): Function`
+### `Alpine.throttle`
+
+```ts
+interface Alpine {
+  throttle(callback: Function, wait: number): Function;
+}
+```
 
 Sometimes you need to `throttle` a function, but you aren't using `@click.throttle`. Well, you can use the same underlying functionality with `Alpine.throttle`! Now you can have your functions run only once every so often.
 
@@ -112,7 +164,13 @@ throttledLog('World'); // doesn't log
 
 > It's also FULLY type safe! So the type of function that goes in is the type of function that comes out!
 
-### `Alpine.debounce(callback: Function, wait: number): Function`
+### `Alpine.debounce`
+
+```ts
+interface Alpine {
+  debounce(callback: Function, wait: number): Function;
+}
+```
 
 Just like the above, for `debounce`! Now you can have your functions run only after a certain amount of time has passed since the last call, always with just the last arguments passed in.
 

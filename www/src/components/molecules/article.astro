@@ -17,7 +17,7 @@ interface Props {
     bottom: `calc(${Astro.props.bottom * 1.4}rem + var(--sticky-offset,0px) - 4rem)`,
   }}>
   <div
-    class="absolute left-8 top-4 z-50 flex h-4 items-center justify-end gap-x-2 lg:left-[unset] lg:right-full w-max opacity-65 text-xs">
+    class="absolute left-6 top-0 z-50 flex h-4 items-center justify-end gap-x-2 lg:left-[unset] lg:top-4 lg:right-full w-max opacity-65 text-xs">
     <a
       class="inline-flex"
       href={`#${Astro.props.post.slug}`}>
