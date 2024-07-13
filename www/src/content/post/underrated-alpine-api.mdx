@@ -36,7 +36,7 @@ To clean up those Proxies in those logs, `Alpine.raw` does the opposite of `reac
 <button type="button" @click="console.log(Alpine.raw(cartItems))"></button>
 ```
 
-## `Alpine.addRootSelector(selectorCallback: () => string): void`
+## `Alpine.addRootSelector(selectorCallback:() => string): void`
 
 Ever make a fancy clean Headless Alpine component (like in `@alpinejs/ui`) but not enjoy the process of adding the `x-data` attribute to the elements, just to make them work? `addRootSelector` is here to help!
 
@@ -54,11 +54,11 @@ Alpine.addRootSelector(() => `[${Alpine.prefixed('dialog')}]`);
 
 > `Alpine.prefixed` is a helper to transform the attribute name to respect `Alpine.prefix` configuration.
 
-### Bonus: `Alpine.addInitSelector(selectorCallback: () => string): void`
+### Bonus: `Alpine.addInitSelector(selectorCallback:() => string): void`
 
 Like `addRootSelector`, but for elements that you only want to evaluate as standalone actions. This is like `x-init`! `x-init` can be used [without being inside an `x-data`](https://alpinejs.dev/directives/init#standalone-x-init) to help run simple startup expressions.
 
-## `Alpine.addScopeToNode(node: Element, data: Record<string, unknown>, referenceNode?: Element): () => void`
+## `Alpine.addScopeToNode(node: Element, data: Record<string, unknown>, referenceNode?: Element):() => void`
 
 `addScopeToNode` is the JavaScript API equivalent to `x-data`! It allows your code to add new data to an element, for directives or children to access.
 

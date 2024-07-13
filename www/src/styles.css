@@ -27,8 +27,12 @@
   h6 {
     @apply scroll-mt-8;
   }
+  pre:has(code) {
+    @apply -mx-8;
+  }
+
   pre code {
-    @apply block !text-base !font-mono tracking-wide !leading-[0.5];
+    @apply block !text-base !font-mono tracking-wide !leading-[0.5] text-sm;
 
     & .line {
       @apply block leading-loose pl-[4ch] -indent-[4ch];
@@ -38,6 +42,17 @@
         font-size: 0;
         word-break: break-all;
       }
+    }
+  }
+  code:not(pre code) {
+    word-break: break-word;
+    white-space: pre-wrap;
+  }
+
+  :is(h1, h2, h3, h4, h5, h6) code {
+    &::before,
+    &::after {
+      content: '';
     }
   }
 
