@@ -32,7 +32,7 @@
     "happy-dom": "14.12.3",
     "husky": "9.0.11",
     "lint-staged": "15.2.7",
-    "netlify-cli": "17.33.0",
+    "netlify-cli": "17.33.3",
     "npm-run-all2": "6.2.2",
     "postcss": "8.4.39",
     "prettier": "3.3.2",
@@ -44,7 +44,7 @@
     "vite": "5.3.3",
     "vite-plugin-dts": "3.9.1",
     "vite-plugin-external-deps": "0.0.3",
-    "vitest": "2.0.0",
+    "vitest": "2.0.2",
     "vitest-environment-alpine": "0.0.2-alpha.2"
   },
   "lint-staged": {
