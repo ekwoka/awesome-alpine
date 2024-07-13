@@ -49,7 +49,7 @@
   },
   "lint-staged": {
     "*.{json,js,ts,astro}": ["biome check --write"],
-    "*.{mdx,html,css}": ["prettier --write"]
+    "*.{html,css}": ["prettier --write"]
   },
   "prettier": {
     "singleQuote": true,
