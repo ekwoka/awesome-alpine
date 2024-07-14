@@ -1,0 +1,367 @@
+---
+title: 'Alpine Performance: A Memory Leak'
+author: 'Eric Kwoka'
+description: "Reactivity engines can make your life easier, but they are truly the enemies of the Garbage Collector. Let's go on a journey to the Memory Garden, where we can Compost your old Memory to fertilize some new Memory."
+date: 2024-07-14
+published: true
+---
+
+I've taken on a challenge of improving Alpines performance (speed, memory, maintainability, code size, etc). Last time we looked at the [optimization of the Data Stack](/posts/alpine-performance-part-1). But this time we're going to look at a Memory Leak.
+
+> tl;dr: [I fix a big ol' memory leak when using nested `x-if` and `x-for` directives](https://github.com/alpinejs/alpine/pull/4300)
+
+## The Problem
+
+At the core of Alpine, and many other UI frameworks, is some kind of system for handling reactivity, so that when you change some data, the UI can immediately update to reflect the change. This can also be called **Reactive Data Binding**.
+
+> It may be difficult to fully grok the intricacies of this topic without having some familiarity with Reactivity Engines. Here's a great video on [making Reactive Data Structures from Scratch](https://youtu.be/4FU7vRQUOTY).
+
+The main issue boils down to an issue that removing an element from the DOM does not free it from memory. Every reactive effect that element has, will keep it around. And the data is aware of the effects. So unless all the data, effects, and element can be cleaned up at once, none of them can. Everything is circularly dependent. Or, more accurately, there is a web made of Data and Effects that captures quite a lot of other things in it.
+
+What this means is that Alpine needs to handle the cleanup of elements in a more explicit manner, to ensure removed elements are properly cleaned up, releasing all their memory.
+
+This can become chaotic.
+
+### Conditional Alpine Directives
+
+`x-if` and `x-for` are both directives that can conditionally add and remove elements from the DOM. `x-if` naturally uses a `Boolean` expression to create an element or remove/destroy it, while `x-for` loops over some data and creates elements for each entry, and destroys those that are no longer needed.
+
+```html
+<div x-data="{
+    isCoding: true,
+    commits: [
+      { date: '2003-07-24' },
+      { date: '2017-03-18' }
+    ]
+  }">
+  <template x-if="isCoding">
+    <div>
+      Hi, I'm coding
+    </div>
+  </template>
+  <template x-for="commit of commits" :key="commit.date">
+    <div x-text="commit.date"></div>
+  </template>
+</div>
+```
+
+When `isCoding` is changed from `true` to `false` (or vice-versa) the element will be created or removed. When `commits` are added or removed, new elements will be created and removed.
+
+This all works great. When elements are removed, the `MutationObserver` sees this, and cleans up their tree.
+
+All well and good.
+
+But an interesting thing happens when you put them inside each other...
+
+> The demo code here will use `x-if` for simplicity, but the problem exists with `x-for` as well, or two mixed together.
+
+
+```html
+<div x-data="{
+    coding: true,
+    dad: true,
+  }">
+  <template x-if="coding">
+    <div>
+      <span>
+        Hi, I'm coding.
+      </span>
+      <template x-if="dad">
+        <span>
+          Hi Coding, I'm Dad
+        </span>
+      </template>
+    </div>
+  </template>
+</div>
+```
+
+When `coding` is true, we have one message appearing, when `coding` and `dad` are true, we have two messages.
+
+All clear so far?
+
+An issue arrises when we go from both being true, to `coding` being false.
+
+But it isn't immediately clear that there is an issue.
+
+### Follow the code
+
+One of the first things to do when these kinds of problems is happening is to slap a `debugger` statement into the code, and just follow along.
+
+> The following code is simplified from the Alpine Source and is in TypeScript with comments for some extra clarity
+
+1. `coding` is changed to false, triggering the `x-if` effect
+
+```ts
+// in x-if
+effect(() =>
+  evaluate((value) => // value is now `false`
+    (value ? show() : hide()) // so we call `hide`
+  )
+)
+```
+
+2. `hide` is called
+
+```ts
+const hide = () => {
+  // We call the undo if present
+  templateEl._x_undoIf?.()
+  // and remove it
+  delete templateEl._x_undoIf
+}
+```
+
+So far so good. A little indirection never hurt anybody.
+
+3. `undoIf`
+
+```ts
+templateEl._x_undoIf = () => {
+  // walk the tree
+  walk(clone, (node) =>
+    // dequeue scheduled effects
+    node._x_effects?.forEach(dequeueJob)
+  )
+
+  // remove the cloned node
+  clone.remove()
+  delete templateEl._x_currentIfEl
+}
+```
+
+This isn't too strange. The tree inside the `x-if` might have some `effect` scheduled to run, so we can remove them from the queue. That makes sense. We don't want children in this tree to run code after we remove it.
+
+And then the `clone` is removed from the DOM, and we move on with our lives. All good.
+
+Wait! This just dequeues the currently scheduled run. it doesn't disable and release the effect at all!
+
+4. Mutation is Observed
+
+The `MutationObserver` picks up all kinds of changes in the DOM so as to initialize Alpine components, handle attribute changes, and clean up removed elements. There is a bit of code in between that we'll skip over to get to the good part.
+
+```ts
+// in mutation observer code
+
+removedNodes.forEach((node) => {
+  // Run generic Element removal hooks
+  onElRemoveds.forEach((i) => i(node))
+
+  // run our special cleanups for this specific node.
+  while (node._x_cleanups?.length)
+    node._x_cleanups.pop()()
+})
+```
+
+> `MutationObserver` is only passed one removed element when a tree of elements is removed. So this will only be given the `clone` element from before, not each element it has has a child.
+
+Well, that's not too helpful. Any number of bits of code could be running here...
+
+Well, let's `CMD+SHIFT+F` and look for relevant code...
+
+> ~Two hours later~ A few clicks later...
+
+This is promising!
+
+5. `destroyTree`
+
+```ts
+// in the code for Alpine.start
+startObservingMutations()
+
+onElAdded((el) => initTree(el, walk))
+onElRemoved(destroyTree)
+```
+
+So when elements are added, we initialize them as a tree, and when they are removed, the tree is destroyed. Okay, that makes sense.
+
+The `clone` element from the outer `x-if` was removed, so it will get passed to `destroyTree` now.
+
+Surely we are nearing the end!!
+
+6. Well, maybe not quite
+
+```ts
+// in lifecycle
+export const destroyTree = (root: HTMLElement) =>
+  walk(root, (el) => {
+    cleanupAttributes(el)
+    cleanupElement(el)
+  })
+```
+
+Well, it's going to walk down the tree, cleaning up the attributes on each element, and then cleaning up the element itself.
+
+The issue we are having is that the child `x-if` isn't fully cleaning up. So let's go see what it needs to go
+
+7. This looks familiar...
+
+```ts
+// back in x-if
+cleanup(() => templateEl._x_undoIf?.())
+```
+
+Well, shit...
+
+That's basically where we started.
+
+So the things that happen next is....
+
+`undoIf` runs, which removes the node, and then the mutation is observed.
+
+oh no! This node is in a detached tree! So it won't get observed!
+
+But that shouldn't matter, since the tree walker was already going to clean it up. Lets go see how `walk` works.
+
+```ts
+// in walk
+export const walk = (
+  el: HTMLElement,
+  callback: WalkerCallback
+) => {
+  // run our callback that cleans up the elements
+  callback(el)
+
+  // loop over the children and clean all of them up too
+  let node = el.firstElementChild
+  while (node) {
+    walk(node, callback)
+    node = node.nextElementSibling
+  }
+}
+```
+
+Now that could be a problem.
+
+The node is changed to the previous nodes `nextElementSibling`.
+
+```html
+<!-- Before the `x-if` is cleaned -->
+<template x-if="dad">
+  <span>
+    Hi Coding, I'm Dad
+  </span>
+</template>
+<span>
+  Hi Coding, I'm Dad
+</span>
+
+<!-- After being cleaned -->
+<template x-if="dad">
+  <span>
+    Hi Coding, I'm Dad
+  </span>
+</template>
+```
+
+The `span` was removed when the `x-if` cleaned up, so the `span` is now not the `nextElementSibling`, so it will never be cleaned up. None of its attributes will be released, and none of its children either!!
+
+> This example doesn't have anything to clean up, but suffice it to say that this is not good!
+
+That's bad!!!
+
+## The Solution
+
+Luckily, [the fix is actually quite simple](https://github.com/alpinejs/alpine/pull/4300).
+
+Instead of just removing the Element and hoping and praying everything works out
+
+```ts
+templateEl._x_undoIf = () => {
+  walk(clone, (node) =>
+    node._x_effects?.forEach(dequeueJob)
+  )
+
+  clone.remove()
+  delete templateEl._x_currentIfEl
+}
+```
+
+We eagerly clean up the tree then and there
+
+```ts
+templateEl._x_undoIf = () => {
+  mutateDom(() => {
+    destroyTree(clone)
+    clone.remove()
+  })
+  delete templateEl._x_currentIfEl
+}
+```
+
+Now we don't need to worry about the mutation observer being responsible (*or irresponsible*) for catching and cleaning the stray element.
+
+Then, to handle effect dequeuing, which we previously handled in the `x-if` cleanup, just in case, we can add it to aforementioned `cleanupElement`.
+
+```ts
+export const cleanupElement = (el: HTMLElement) => {
+  el._x_effects?.forEach(dequeueJob)
+  while (el._x_cleanups?.length)
+    el._x_cleanups.pop()()
+}
+```
+
+Boom!
+
+## The Results
+
+Well, our goals here are to
+
+```
+Free Memory: 〰️
+Reduce Code Size: 〰️
+Increase Runtime Speed: 〰️
+```
+
+So, how did we do?
+
+We cleared up a ton of leaky memory! That was the whole point, after all.
+
+```
+Free Memory: ✅
+```
+
+Did we manage to solve the issue with less code?
+
+The tally is
+
+<dl>
+  <dt>x-for.js</dt>
+  <dd>
+    <span class="text-red-600 dark:text-red-400">-11</span>/<span class="text-green-600 dark:text-green-400">+11</span>
+  </dd>
+  <dt>x-if.js</dt>
+  <dd>
+    <span class="text-red-600 dark:text-red-400">-10</span>/<span class="text-green-600 dark:text-green-400">+5</span>
+  </dd>
+  <dt>mutation.js</dt>
+  <dd>
+    <span class="text-red-600 dark:text-red-400">-3</span>/<span class="text-green-600 dark:text-green-400">+3</span>
+  </dd>
+  <dt>lifecycle.js</dt>
+  <dd>
+    <span class="text-red-600 dark:text-red-400">-1</span>/<span class="text-green-600 dark:text-green-400">+1</span>
+  </dd>
+  <dt>Total</dt>
+  <dd>
+    <span class="text-red-600 dark:text-red-400">-25</span>/<span class="text-green-600 dark:text-green-400">+20</span>
+  </dd>
+</dl>
+
+Nice! We removed a net of 5 lines of code! It's not enough to retire on, but it's a start!
+
+```
+Reduce Code Size: ✅
+```
+
+And finally, did we speed up the runtime?
+
+I'm not going to benchmark this, as that might be a bit too much for this, but we can use some common sense.
+
+Before, we were walking the tree of the removed node twice! Once in the `x-if`/`x-for` cleanup (to dequeue jobs), and AGAIN in the `destroyTree`! Now we only walk the tree once, in the `destroyTree` where we just also dequeue the jobs.
+
+```
+Increase Runtime Speed: ✅
+```
+
+I'm no Vanderbilt, but this train makes hay!

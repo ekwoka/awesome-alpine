@@ -13,4 +13,7 @@ const { entry } = Astro.props;
 const { Content } = await entry.render();
 ---
 
-<Post frontmatter={entry.data}> <Content /></Post>
+<Post frontmatter={entry.data}>
+  <Content />
+  <hr/>
+</Post>
