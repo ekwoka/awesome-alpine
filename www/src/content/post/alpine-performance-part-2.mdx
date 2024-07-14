@@ -98,7 +98,7 @@ effect(() =>
   evaluate((value) => // value is now `false`
     (value ? show() : hide()) // so we call `hide`
   )
-);
+)
 ```
 
 2. `hide` is called
@@ -106,10 +106,10 @@ effect(() =>
 ```ts
 const hide = () => {
   // We call the undo if present
-  templateEl._x_undoIf?.();
- // and remove it
-  delete templateEl._x_undoIf;
-};
+  templateEl._x_undoIf?.()
+  // and remove it
+  delete templateEl._x_undoIf
+}
 ```
 
 So far so good. A little indirection never hurt anybody.
@@ -118,16 +118,16 @@ So far so good. A little indirection never hurt anybody.
 
 ```ts
 templateEl._x_undoIf = () => {
-		// walk the tree
-        walk(clone, (node) =>
-          // dequeue scheduled effects
-            node._x_effects?.forEach(dequeueJob);
-        );
+  // walk the tree
+  walk(clone, (node) =>
+    // dequeue scheduled effects
+    node._x_effects?.forEach(dequeueJob)
+  )
 
-		// remove the cloned node
-        clone.remove();
-        delete templateEl._x_currentIfEl;
-      };
+  // remove the cloned node
+  clone.remove()
+  delete templateEl._x_currentIfEl
+}
 ```
 
 This isn't too strange. The tree inside the `x-if` might have some `effect` scheduled to run, so we can remove them from the queue. That makes sense. We don't want children in this tree to run code after we remove it.
@@ -144,13 +144,13 @@ The `MutationObserver` picks up all kinds of changes in the DOM so as to initial
 // in mutation observer code
 
 removedNodes.forEach((node) => {
-	// Run generic Element removal hooks
-    onElRemoveds.forEach((i) => i(node));
+  // Run generic Element removal hooks
+  onElRemoveds.forEach((i) => i(node))
 
-	// run our special cleanups for this specific node.
-    while (node._x_cleanups?.length)
-	    node._x_cleanups.pop()();
-  });
+  // run our special cleanups for this specific node.
+  while (node._x_cleanups?.length)
+    node._x_cleanups.pop()()
+})
 ```
 
 > `MutationObserver` is only passed one removed element when a tree of elements is removed. So this will only be given the `clone` element from before, not each element it has has a child.
@@ -167,10 +167,10 @@ This is promising!
 
 ```ts
 // in the code for Alpine.start
-startObservingMutations();
+startObservingMutations()
 
-onElAdded((el) => initTree(el, walk));
-onElRemoved(destroyTree);
+onElAdded((el) => initTree(el, walk))
+onElRemoved(destroyTree)
 ```
 
 So when elements are added, we initialize them as a tree, and when they are removed, the tree is destroyed. Okay, that makes sense.
@@ -183,12 +183,11 @@ Surely we are nearing the end!!
 
 ```ts
 // in lifecycle
-export const destroyTree = (root: ElementWithXAttributes) => {
+export const destroyTree = (root: HTMLElement) =>
   walk(root, (el) => {
-    cleanupAttributes(el);
-    cleanupElement(el);
-  });
-};
+    cleanupAttributes(el)
+    cleanupElement(el)
+  })
 ```
 
 Well, it's going to walk down the tree, cleaning up the attributes on each element, and then cleaning up the element itself.
@@ -217,21 +216,19 @@ But that shouldn't matter, since the tree walker was already going to clean it u
 ```ts
 // in walk
 export const walk = (
-	el: ElementWithXAttributes,
-	callback: WalkerCallback
+  el: HTMLElement,
+  callback: WalkerCallback
 ) => {
-	// run our callback that cleans up the elements
-  callback(el);
+  // run our callback that cleans up the elements
+  callback(el)
 
-  let node = el.firstElementChild as ElementWithXAttributes;
-
-	// loop over the children and clean all of them up too
+  // loop over the children and clean all of them up too
+  let node = el.firstElementChild
   while (node) {
-    walk(node, callback);
-
-    node = node.nextElementSibling as ElementWithXAttributes;
+    walk(node, callback)
+    node = node.nextElementSibling
   }
-};
+}
 ```
 
 Now that could be a problem.
@@ -241,20 +238,20 @@ The node is changed to the previous nodes `nextElementSibling`.
 ```html
 <!-- Before the `x-if` is cleaned -->
 <template x-if="dad">
-        <span>
-          Hi Coding, I'm Dad
-        </span>
-      </template>
-      <span>
-          Hi Coding, I'm Dad
-        </span>
+  <span>
+    Hi Coding, I'm Dad
+  </span>
+</template>
+<span>
+  Hi Coding, I'm Dad
+</span>
 
 <!-- After being cleaned -->
 <template x-if="dad">
-        <span>
-          Hi Coding, I'm Dad
-        </span>
-      </template>
+  <span>
+    Hi Coding, I'm Dad
+  </span>
+</template>
 ```
 
 The `span` was removed when the `x-if` cleaned up, so the `span` is now not the `nextElementSibling`, so it will never be cleaned up. None of its attributes will be released, and none of its children either!!
@@ -271,26 +268,25 @@ Instead of just removing the Element and hoping and praying everything works out
 
 ```ts
 templateEl._x_undoIf = () => {
-        walk(clone, (node) =>
-            node._x_effects?.forEach(dequeueJob);
-        );
+  walk(clone, (node) =>
+    node._x_effects?.forEach(dequeueJob)
+  )
 
-        clone.remove();
-        delete templateEl._x_currentIfEl;
-      };
+  clone.remove()
+  delete templateEl._x_currentIfEl
+}
 ```
 
 We eagerly clean up the tree then and there
 
 ```ts
 templateEl._x_undoIf = () => {
-        mutateDom(() => {
-          destroyTree(clone);
-          clone.remove();
-        });
-
-        delete templateEl._x_currentIfEl;
-      };
+  mutateDom(() => {
+    destroyTree(clone)
+    clone.remove()
+  })
+  delete templateEl._x_currentIfEl
+}
 ```
 
 Now we don't need to worry about the mutation observer being responsible (*or irresponsible*) for catching and cleaning the stray element.
@@ -298,11 +294,11 @@ Now we don't need to worry about the mutation observer being responsible (*or ir
 Then, to handle effect dequeuing, which we previously handled in the `x-if` cleanup, just in case, we can add it to aforementioned `cleanupElement`.
 
 ```ts
-export const cleanupElement = (el: ElementWithXAttributes) => {
-  el._x_effects?.forEach(dequeueJob);
+export const cleanupElement = (el: HTMLElement) => {
+  el._x_effects?.forEach(dequeueJob)
   while (el._x_cleanups?.length)
-	  el._x_cleanups.pop()();
-};
+    el._x_cleanups.pop()()
+}
 ```
 
 Boom!
@@ -330,24 +326,24 @@ Did we manage to solve the issue with less code?
 The tally is
 
 <dl>
-	<dt>x-for.js</dt>
-		<dd>
+  <dt>x-for.js</dt>
+  <dd>
     <span class="text-red-600 dark:text-red-400">-11</span>/<span class="text-green-600 dark:text-green-400">+11</span>
   </dd>
   <dt>x-if.js</dt>
-		<dd>
+  <dd>
     <span class="text-red-600 dark:text-red-400">-10</span>/<span class="text-green-600 dark:text-green-400">+5</span>
   </dd>
   <dt>mutation.js</dt>
-		<dd>
+  <dd>
     <span class="text-red-600 dark:text-red-400">-3</span>/<span class="text-green-600 dark:text-green-400">+3</span>
   </dd>
   <dt>lifecycle.js</dt>
-		<dd>
+  <dd>
     <span class="text-red-600 dark:text-red-400">-1</span>/<span class="text-green-600 dark:text-green-400">+1</span>
   </dd>
   <dt>Total</dt>
-		<dd>
+  <dd>
     <span class="text-red-600 dark:text-red-400">-25</span>/<span class="text-green-600 dark:text-green-400">+20</span>
   </dd>
 </dl>
@@ -369,5 +365,3 @@ Increase Runtime Speed: ✅
 ```
 
 I'm no Vanderbilt, but this train makes hay!
-
----
