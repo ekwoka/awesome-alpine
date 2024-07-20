@@ -5,7 +5,7 @@ import * as monaco from 'monaco-editor';
 import DefaultWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker';
 import HTMLWorker from 'monaco-editor/esm/vs/language/html/html.worker?worker';
 import TSWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker';
-import { createHighlighter } from 'shiki';
+import { highlightCode } from './highlightCode';
 import { Language } from './prettier';
 
 monaco.languages.typescript.typescriptDefaults.addExtraLib(
@@ -23,11 +23,7 @@ monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
   allowNonTsExtensions: true,
   target: monaco.languages.typescript.ScriptTarget.ESNext,
 });
-const highlighter = await createHighlighter({
-  themes: ['one-dark-pro'],
-  langs: ['html', 'css', 'javascript', 'typescript'],
-});
-shikiToMonaco(highlighter, monaco);
+shikiToMonaco(highlightCode, monaco);
 export const makeEditor = (
   el: HTMLElement,
   initialContent: string,

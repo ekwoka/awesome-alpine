@@ -1,6 +1,6 @@
 ---
 const editorTabs = ['markup', 'script', 'config'];
-import { codeToHtml } from 'shiki';
+import { highlightCode } from '../../lib/highlightCode';
 import { CorePlugin } from '../../lib/lazyModules/alpinePlugins';
 import alpineVersions from './alpine-versions';
 interface Props {
@@ -86,7 +86,7 @@ interface Props {
         class="relative flex-auto max-w-full"
         x-on:keyup="update('html')"
         x-init="registerEditor($el, 'html')">
-        <div class="max-h-[90dvh] h-[90dvh] overflow-hidden" set:html={codeToHtml(Astro.props.initialHTML.trim(), { lang: 'typescript', theme: 'one-dark-pro' })}></div>
+        <div class="max-h-[90dvh] h-[90dvh] overflow-hidden" set:html={highlightCode.codeToHtml(Astro.props.initialHTML.trim(), { lang: 'typescript', theme: 'one-dark-pro' })}></div>
       </div>
     </div>
     <div
@@ -97,7 +97,7 @@ interface Props {
         class="relative flex-auto max-w-full"
         x-on:keyup.debounce.1000="update('typescript')"
         x-init="registerEditor($el, 'typescript')">
-        <div class="max-h-[90dvh] h-[90dvh] overflow-hidden" set:html={codeToHtml(Astro.props.initialScript.trim(), { lang: 'typescript', theme: 'one-dark-pro' })}></div>
+        <div class="max-h-[90dvh] h-[90dvh] overflow-hidden" set:html={highlightCode.codeToHtml(Astro.props.initialScript.trim(), { lang: 'typescript', theme: 'one-dark-pro' })}></div>
       </div>
     </div>
     <div
