@@ -1,7 +1,17 @@
 ---
 const editorTabs = ['markup', 'script', 'config'];
+import { codeToHtml } from 'shiki';
 import { CorePlugin } from '../../lib/lazyModules/alpinePlugins';
 import alpineVersions from './alpine-versions';
+interface Props {
+  initialHTML: string;
+  initialScript: string;
+  activePanel: 'markup' | 'script' | 'config';
+  tailwind: boolean;
+  typescript: boolean;
+  activePlugins: CorePlugin;
+  version: string;
+}
 ---
 
 <script>
@@ -29,6 +39,7 @@ import alpineVersions from './alpine-versions';
                 class="absolute bottom-0 inset-x-0 bg-sky-500 h-0.5 rounded-full transition-opacity duration-150"
                 x-cloak
                 x-show={`panel === '${name}'`}
+                style={Astro.props.activePanel === name ? '' : 'display: none;'}
               />
               {name}
             </button>
@@ -39,9 +50,9 @@ import alpineVersions from './alpine-versions';
         <button
           type="button"
           class="py-1 px-2 rounded bg-sky-700 hover:bg-sky-600 text-gray-100 text-sm"
-          x-on:click="navigator.clipboard.writeText(window.location.href)"
-          >Share</button
-        >
+          x-on:click="navigator.clipboard.writeText(window.location.href)">
+          Share
+        </button>
       </div>
     </div>
     <div class="ml-auto flex items-center">
@@ -69,25 +80,30 @@ import alpineVersions from './alpine-versions';
   <div class="flex flex-col flex-auto h-full w-full select-text min-h-[25vh]">
     <div
       class="border-t border-gray-200 dark:border-white/10 flex-auto flex"
-      x-show="panel === 'markup'">
+      x-show="panel === 'markup'"
+      style={Astro.props.activePanel === 'markup' ? '' : 'display: none;'}>
       <div
         class="relative flex-auto max-w-full"
         x-on:keyup="update('html')"
         x-init="registerEditor($el, 'html')">
+        <div class="max-h-[90dvh] h-[90dvh] overflow-hidden" set:html={codeToHtml(Astro.props.initialHTML.trim(), { lang: 'typescript', theme: 'one-dark-pro' })}></div>
       </div>
     </div>
     <div
       class="border-t border-gray-200 dark:border-white/10 flex-auto flex"
-      x-show="panel === 'script'">
+      x-show="panel === 'script'"
+      style={Astro.props.activePanel === 'script' ? '' : 'display: none;'}>
       <div
         class="relative flex-auto max-w-full"
         x-on:keyup.debounce.1000="update('typescript')"
         x-init="registerEditor($el, 'typescript')">
+        <div class="max-h-[90dvh] h-[90dvh] overflow-hidden" set:html={codeToHtml(Astro.props.initialScript.trim(), { lang: 'typescript', theme: 'one-dark-pro' })}></div>
       </div>
     </div>
     <div
       class="border-t border-gray-200 dark:border-white/10 flex-auto text-slate-100 flex flex-col gap-4 py-3 px-4 accent-indigo-800"
-      x-show="panel === 'config'">
+      x-show="panel === 'config'"
+      style={Astro.props.activePanel === 'config' ? '' : 'display: none;'}>
       <h2 class="sr-only">Configuration Options</h2>
       <div class="flex flex-col gap-2">
         <h3>Settings</h3>
@@ -97,7 +113,8 @@ import alpineVersions from './alpine-versions';
               <input
                 type="checkbox"
                 name="setting"
-                x-model="config.settings.typescript"
+                x-model.fill="config.settings.typescript"
+                checked={Astro.props.typescript}
               />
               <code>Use TypeScript</code>
             </label>
@@ -107,7 +124,8 @@ import alpineVersions from './alpine-versions';
               <input
                 type="checkbox"
                 name="setting"
-                x-model="config.settings.tailwind"
+                x-model.fill="config.settings.tailwind"
+                checked={Astro.props.tailwind}
               />
               <code>Use Tailwind</code>
             </label>
@@ -117,12 +135,12 @@ import alpineVersions from './alpine-versions';
       <label class="flex flex-col gap-2">
         <h3>Alpine Version</h3>
         <select
-          x-model="config.settings.version"
+          x-model.fill="config.settings.version"
           class="bg-slate-800 px-2 py-1 max-w-max min-w-[12ch] font-mono ml-3">
           <each loop="version, index in alpineVersions.alpinejs">
             {
               alpineVersions.alpinejs.map((version, idx) => (
-                <option value={version}>
+                <option value={version} selected={version === Astro.props.version}>
                   {idx === 0 ? `Latest (${version})` : version}
                 </option>
               ))
@@ -147,6 +165,7 @@ import alpineVersions from './alpine-versions';
                       x-model="config.plugins"
                       value={plugin}
                       x-bind:disabled={`!versionExists(${plugin})`}
+                      checked={Boolean(Astro.props.activePlugins & plugin)}
                     />
                     <code
                       x-bind:class={`{ 'line-through opacity-70': !versionExists(${plugin}) }`}>

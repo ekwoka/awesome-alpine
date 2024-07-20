@@ -11,9 +11,11 @@
     "@astrojs/tailwind": "5.1.0",
     "@awesome-alpine/htma": "workspace:^",
     "@ekwoka/alpine-history": "0.2.0",
+    "@shikijs/monaco": "1.10.3",
     "alpinejs": "3.14.1",
-    "astro": "4.12.0",
-    "monaco-editor": "0.50.0"
+    "astro": "4.12.2",
+    "monaco-editor": "0.50.0",
+    "shiki": "1.10.3"
   },
   "scripts": {
     "astro": "astro",

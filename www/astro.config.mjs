@@ -34,7 +34,7 @@ export default defineConfig({
     }
   },
   output: "server",
-  adapter: cloudflare()
+  adapter: cloudflare({ platformProxy: { enabled: true }, imageService: 'compile' })
 });
 function addSpacesToCode() {
   return tree => visit(tree, 'element', (node, _index, parent) => {

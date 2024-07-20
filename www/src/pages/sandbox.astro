@@ -1,3 +1,7 @@
+---
+import { base64URL } from '@ekwoka/alpine-history';
+const params = Object.fromEntries(new URL(Astro.request.url).searchParams);
+---
 <!doctype html>
 <html lang="en">
   <head>
@@ -10,5 +14,7 @@
       initializeSandbox();
     </script>
   </head>
-  <body class="bg-slate-300" style="margin-top: 32px"> Loading... </body>
+  <body class="bg-slate-300" style="margin-top: 32px">
+    <Fragment set:html={base64URL.from(params.html)}></Fragment>
+  </body>
 </html>

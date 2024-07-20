@@ -1,7 +1,30 @@
 ---
+import { base64URL } from '@ekwoka/alpine-history';
 import Header from '../components/header.astro';
 import Editor from '../components/organisms/editor.astro';
 import MainLayout from '../layout/main.astro';
+import type { CorePlugin } from '../lib/lazyModules/alpinePlugins';
+import starterHTML from '../play/starter.html?raw';
+import starterScript from '../play/starter.js?raw';
+import versionData from './alpine-versions';
+
+const params = Object.assign(
+  {
+    panel: 'markup' as const,
+    coreplugins: '0',
+    html: '',
+    script: '',
+    ts: '0',
+    tw: '0',
+    v: versionData[0],
+  },
+  Object.fromEntries(new URL(Astro.request.url).searchParams),
+);
+params.html = base64URL.from(params.html) || starterHTML;
+params.script = base64URL.from(params.script) || starterScript;
+params.corePlugins = Number(params.coreplugins) as CorePlugin;
+params.ts = params.ts === '1';
+params.tw = params.tw === '1';
 ---
 
 <MainLayout title="Alpine Plays">
@@ -16,7 +39,7 @@ import MainLayout from '../layout/main.astro';
     x-data
     x-partition
     class="flex flex-col md:flex-row flex-auto relative border-t border-gray-200 dark:border-gray-800">
-    <Editor />
+    <Editor initialHTML={params.html} initialScript={params.script} activePanel={params.panel} typescript={params.ts} tailwind={params.tw} activePlugins={params.coreplugins} version={params.v}/>
     <span
       role="presentation"
       class="bg-neutral-900 md:w-1 hover:bg-neutral-700 md:hover:w-2 transition-all max-md:h-1 max-md:hover:h-2 z-100"
@@ -28,7 +51,7 @@ import MainLayout from '../layout/main.astro';
         title="Preview"
         class="w-full h-full bg-neutral-900 grow"
         sandbox="allow-scripts allow-pointer-lock"
-        src="/sandbox/"></iframe>
+        src={`/sandbox/?html=${base64URL.to(params.html)}`}></iframe>
     </div>
   </main>
 </MainLayout>
