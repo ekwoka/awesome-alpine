@@ -2,18 +2,24 @@ import type { APIRoute } from 'astro';
 const relevantParams = ['coreplugins', 'html', 'script', 'ts', 'tw', 'v'];
 export const GET: APIRoute = async ({ request, locals }) => {
   const params = new URL(request.url).searchParams;
-  const result = Buffer.from(
-    await crypto.subtle.digest(
-      'SHA-256',
-      new TextEncoder().encode(
-        relevantParams
-          .filter((param) => params.has(param))
-          .map((param) => params.get(param))
-          .join(''),
-      ),
-    ),
+  const result = btoa(
+    Array.prototype.map
+      .call(
+        new Uint8Array(
+          await crypto.subtle.digest(
+            'SHA-256',
+            new TextEncoder().encode(
+              relevantParams
+                .filter((param) => params.has(param))
+                .map((param) => params.get(param))
+                .join(''),
+            ),
+          ),
+        ),
+        (num) => String.fromCharCode(num),
+      )
+      .join(''),
   )
-    .toString('base64')
     .slice(0, 12)
     .replaceAll('+', '-')
     .replaceAll('/', '_')
