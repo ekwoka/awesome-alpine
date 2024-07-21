@@ -3,6 +3,7 @@ import Documentation from '../../../layout/documentation.astro';
 
 import { getCollection } from 'astro:content';
 import { getDocNavigation } from '../../../lib/getDocNavigation';
+export const prerender = true;
 export async function getStaticPaths() {
   const postEntries = await getCollection('docs');
   return postEntries.map((entry) => {

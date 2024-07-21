@@ -68,6 +68,25 @@
   }
 }
 
+pre.shiki {
+  @apply h-full pl-[74px];
+  & > code {
+    @apply block !text-base !font-mono tracking-[0px] !leading-[0.5] text-sm whitespace-pre-wrap;
+    counter-reset: step;
+    counter-increment: step 0;
+
+    & .line {
+      @apply inline-block leading-[36px] relative tracking-[1.25px];
+
+      &::before {
+        @apply absolute right-[calc(100%_+1.62rem)] w-4 inline-block text-right text-gray-600;
+        content: counter(step);
+        counter-increment: step;
+      }
+    }
+  }
+}
+
 @font-face {
   font-family: ml;
   src: local(MonoLisa) url(./fonts/ml-Bold.woff2);

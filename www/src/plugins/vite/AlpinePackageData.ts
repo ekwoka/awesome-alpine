@@ -25,11 +25,17 @@ const getPackageData = async (): Promise<PackageInfo[]> => {
       } catch (_) {
         // Ignore cache errors
       }
-      const res = await fetch(NPM + pkg);
-      if (!res.ok) return null;
-      const result = (await res.json()) as PackageInfo;
-      await cache.set(pkg, JSON.stringify(result));
-      return result;
+      try {
+        const res = await fetch(NPM + pkg);
+        if (!res.ok) return null;
+        const result = (await res.json()) as PackageInfo;
+        await cache.set(pkg, JSON.stringify(result));
+        return result;
+      } catch (e) {
+        console.error(e);
+        console.error('failed to fetch package data for', pkg);
+        return null;
+      }
     }),
   );
   return packages.filter((pkg): pkg is PackageInfo => Boolean(pkg));

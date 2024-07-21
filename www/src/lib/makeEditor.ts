@@ -1,14 +1,13 @@
+import { shikiToMonaco } from '@shikijs/monaco';
 // @ts-expect-error - this is a raw types import for monaco
 import dts from '@types/alpinejs/index.d.ts?raw';
 import * as monaco from 'monaco-editor';
 import DefaultWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker';
 import HTMLWorker from 'monaco-editor/esm/vs/language/html/html.worker?worker';
 import TSWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker';
-import oneDark from './oneDarkPro.json';
+import { createHighlighter } from 'shiki';
 import { Language } from './prettier';
 
-// biome-ignore lint/suspicious/noExplicitAny: Not Worth Correctly typing
-monaco.editor.defineTheme('onedark', oneDark as any);
 monaco.languages.typescript.typescriptDefaults.addExtraLib(
   `
   ${dts}
@@ -24,15 +23,21 @@ monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
   allowNonTsExtensions: true,
   target: monaco.languages.typescript.ScriptTarget.ESNext,
 });
+const highlighter = await createHighlighter({
+  themes: ['one-dark-pro'],
+  langs: ['html', 'css', 'javascript', 'typescript'],
+});
+shikiToMonaco(highlighter, monaco);
 export const makeEditor = (
   el: HTMLElement,
   initialContent: string,
   type: Language,
 ) => {
-  const editor = monaco.editor.create(el, {
+  const editorEl = document.createElement('div');
+  const editor = monaco.editor.create(editorEl, {
     value: initialContent,
     language: type,
-    theme: 'onedark',
+    theme: 'one-dark-pro',
     automaticLayout: false,
     minimap: {
       enabled: false,
@@ -55,6 +60,7 @@ export const makeEditor = (
     editor.layout({ height: el.offsetHeight, width: el.offsetWidth });
   });
 
+  el.replaceChildren(editorEl);
   observer.observe(el);
 
   return editor;
