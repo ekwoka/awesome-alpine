@@ -19,3 +19,16 @@ declare module '*?urlfollow' {
 interface Window {
   Alpine: import('alpinejs').Alpine;
 }
+
+/// <reference types="astro/client" />
+
+type Runtime = import('@astrojs/cloudflare').Runtime<Env>;
+
+// biome-ignore lint/style/noNamespace: Astro Requires it
+declare namespace App {
+  interface Locals extends Runtime {
+    otherLocals: {
+      test: string;
+    };
+  }
+}

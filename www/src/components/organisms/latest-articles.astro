@@ -11,7 +11,6 @@ interface Props {
   Alpine.data('stickyOffset', () => ({
     stickyOffset: 0,
     updateOffset() {
-      console.log(this.stickyOffset);
       this.stickyOffset = (window.scrollY / document.body.scrollHeight) * 8;
     },
   }));

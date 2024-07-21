@@ -4,27 +4,41 @@ import Header from '../components/header.astro';
 import Editor from '../components/organisms/editor.astro';
 import MainLayout from '../layout/main.astro';
 import type { CorePlugin } from '../lib/lazyModules/alpinePlugins';
+import { PropTransformer, Struct } from '../lib/validate';
 import starterHTML from '../play/starter.html?raw';
 import starterScript from '../play/starter.js?raw';
 import versionData from './alpine-versions';
 
-const params = Object.assign(
-  {
-    panel: 'markup' as const,
-    coreplugins: '0',
-    html: '',
-    script: '',
-    ts: '0',
-    tw: '0',
-    v: versionData[0],
-  },
-  Object.fromEntries(new URL(Astro.request.url).searchParams),
-);
-params.html = base64URL.from(params.html) || starterHTML;
-params.script = base64URL.from(params.script) || starterScript;
-params.corePlugins = Number(params.coreplugins) as CorePlugin;
-params.ts = params.ts === '1';
-params.tw = params.tw === '1';
+const currentURL = new URL(Astro.request.url);
+const searchParams = currentURL.searchParams;
+if (searchParams.has('share')) {
+  const shareKey = searchParams.get('share');
+  const shareData = await Astro.locals.runtime.env.PLAY_SHARE.get(shareKey);
+  if (shareData) return Astro.redirect(`${currentURL.pathname}?${shareData}`);
+}
+const acceptedParams = new Struct({
+  panel: new PropTransformer(
+    (v: string | null): 'markup' | 'script' | 'config' =>
+      v && ['markup', 'script', 'style'].includes(v)
+        ? (v as 'markup' | 'script' | 'config')
+        : 'markup',
+  ),
+  coreplugins: new PropTransformer(
+    (v: string | null): CorePlugin => (v ? Number(v) : 0),
+  ),
+  html: new PropTransformer((v: string | null): string =>
+    v ? base64URL.from(v) : starterHTML,
+  ),
+  script: new PropTransformer((v: string | null): string =>
+    v ? base64URL.from(v) : starterScript,
+  ),
+  ts: new PropTransformer((v: string | null) => v === '1'),
+  tw: new PropTransformer((v: string | null) => v === '1'),
+  v: new PropTransformer((v: string | null): string =>
+    versionData.alpinejs.includes(v) ? v : versionData.alpinejs[0],
+  ),
+});
+const params = acceptedParams.mask(Object.fromEntries(searchParams));
 ---
 
 <MainLayout title="Alpine Plays">
