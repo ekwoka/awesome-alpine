@@ -9,6 +9,13 @@ import starterHTML from '../play/starter.html?raw';
 import starterScript from '../play/starter.js?raw';
 import versionData from './alpine-versions';
 
+const currentURL = new URL(Astro.request.url);
+const searchParams = currentURL.searchParams;
+if (searchParams.has('share')) {
+  const shareKey = searchParams.get('share');
+  const shareData = await Astro.locals.runtime.env.PLAY_SHARE.get(shareKey);
+  if (shareData) return Astro.redirect(`${currentURL.pathname}?${shareData}`);
+}
 const acceptedParams = new Struct({
   panel: new PropTransformer(
     (v: string | null): 'markup' | 'script' | 'config' =>
@@ -31,9 +38,7 @@ const acceptedParams = new Struct({
     versionData.alpinejs.includes(v) ? v : versionData.alpinejs[0],
   ),
 });
-const params = acceptedParams.mask(
-  Object.fromEntries(new URL(Astro.request.url).searchParams),
-);
+const params = acceptedParams.mask(Object.fromEntries(searchParams));
 ---
 
 <MainLayout title="Alpine Plays">

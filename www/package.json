@@ -19,16 +19,16 @@
   },
   "scripts": {
     "astro": "astro",
-    "build": "astro build",
-    "build-site": "astro build",
-    "dev": "astro dev",
+    "build": "wrangler types && astro build",
+    "build-site": "wrangler types && astro build",
+    "dev": "wrangler types && astro dev",
     "doctor": "run-s lint test:run build",
     "lint": "run-s lint:*",
     "lint:biome": "biome check --write ./**/src/**/*.{json,js,ts,astro}",
     "lint:prettier": "prettier --write ./**/src/**/*.{json,mdx,html,css}",
     "netlify": "netlify",
-    "test": "vitest",
-    "test:run": "vitest --run"
+    "test": "wrangler types && vitest",
+    "test:run": "wrangler types && vitest --run"
   },
   "devDependencies": {
     "@netlify/functions": "2.8.1",
@@ -46,7 +46,8 @@
     "unist-util-visit": "5.0.0",
     "vite": "5.3.4",
     "vite-plugin-dts": "3.9.1",
-    "vitest": "2.0.3"
+    "vitest": "2.0.3",
+    "wrangler": "3.65.1"
   },
   "lint-staged": {
     "*.{json,js,ts,astro}": ["biome check --write"],

@@ -47,10 +47,13 @@ interface Props {
         })
       }
       <div class="flex justify-center items-center">
-        <button
+        <button x-data="shareButton"
           type="button"
+          :disabled="status === 'loading'"
           class="py-1 px-2 rounded bg-sky-700 hover:bg-sky-600 text-gray-100 text-sm"
-          x-on:click="navigator.clipboard.writeText(window.location.href)">
+          x-on:click="share"
+          x-text="status === 'loading' ? 'Sharing...' : status === 'idle' ? 'Share' : 'Copied!'"
+          >
           Share
         </button>
       </div>

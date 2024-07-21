@@ -131,6 +131,32 @@ export const Editor: PluginCallback = (Alpine) => {
       ) as [string, CorePlugin][],
     };
   });
+  Alpine.data('shareButton', () => ({
+    status: 'idle' as 'idle' | 'loading' | 'success' | 'error',
+    async getShareURL() {
+      const params = window.location.search;
+      try {
+        const res = await fetch(`/play/share${params}`);
+        if (res.ok) {
+          const shareKey = await res.text();
+          return `${window.location.origin}/play?share=${shareKey}`;
+        }
+      } catch (e) {
+        console.error(e);
+      }
+      return window.location.href;
+    },
+    async share() {
+      this.status = 'loading';
+      const url = await this.getShareURL();
+      if (url) {
+        navigator.clipboard.writeText(url);
+        this.status = 'success';
+      } else {
+        this.status = 'error';
+      }
+    },
+  }));
 };
 
 const effectPromise = (fn: () => Promise<void>) =>
