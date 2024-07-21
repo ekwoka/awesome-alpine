@@ -110,7 +110,7 @@ jobs:
         run: pnpm i
 
       - name: Test
-        run: pnpm run -C ${{ matrix.package }} test --run --reporter=verbose
+        run: pnpm --filter @awesome-alpine/${{matrix.package}} run test --run --reporter=verbose
 
   Build:
     runs-on: ubuntu-latest
@@ -151,7 +151,7 @@ jobs:
         run: pnpm i
 
       - name: Build Package
-        run: pnpm run -C ${{ matrix.package }} -r build
+        run: pnpm --filter @awesome-alpine/${{matrix.package}} build
 
   check-success:
     runs-on: ubuntu-latest
