@@ -1,4 +1,14 @@
 {
+  "forms": {
+    "minified": {
+      "pretty": "1.32 kB",
+      "raw": 1318
+    },
+    "brotli": {
+      "pretty": "568 B",
+      "raw": 568
+    }
+  },
   "htma": {
     "minified": {
       "pretty": "2.58 kB",
