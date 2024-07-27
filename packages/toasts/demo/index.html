@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AlpineTS Sandbox</title>
+    <script type="module" src="./index.ts"></script>
+  </head>
+  <body x-data>
+    <button @click="$toasts.show('hello')">Show Toast</button>
+    <button @click="$toasts.success('hello success')">
+      Show Success Toast
+    </button>
+    <button @click="$toasts.error('hello error')">Show Error Toast</button>
+    <button @click="$toasts.loading('hello loading')">
+      Show loading Toast
+    </button>
+    <template x-for="toast of $toasts.queue" :key="toast.id">
+      <div
+        :style="{ backgroundColor: toast.type === 'success'
+        ? 'green'
+        : toast.type === 'error'
+        ? 'red'
+        : toast.type === 'loading'
+        ? 'yellow'
+        : 'lightgray' }">
+        <div x-text="toast.message"></div>
+      </div>
+    </template>
+  </body>
+</html>

@@ -18,7 +18,7 @@
     "size:test": "NODE_ENV=test node scripts/getSize.js",
     "test": "vitest",
     "test:run": "vitest --run",
-    "netlify": "netlify dev"
+    "demo": "vite"
   },
   "devDependencies": {
     "@biomejs/biome": "1.8.3",

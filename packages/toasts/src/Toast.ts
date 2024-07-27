@@ -13,6 +13,7 @@ export class Toast implements ToastControls {
 
   constructor(
     public id: number,
+    public type: string = 'info',
     public message: string,
     public details: ToastDetails = {},
   ) {}
