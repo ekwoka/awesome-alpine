@@ -2,7 +2,7 @@
 // by running `wrangler types`
 
 interface Env {
-	PLAY_SHARE: KVNamespace;
-	NODE_VERSION: "22.5.1";
-	PNPM_VERSION: "9.6.0";
+  PLAY_SHARE: KVNamespace;
+  NODE_VERSION: '22.5.1';
+  PNPM_VERSION: '9.6.0';
 }
