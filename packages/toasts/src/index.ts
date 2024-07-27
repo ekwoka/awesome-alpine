@@ -11,17 +11,35 @@ export const Toasts = ((AlpineOrDefaults: Alpine | ToastDetails) => {
     const toastManager = Alpine.reactive<ToastManager>({
       queue: [] as Toast[],
 
-      show(message: string, details: ToastDetails = {}): Toast | void {
+      show(
+        message: string,
+        type = 'info',
+        details: ToastDetails = {},
+      ): Toast | void {
         if (!message) {
           return console.error('$toasts.show requires a message');
         }
 
         const toast = Alpine.reactive(
-          new Toast(toastId++, message, Object.assign({}, defaults, details)),
+          new Toast(
+            toastId++,
+            type,
+            message,
+            Object.assign({}, defaults, details),
+          ),
         );
         this.queue.push(toast);
         Alpine.nextTick(() => toast.show().hide(details?.timeout ?? 0));
         return toast;
+      },
+      success(message: string, details: ToastDetails = {}): Toast | void {
+        return this.show(message, 'success', details);
+      },
+      error(message: string, details: ToastDetails = {}): Toast | void {
+        return this.show(message, 'error', details);
+      },
+      loading(message: string, details: ToastDetails = {}): Toast | void {
+        return this.show(message, 'loading', details);
       },
       clearFromQueue(toast: Toast): boolean {
         if (toast.shown) return false;
@@ -71,12 +89,39 @@ type ToastManager = {
   queue: Toast[];
 
   /**
-   * Add a toast to the queue, and show it
+   * Add a generically typed toast to the queue, and show it
+   * @param {String} message
+   * @param {string} type @default 'info'
+   * @param {Record} details extra information to attach to toast
+   * @returns {Toast | void} Toast object if successful
+   */
+  show: (
+    message: string,
+    type: string,
+    details?: Record<string, unknown>,
+  ) => Toast | void;
+
+  /**
+   * Add a Success toast to the queue
    * @param {String} message
    * @param {Record} details extra information to attach to toast
    * @returns {Toast | void} Toast object if successful
    */
-  show: (message: string, details?: Record<string, unknown>) => Toast | void;
+  success: (message: string, details?: Record<string, unknown>) => Toast | void;
+  /**
+   * Add an Error toast to the queue
+   * @param {String} message
+   * @param {Record} details extra information to attach to toast
+   * @returns {Toast | void} Toast object if successful
+   */
+  error: (message: string, details?: Record<string, unknown>) => Toast | void;
+  /**
+   * Add an Error toast to the queue
+   * @param {String} message
+   * @param {Record} details extra information to attach to toast
+   * @returns {Toast | void} Toast object if successful
+   */
+  loading: (message: string, details?: Record<string, unknown>) => Toast | void;
 
   /**
    * Clears a toast from the queue
