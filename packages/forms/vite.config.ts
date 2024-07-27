@@ -22,8 +22,8 @@ export default defineConfig({
     'import.meta.vitest': 'undefined',
   },
   build: {
-    target: 'esnext',
     emptyOutDir: true,
+    target: 'esnext',
     outDir: resolve(__dirname, 'dist'),
     lib: {
       entry: resolve(__dirname, 'src', 'index.ts'),

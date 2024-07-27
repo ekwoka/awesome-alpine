@@ -4,7 +4,6 @@ import { defineConfig } from 'vite';
 
 export default defineConfig({
   plugins: [alpineTestingPlugin()],
-
   build: {
     target: 'esnext',
   },
