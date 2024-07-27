@@ -1,15 +1,15 @@
 {
-  "name": "@awesome-alpine/toasts",
+  "name": "@awesome-alpine/forms",
   "version": "0.0.1-alpha.0",
   "private": true,
-  "description": "Simple Toast Manager",
+  "description": "Simple Form Validation Helpers",
   "author": {
     "name": "Eric Kwoka",
     "email": "ninjatheory@gmail.com",
     "url": "https://thekwoka.net/"
   },
   "repository": "github:ekwoka/awesome-alpine",
-  "keywords": ["utilities", "alpine", "toasts"],
+  "keywords": ["utilities", "alpine", "forms", "validation"],
   "main": "dist/index.js",
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
