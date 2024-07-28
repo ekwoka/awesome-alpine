@@ -11,12 +11,12 @@
   },
   "toasts": {
     "minified": {
-      "pretty": "1.22 kB",
-      "raw": 1219
+      "pretty": "2.2 kB",
+      "raw": 2204
     },
     "brotli": {
-      "pretty": "583 B",
-      "raw": 583
+      "pretty": "951 B",
+      "raw": 951
     }
   }
 }

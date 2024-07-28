@@ -3,7 +3,7 @@ export class Toast implements ToastControls {
    * Whether the toast is shown
    * @type {Boolean}
    */
-  shown: boolean = false;
+  shown: boolean = true;
 
   /**
    * Timeout ID for hiding the toast
@@ -13,6 +13,7 @@ export class Toast implements ToastControls {
 
   constructor(
     public id: number,
+    public type: string = 'info',
     public message: string,
     public details: ToastDetails = {},
   ) {}
