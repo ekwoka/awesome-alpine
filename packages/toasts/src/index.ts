@@ -29,16 +29,25 @@ export const Toasts = ((AlpineOrDefaults: Alpine | ToastDetails) => {
           ),
         );
         this.queue.push(toast);
-        Alpine.nextTick(() => toast.show().hide(details?.timeout ?? 0));
+        toast.hide(details?.timeout ?? toasterTimeout);
         return toast;
       },
-      success(message: string, details: ToastDetails = {}): Toast | void {
+      success(
+        message: string,
+        details: ToastDetails = { timeout: 2000 },
+      ): Toast | void {
         return this.show(message, 'success', details);
       },
-      error(message: string, details: ToastDetails = {}): Toast | void {
+      error(
+        message: string,
+        details: ToastDetails = { timeout: 5000 },
+      ): Toast | void {
         return this.show(message, 'error', details);
       },
-      loading(message: string, details: ToastDetails = {}): Toast | void {
+      loading(
+        message: string,
+        details: ToastDetails = { timeout: 0 },
+      ): Toast | void {
         return this.show(message, 'loading', details);
       },
       clearFromQueue(toast: Toast): boolean {
@@ -57,6 +66,45 @@ export const Toasts = ((AlpineOrDefaults: Alpine | ToastDetails) => {
     });
     Alpine.$toasts = toastManager;
     Alpine.magic('toasts', () => toastManager);
+    Alpine.directive('toaster', (el, _, { Alpine }) => {
+      Alpine.bind(el, {
+        'x-for': '$toast of $toasts.queue',
+        ':key': '$toast.id',
+      });
+    });
+    Alpine.directive('toast-transition', (el, _, { evaluate, effect }) => {
+      const animation = new Animation(
+        new KeyframeEffect(
+          el,
+          [
+            {
+              opacity: '0',
+              gridTemplateRows: '0fr',
+              transform: 'scale(0.25)',
+              margin: '0',
+            },
+            {
+              opacity: '1',
+              gridTemplateRows: '1fr',
+              margin: '0.25rem 0',
+              transform: 'scale(1)',
+            },
+          ],
+          { duration: 200, fill: 'both' },
+        ),
+      );
+      animation.persist();
+      animation.play();
+      const $toast = evaluate<Toast>('$toast');
+      effect(() => {
+        if ($toast.shown) return;
+        animation.playbackRate = -1;
+        animation.finished.then(() => {
+          console.log('finished');
+          toastManager.clearFromQueue($toast);
+        });
+      });
+    });
   };
   if (isAlpine(AlpineOrDefaults)) return plugin(AlpineOrDefaults);
   return plugin;

@@ -3,7 +3,7 @@ export class Toast implements ToastControls {
    * Whether the toast is shown
    * @type {Boolean}
    */
-  shown: boolean = false;
+  shown: boolean = true;
 
   /**
    * Timeout ID for hiding the toast
