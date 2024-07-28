@@ -32,6 +32,15 @@
           class="text-left border rounded py-2 px-4">
           Blank
         </button>
+        <button
+          @click="$toasts.promise(new Promise((res, rej) => setTimeout(Math.random() > 0.5 ? res : rej, 2000)), {
+            loading: 'Loading...',
+            success: 'Successful!',
+            error: 'Failed!',
+          })"
+          class="text-left border rounded py-2 px-4">
+          Promise
+        </button>
       </menu>
     </div>
     <div class="fixed right-4 bottom-4 flex flex-col-reverse items-end">

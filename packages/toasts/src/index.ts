@@ -50,6 +50,33 @@ export const Toasts = ((AlpineOrDefaults: Alpine | ToastDetails) => {
       ): Toast | void {
         return this.show(message, 'loading', details);
       },
+      promise<T>(
+        pr: Promise<T>,
+        message: PromiseHandlers<T>,
+        details: ToastDetails = { timeout: 0 },
+      ) {
+        const toast = this.loading(message.loading, details);
+        if (!toast) return;
+        pr.then(
+          (result) => {
+            toast.type = 'success';
+            toast.message =
+              typeof message.success === 'function'
+                ? message.success(result)
+                : message.success;
+            toast.hide(2000);
+          },
+          (error) => {
+            toast.type = 'error';
+            toast.message =
+              typeof message.error === 'function'
+                ? message.error(error)
+                : message.error;
+            toast.hide(5000);
+          },
+        );
+        return toast;
+      },
       clearFromQueue(toast: Toast): boolean {
         if (toast.shown) return false;
         toast.clear();
@@ -172,6 +199,18 @@ type ToastManager = {
   loading: (message: string, details?: Record<string, unknown>) => Toast | void;
 
   /**
+   * Add an dynamic toast to the queue representing a promise.
+   * @param {String} message
+   * @param {Record} details extra information to attach to toast
+   * @returns {Toast | void} Toast object if successful
+   */
+  promise: <T>(
+    pr: Promise<T>,
+    message: PromiseHandlers<T>,
+    details?: Record<string, unknown>,
+  ) => Toast | void;
+
+  /**
    * Clears a toast from the queue
    * @param {Toast} toast to dismiss
    * @returns {Boolean} true if toast was removed
@@ -212,4 +251,10 @@ export const InitializeParams: PluginCallback = (Alpine) => {
     '',
     `${window.location.pathname}?${params.toString()}`,
   );
+};
+
+type PromiseHandlers<T> = {
+  loading: string;
+  success: string | ((result: T) => string);
+  error: string | ((error: unknown) => string);
 };
