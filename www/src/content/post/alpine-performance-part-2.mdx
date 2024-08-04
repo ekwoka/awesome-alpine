@@ -354,3 +354,33 @@ Increase Runtime Speed: ✅
 ```
 
 I'm no Vanderbilt, but this train makes hay!
+
+
+## Update: A Regression
+
+Unfortunately, while this fixed a memory leak in some common situations, it also introduced a memory leak in another: When an `x-teleport` is included inside and `x-if`!!
+
+```html
+<template x-if="isVisible">
+    <div>
+        <template x-teleport="#somewhere">
+            <div x-data="{ destroy() { console.log('destroy'); } }"></div>
+        </template>
+    </div>
+</template>
+```
+
+In the above, when `isVisible` is changed to `false`, the `x-teleport` would clean up, but it's cloned div would not be cleaned up, and it's `destroy` function would not be called.
+
+Dangit!
+
+Well, luckily, it's easy to just [apply the same fix](https://github.com/alpinejs/alpine/pull/4328) to `x-teleport` as we did to `x-if`!
+
+```ts
+cleanup(() =>
+  mutateDom(() => {
+    clone.remove()
+    destroyTree(clone)
+  })
+)
+```
