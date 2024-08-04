@@ -1,6 +1,7 @@
 ---
 import '../styles.css';
 import Logo from '../components/atoms/logo.astro';
+import Metatags from '../components/atoms/metatags.astro';
 import LeftPanel from '../components/organisms/left-panel.astro';
 interface Props {
   frontmatter: {
@@ -13,9 +14,7 @@ interface Props {
 <!doctype html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <Metatags title={Astro.props.frontmatter.title} description={Astro.props.frontmatter.description ?? ''} />
     <title>{Astro.props.frontmatter.title} - AwesomeAlpine</title>
   </head>
   <body
