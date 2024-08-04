@@ -27,7 +27,8 @@ This can become chaotic.
 `x-if` and `x-for` are both directives that can conditionally add and remove elements from the DOM. `x-if` naturally uses a `Boolean` expression to create an element or remove/destroy it, while `x-for` loops over some data and creates elements for each entry, and destroys those that are no longer needed.
 
 ```html
-<div x-data="{
+<div
+  x-data="{
     isCoding: true,
     commits: [
       { date: '2003-07-24' },
@@ -35,9 +36,7 @@ This can become chaotic.
     ]
   }">
   <template x-if="isCoding">
-    <div>
-      Hi, I'm coding
-    </div>
+    <div>Hi, I'm coding</div>
   </template>
   <template x-for="commit of commits" :key="commit.date">
     <div x-text="commit.date"></div>
@@ -55,21 +54,17 @@ But an interesting thing happens when you put them inside each other...
 
 > The demo code here will use `x-if` for simplicity, but the problem exists with `x-for` as well, or two mixed together.
 
-
 ```html
-<div x-data="{
+<div
+  x-data="{
     coding: true,
     dad: true,
   }">
   <template x-if="coding">
     <div>
-      <span>
-        Hi, I'm coding.
-      </span>
+      <span> Hi, I'm coding. </span>
       <template x-if="dad">
-        <span>
-          Hi Coding, I'm Dad
-        </span>
+        <span> Hi Coding, I'm Dad </span>
       </template>
     </div>
   </template>
@@ -95,10 +90,12 @@ One of the first things to do when these kinds of problems is happening is to sl
 ```ts
 // in x-if
 effect(() =>
-  evaluate((value) => // value is now `false`
-    (value ? show() : hide()) // so we call `hide`
-  )
-)
+  evaluate(
+    (
+      value, // value is now `false`
+    ) => (value ? show() : hide()), // so we call `hide`
+  ),
+);
 ```
 
 2. `hide` is called
@@ -106,10 +103,10 @@ effect(() =>
 ```ts
 const hide = () => {
   // We call the undo if present
-  templateEl._x_undoIf?.()
+  templateEl._x_undoIf?.();
   // and remove it
-  delete templateEl._x_undoIf
-}
+  delete templateEl._x_undoIf;
+};
 ```
 
 So far so good. A little indirection never hurt anybody.
@@ -121,13 +118,13 @@ templateEl._x_undoIf = () => {
   // walk the tree
   walk(clone, (node) =>
     // dequeue scheduled effects
-    node._x_effects?.forEach(dequeueJob)
-  )
+    node._x_effects?.forEach(dequeueJob),
+  );
 
   // remove the cloned node
-  clone.remove()
-  delete templateEl._x_currentIfEl
-}
+  clone.remove();
+  delete templateEl._x_currentIfEl;
+};
 ```
 
 This isn't too strange. The tree inside the `x-if` might have some `effect` scheduled to run, so we can remove them from the queue. That makes sense. We don't want children in this tree to run code after we remove it.
@@ -145,12 +142,11 @@ The `MutationObserver` picks up all kinds of changes in the DOM so as to initial
 
 removedNodes.forEach((node) => {
   // Run generic Element removal hooks
-  onElRemoveds.forEach((i) => i(node))
+  onElRemoveds.forEach((i) => i(node));
 
   // run our special cleanups for this specific node.
-  while (node._x_cleanups?.length)
-    node._x_cleanups.pop()()
-})
+  while (node._x_cleanups?.length) node._x_cleanups.pop()();
+});
 ```
 
 > `MutationObserver` is only passed one removed element when a tree of elements is removed. So this will only be given the `clone` element from before, not each element it has has a child.
@@ -167,10 +163,10 @@ This is promising!
 
 ```ts
 // in the code for Alpine.start
-startObservingMutations()
+startObservingMutations();
 
-onElAdded((el) => initTree(el, walk))
-onElRemoved(destroyTree)
+onElAdded((el) => initTree(el, walk));
+onElRemoved(destroyTree);
 ```
 
 So when elements are added, we initialize them as a tree, and when they are removed, the tree is destroyed. Okay, that makes sense.
@@ -185,9 +181,9 @@ Surely we are nearing the end!!
 // in lifecycle
 export const destroyTree = (root: HTMLElement) =>
   walk(root, (el) => {
-    cleanupAttributes(el)
-    cleanupElement(el)
-  })
+    cleanupAttributes(el);
+    cleanupElement(el);
+  });
 ```
 
 Well, it's going to walk down the tree, cleaning up the attributes on each element, and then cleaning up the element itself.
@@ -198,7 +194,7 @@ The issue we are having is that the child `x-if` isn't fully cleaning up. So let
 
 ```ts
 // back in x-if
-cleanup(() => templateEl._x_undoIf?.())
+cleanup(() => templateEl._x_undoIf?.());
 ```
 
 Well, shit...
@@ -215,20 +211,17 @@ But that shouldn't matter, since the tree walker was already going to clean it u
 
 ```ts
 // in walk
-export const walk = (
-  el: HTMLElement,
-  callback: WalkerCallback
-) => {
+export const walk = (el: HTMLElement, callback: WalkerCallback) => {
   // run our callback that cleans up the elements
-  callback(el)
+  callback(el);
 
   // loop over the children and clean all of them up too
-  let node = el.firstElementChild
+  let node = el.firstElementChild;
   while (node) {
-    walk(node, callback)
-    node = node.nextElementSibling
+    walk(node, callback);
+    node = node.nextElementSibling;
   }
-}
+};
 ```
 
 Now that could be a problem.
@@ -238,19 +231,13 @@ The node is changed to the previous nodes `nextElementSibling`.
 ```html
 <!-- Before the `x-if` is cleaned -->
 <template x-if="dad">
-  <span>
-    Hi Coding, I'm Dad
-  </span>
+  <span> Hi Coding, I'm Dad </span>
 </template>
-<span>
-  Hi Coding, I'm Dad
-</span>
+<span> Hi Coding, I'm Dad </span>
 
 <!-- After being cleaned -->
 <template x-if="dad">
-  <span>
-    Hi Coding, I'm Dad
-  </span>
+  <span> Hi Coding, I'm Dad </span>
 </template>
 ```
 
@@ -268,13 +255,11 @@ Instead of just removing the Element and hoping and praying everything works out
 
 ```ts
 templateEl._x_undoIf = () => {
-  walk(clone, (node) =>
-    node._x_effects?.forEach(dequeueJob)
-  )
+  walk(clone, (node) => node._x_effects?.forEach(dequeueJob));
 
-  clone.remove()
-  delete templateEl._x_currentIfEl
-}
+  clone.remove();
+  delete templateEl._x_currentIfEl;
+};
 ```
 
 We eagerly clean up the tree then and there
@@ -282,23 +267,22 @@ We eagerly clean up the tree then and there
 ```ts
 templateEl._x_undoIf = () => {
   mutateDom(() => {
-    destroyTree(clone)
-    clone.remove()
-  })
-  delete templateEl._x_currentIfEl
-}
+    destroyTree(clone);
+    clone.remove();
+  });
+  delete templateEl._x_currentIfEl;
+};
 ```
 
-Now we don't need to worry about the mutation observer being responsible (*or irresponsible*) for catching and cleaning the stray element.
+Now we don't need to worry about the mutation observer being responsible (_or irresponsible_) for catching and cleaning the stray element.
 
 Then, to handle effect dequeuing, which we previously handled in the `x-if` cleanup, just in case, we can add it to aforementioned `cleanupElement`.
 
 ```ts
 export const cleanupElement = (el: HTMLElement) => {
-  el._x_effects?.forEach(dequeueJob)
-  while (el._x_cleanups?.length)
-    el._x_cleanups.pop()()
-}
+  el._x_effects?.forEach(dequeueJob);
+  while (el._x_cleanups?.length) el._x_cleanups.pop()();
+};
 ```
 
 Boom!
@@ -328,23 +312,28 @@ The tally is
 <dl>
   <dt>x-for.js</dt>
   <dd>
-    <span class="text-red-600 dark:text-red-400">-11</span>/<span class="text-green-600 dark:text-green-400">+11</span>
+    <span class="text-red-600 dark:text-red-400">-11</span>/
+    <span class="text-green-600 dark:text-green-400">+11</span>
   </dd>
   <dt>x-if.js</dt>
   <dd>
-    <span class="text-red-600 dark:text-red-400">-10</span>/<span class="text-green-600 dark:text-green-400">+5</span>
+    <span class="text-red-600 dark:text-red-400">-10</span>/
+    <span class="text-green-600 dark:text-green-400">+5</span>
   </dd>
   <dt>mutation.js</dt>
   <dd>
-    <span class="text-red-600 dark:text-red-400">-3</span>/<span class="text-green-600 dark:text-green-400">+3</span>
+    <span class="text-red-600 dark:text-red-400">-3</span>/
+    <span class="text-green-600 dark:text-green-400">+3</span>
   </dd>
   <dt>lifecycle.js</dt>
   <dd>
-    <span class="text-red-600 dark:text-red-400">-1</span>/<span class="text-green-600 dark:text-green-400">+1</span>
+    <span class="text-red-600 dark:text-red-400">-1</span>/
+    <span class="text-green-600 dark:text-green-400">+1</span>
   </dd>
   <dt>Total</dt>
   <dd>
-    <span class="text-red-600 dark:text-red-400">-25</span>/<span class="text-green-600 dark:text-green-400">+20</span>
+    <span class="text-red-600 dark:text-red-400">-25</span>/
+    <span class="text-green-600 dark:text-green-400">+20</span>
   </dd>
 </dl>
 
@@ -365,3 +354,33 @@ Increase Runtime Speed: ✅
 ```
 
 I'm no Vanderbilt, but this train makes hay!
+
+
+## Update: A Regression
+
+Unfortunately, while this fixed a memory leak in some common situations, it also introduced a memory leak in another: When an `x-teleport` is included inside and `x-if`!!
+
+```html
+<template x-if="isVisible">
+    <div>
+        <template x-teleport="#somewhere">
+            <div x-data="{ destroy() { console.log('destroy'); } }"></div>
+        </template>
+    </div>
+</template>
+```
+
+In the above, when `isVisible` is changed to `false`, the `x-teleport` would clean up, but it's cloned div would not be cleaned up, and it's `destroy` function would not be called.
+
+Dangit!
+
+Well, luckily, it's easy to just [apply the same fix](https://github.com/alpinejs/alpine/pull/4328) to `x-teleport` as we did to `x-if`!
+
+```ts
+cleanup(() =>
+  mutateDom(() => {
+    clone.remove()
+    destroyTree(clone)
+  })
+)
+```
