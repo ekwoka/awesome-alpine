@@ -1,5 +1,6 @@
 ---
 import '../styles.css';
+import Metatags from '../components/atoms/metatags.astro';
 import Header from '../components/header.astro';
 import SectionNavigation from '../components/organisms/section-navigation.astro';
 import type { NavTree } from '../lib/getDocNavigation';
@@ -14,9 +15,7 @@ const pkgName = Astro.props.title.replaceAll('-', ' ');
 <!doctype html>
 <html lang="en" transition:animate="initial">
   <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <Metatags title={pkgName} description={`Check out the docs for ${pkgName}`}>
     <title>{pkgName} - AwesomeAlpine</title>
     <script>
       import Alpine from 'alpinejs';
