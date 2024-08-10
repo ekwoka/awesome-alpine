@@ -1,0 +1,48 @@
+---
+pkg: 'Alpine Toasts'
+page: configuration
+description: Configuring Alpine Toast
+date: 2024-08-10
+---
+
+# Configuring Alpine Toast
+
+There are multiple ways to configure Alpine Toast, based on the scope of the changes you want to make. The API is pretty much uniform across all methods, but the scope of how the changes apply is different.
+
+## Configuration Scopes
+
+### Global Configuration
+
+Global configuration, naturally, applies to all toasts and toasters in your application. This is done by passing a configuration object to the `Toasts` plugin when you add it to Alpine.
+
+```ts
+import Alpine from 'alpinejs';
+import Toasts from '@awesome-alpine/toasts';
+
+Alpine.plugin(Toasts({
+  position: 'top-right',
+  duration: 5000,
+  dismissable: true,
+}));
+
+Alpine.start();
+```
+
+### Toaster Configuration
+
+You can also configure details on a per-toaster basis. While most applications will use a single toaster, you can have multiple toasters with different configurations that handle different kinds of toasts or different pages. You can also use this to simply allow a more declarative way to configure toasters.
+
+```html
+<template x-toaster="{ position: 'bottom-left', duration: 3000 }"></template>
+```
+
+### Toast Configuration
+
+Finally, you can configure individual toasts. This is generally done when you want to have a specific toast behave differently than the rest. This is done by passing a configuration object to the `$toast` method.
+
+```html
+<button type="button"
+  @click="$toast.success('You are so pretty', { dismissable: false, duration: 10_000 })">
+  What are you?
+</button>
+```
