@@ -1,0 +1,45 @@
+---
+pkg: 'Alpine Toasts'
+page: toaster-options
+description: Options for Customizing the Toaster
+date: 2024-08-10
+---
+
+# Toaster Options
+
+```ts
+type ToasterOptions = {
+  position?: string;
+  reverseOrder?: boolean;
+  containerStyle?: CSSStyleDeclaration;
+  gap?: number;
+  toastOptions?: ToastOptions;
+};
+```
+
+## `position: string`
+
+- default: `bottom-right`
+- choices: `top-left`, `top-center`,`top-right`, `bottom-left`, `bottom-center`, `bottom-right`
+
+Naturally controls the position of the Toaster on the screen.
+
+## `reverseOrder: boolean`
+
+- default: `false`
+
+By default, newer toasts appear at the top of the stack. If you want them to appear at the bottom, set this to `true`. This is useful for toasts that are more like notifications.
+
+## `containerStyle: CSSStyleDeclaration`
+
+Overrides the default styles of the toaster container. This is useful if you want to change the basic layout of the toaster, without writing a full custom toaster.
+
+## `gap: number`
+
+- default: `0.5` (`rem`)
+
+Adjusts the gap between toasts in the toaster. Number provided is in `rem`.
+
+## `toastOptions: ToastOptions`
+
+Provides new default values for all the toasts in this toaster (or in the App). Helpful to not need to set toast options on each and every toast.

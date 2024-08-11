@@ -1,0 +1,69 @@
+---
+pkg: 'Alpine Toasts'
+page: quick-start
+description: Quick start guide for Alpine Toast
+date: 2024-08-10
+---
+
+# Getting started with Alpine Toast
+
+Alpine Toast is a great way to simply add nice toast and candybar notification to your AlpineJS project. Whether you want custom designs, or use the provided, you can manage it all easily with a simple interface inspired by [React Hot Toast](https://react-hot-toast.com/).
+
+## Installation
+
+In your terminal of choice:
+
+```sh
+pnpm add @awesome-alpine/toasts
+```
+
+In your AlpineJS setup module:
+
+```ts
+import Alpine from 'alpinejs';
+import Toasts from '@awesome-alpine/toasts';
+
+Alpine.plugin(Toasts);
+
+Alpine.start();
+```
+
+## Adding Toaster
+
+Alpine will need to know where and how to render the toasts. This is simply done by making a `template` element with the `x-toaster` directive. It doesn't even need to be in an `x-data`.
+
+```html
+<template x-toaster></template>
+```
+
+This will use all the defaults, but you can also configure the toaster with a few options, that you can check out on the `configuration` page.
+
+## Triggering Toasts
+
+Triggering toasts can be done easily from many places in your application.
+
+Inside an Attribute Expression (with `$toast`):
+
+```html
+<button type="button" @click="$toast.info('Woah you clicked me!')">
+  Show Info Toast
+</button>
+```
+
+Inside a component method (this `this.$toast`):
+
+```ts
+Alpine.data('myComponent', () => ({
+  showToast() {
+    this.$toast.success('You did it!');
+  }
+}));
+```
+
+or from other JS (on `Alpine.$toast`):
+
+```ts
+document.addEventListener('error', () =>
+  Alpine.$toast.error('Something went wrong!');
+);
+```

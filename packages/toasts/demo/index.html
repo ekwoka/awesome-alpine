@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AlpineTS Sandbox</title>
+    <script type="module" src="./index.ts"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body x-data class="flex flex-col py-8 px-4 gap-4">
+    <h1 class="text-2xl font-bold">Toasts</h1>
+    <div class="flex gap-8 flex-col md:flex-row">
+      <menu class="grid grid-cols-2 gap-4">
+        <button
+          @click="$toasts.success('It was successful!!!')"
+          class="text-left border rounded py-2 px-4">
+          Success
+        </button>
+        <button
+          @click="$toasts.error(`Oh no! There's been an error!`)"
+          class="text-left border rounded py-2 px-4">
+          Error
+        </button>
+        <button
+          @click="$toasts.loading(`Hold on... we're loading...`)"
+          class="text-left border rounded py-2 px-4">
+          Loading
+        </button>
+        <button
+          @click="$toasts.show(`This is just some info`)"
+          class="text-left border rounded py-2 px-4">
+          Blank
+        </button>
+        <button
+          @click="$toasts.promise(new Promise((res, rej) => setTimeout(Math.random() > 0.5 ? res : rej, 2000)), {
+            loading: 'Loading...',
+            success: 'Successful!',
+            error: 'Failed!',
+          })"
+          class="text-left border rounded py-2 px-4">
+          Promise
+        </button>
+      </menu>
+    </div>
+    <div class="fixed right-4 bottom-4 flex flex-col-reverse items-end">
+      <template x-toaster>
+        <div
+          x-toast-transition
+          @click="$toast.dismiss()"
+          class="grid grid-rows-[0fr]">
+          <div
+            class="min-h-0 overflow-hidden bg-white rounded-md border shadow-md">
+            <div class="flex gap-2 py-2 px-4">
+              <span
+                x-show="$toast.type !== 'info'"
+                x-text="$toast.type === 'success'
+                  ? '✅'
+                  : $toast.type === 'error'
+                  ? '❌'
+                  : $toast.type === 'loading'
+                  ? '⏳'
+                  : ''"></span>
+              <span
+                class="text-center min-w-[16ch]"
+                x-text="$toast.message"></span>
+            </div>
+          </div>
+        </div>
+      </template>
+    </div>
+  </body>
+</html>

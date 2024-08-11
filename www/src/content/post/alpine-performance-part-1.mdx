@@ -68,7 +68,7 @@ Most of the time, this isn't too much extra work, but during initial startup, or
 
 Here's a version of the code for this before I started tweaking it (simplified with comments added for clarity):
 
-```js
+```ts
 // This accepts an array of reactive data objects, arranged from closest to furthest.
 export function mergeProxies(objects) {
   // Creates the new proxy with all unique handlers every time
@@ -139,7 +139,7 @@ Instead of neeing to manually bind getters and setters, we can use `Reflect.get`
 
 not the `get` trap can just be
 
-```js
+```ts
 get: (target, name) => {
   if (name == 'toJSON') return collapseProxies;
   return Reflect.get(
@@ -157,7 +157,7 @@ Now, getters will accurately be provided the correct `this` context, and we don'
 
 This can also be applied to the `set` trap
 
-```js
+```ts
 set: (target, name, value) => {
   return Reflect.set(
     objects.find((obj) => Object.prototype.hasOwnProperty.call(obj, name)) ??
@@ -180,7 +180,7 @@ Alpine exposes data to the expressions primarily through use of the `with` state
 
 The `with` statement is a way to expose all of the keyed values on an object to a scope of code, so that properties can be accessed on it without referencing the object itself. Generally, it's use is not recommended, due to how it can really make code quite unreadable, and can lead to some very difficult to debug issues.
 
-```js
+```ts
 const data = {
   clicked: false,
   count: 1,
@@ -203,7 +203,7 @@ And even more, this happens TWICE for every property! When using `with`, the JS 
 
 We can be pretty sure that there is never going to be a data object with the `@@unscopables` symbol, so we can just short circuit this check and say right away "we don't have that".
 
-```js
+```ts
 has: (target, name) => {
   if (name == Symbol.unscopables) return false;
   return objects.some((obj) => obj.hasOwnProperty(name));
@@ -220,7 +220,7 @@ In total, there were 7 objects being created, everytime the function was called.
 
 If you noticed, we have the `target` passed to every trap, which can be used to access that individual Proxies wrapped values. So instead of refering to the enclosed `objects` array, we can just use the `target` object.
 
-```js
+```ts
 export function mergeProxies(objects) {
   // We put the objects array into the target object
   const thisProxy = new Proxy({ objs: objects }, mergeTraps);
@@ -293,7 +293,7 @@ This caused issues when a `setter` existed but referred to a value on `this` tha
 
 [A small change was necessary](https://github.com/alpinejs/alpine/pull/3807) to get the setter working again.
 
-```js
+```ts
 set({ objects }, name, value, thisProxy) {
     const target = objects.find((obj) =>
             Object.prototype.hasOwnProperty.call(obj, name)
@@ -317,7 +317,7 @@ Apparently, when `@vue/reactivity` was checking for equality on the reactive pro
 
 Most of the time this wouldn't be an issue, EXCEPT if the setter itself was accessing a nested property like
 
-```js
+```ts
 {
   set count(val) {
     this.data.count = val
@@ -331,7 +331,7 @@ I [had a fix ready](https://github.com/alpinejs/alpine/pull/4265) quite quickly,
 
 The final version (for now)
 
-```js
+```ts
 set({ objects }, name, value, thisProxy) {
     const target =
         objects.find((obj) =>

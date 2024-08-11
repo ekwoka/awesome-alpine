@@ -22,7 +22,7 @@ Underneath Alpine is the powerful `@vue/reactivity` package. When you make new c
 
 Well, you can use `Alpine.reactive` to make your own reactive objects! This is useful mainly for plugins that might want to hook into reactivity without waiting for values to exist in a component.
 
-```js
+```ts
 import Alpine from 'alpinejs';
 
 const data = Alpine.reactive({ count: 0 });
@@ -64,7 +64,7 @@ Ever make a fancy clean Headless Alpine component (like in `@alpinejs/ui`) but n
 
 It basically adds new selectors for Alpine to initialize as if they are `x-data`, indicating the root of a new Alpine component. Just pass in a function that returns a css selector string.
 
-```js
+```ts
 import Alpine from 'alpinejs';
 
 Alpine.addRootSelector(() => `[${Alpine.prefixed('dialog')}]`);
@@ -102,7 +102,7 @@ interface Alpine {
 
 The optionally passed in `referenceNode` allows you to pass in a different node for the element to "inherit" from. This is useful for things like `x-teleport` where the element is somewhere else, but reactively interacts with a different component tree!
 
-```js
+```ts
 import Alpine from 'alpinejs';
 
 const el = document.querySelector('[x-data]');
@@ -125,7 +125,7 @@ interface Alpine {
 
 This gets the data context of the element! It's the same way expressions access the data context. You get a flattened object of the entire data stack that expressions on that element can access.
 
-```js
+```ts
 import Alpine from 'alpinejs';
 
 const el = document.querySelector('button');
@@ -148,7 +148,7 @@ interface Alpine {
 
 Sometimes you need to `throttle` a function, but you aren't using `@click.throttle`. Well, you can use the same underlying functionality with `Alpine.throttle`! Now you can have your functions run only once every so often.
 
-```js
+```ts
 import Alpine from 'alpinejs';
 
 const throttledLog = Alpine.throttle(
@@ -172,7 +172,7 @@ interface Alpine {
 
 Just like the above, for `debounce`! Now you can have your functions run only after a certain amount of time has passed since the last call, always with just the last arguments passed in.
 
-```js
+```ts
 import Alpine from 'alpinejs';
 
 const debouncedLog = Alpine.debounce(
