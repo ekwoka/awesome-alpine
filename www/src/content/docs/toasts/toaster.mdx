@@ -1,0 +1,58 @@
+---
+pkg: 'Alpine Toasts'
+page: x-toaster
+description: The Directive for Defining a Toaster
+date: 2024-08-10
+---
+
+# `x-toaster`
+
+`x-toaster` defines a Toaster component. Toaster components are layouts used to display toasts! You can have multiple toasters on a page, each with their own configuration, and even apply filters on what toasts each toaster should handle. This can be useful for having a toast handle conventional toasts, and another to handle a kind of notifications panel.
+
+## Usage
+
+Simply add `x-toaster` to a template tag of your choice to define a toaster.
+```html
+<template x-toaster></template>
+```
+
+Without anything else, this will display all toasts with their default displays.
+
+## Filtering Toasts
+
+You can also filter toasts with modifiers! Simply add modifiers for the main types of toasts you want to handle.
+
+```html
+/* Only show success toasts */
+<template x-toaster.success></template>
+
+/* Only show error toasts */
+<template x-toaster.error></template>
+```
+
+The categories are `success`, `error`, `info`.
+
+You can even combine them!
+
+```html
+/* Only show success and error toasts */
+<template x-toaster.success.error></template>
+```
+
+## Custom Configuration
+
+You can also configure the toaster by supplying a configuration object to the `x-toaster` directive.
+
+```html
+<template x-toaster="{ position: 'bottom-left', duration: 3000 }"></template>
+```
+
+More information can be found on the [Configuration](/docs/toasts/2-configuration/toaster-options/) page.
+
+Alternatively, you can also supply configurations for settings via attributes.
+
+```html
+<template x-toaster
+  position="bottom-left"
+  duration="3000"></template>
+```

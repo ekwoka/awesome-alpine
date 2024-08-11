@@ -1,0 +1,74 @@
+---
+pkg: 'Alpine Toasts'
+page: toast-options
+description: Options for Customizing Individual Toasts
+date: 2024-08-10
+---
+
+# Toast Options
+
+```ts
+type ToastOptions = ToastOptionsSet && Partial<{
+  success: ToastOptionsSet,
+  error: ToastOptionsSet,
+  loading: ToastOptionsSet,
+  custom: ToastOptionsSet,
+}>
+
+
+type ToastOptionsSet = Partial<{
+  // Behavior
+  duration: number,
+  dismissable: boolean,
+
+  // Styling
+  style: CSSStyleDeclaration,
+  className: string,
+
+  // Custom Icon
+  icon: string,
+
+  // Change colors of default success/error/loading icon
+  iconTheme: {
+    primary: string,
+    secondary: string,
+  },
+
+  // Additional attributes to add to the toast
+  attrs: Record<string, string>,
+}>
+```
+
+## `duration: number`
+
+- default: `10000` (for `error`), `2000` (for `success`), `4000` (for `info`)
+
+Controls how long the toast stays on screen before it is automatically dismissed. Number provided is in milliseconds. Set to `0` to disable auto-dismissal.
+
+## `dismissable: boolean`
+
+- default: `true`
+
+Controls whether the toast can be dismissed by the user. If set to `false`, the toast will not be manually dismissable by clicking on the toast.
+
+Useful to disable for critical toasts and toasts that have interactivity. You can still dismiss these toasts programmatically, so consider using a custom Toast.
+
+## `style: CSSStyleDeclaration`
+
+Overrides the default styles of the toast. This is useful if you want to change the styles of this particular toast, without writing a full custom toast.
+
+## `className: string`
+
+Adds a class to the toast.
+
+## `icon: string`
+
+Overrides the default icon for the toast.
+
+## `iconTheme: { primary: string, secondary: string }`
+
+Changes the colors of the default success/error/loading icons. The primary color is the fill color, and the secondary color is the stroke color.
+
+## `attrs: Record<string, string>`
+
+Adds additional attributes to the toast. Useful for adding ARIA attributes.

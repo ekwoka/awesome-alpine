@@ -13,7 +13,7 @@ There are multiple ways to configure Alpine Toast, based on the scope of the cha
 
 ### Global Configuration
 
-Global configuration, naturally, applies to all toasts and toasters in your application. This is done by passing a configuration object to the `Toasts` plugin when you add it to Alpine.
+Global configuration, naturally, applies to all toasts and toasters in your application. This is done by passing a configuration object to the `Toasts` plugin when you add it to Alpine. Accepts the full range of configuration options.
 
 ```ts
 import Alpine from 'alpinejs';
@@ -32,6 +32,8 @@ Alpine.start();
 
 You can also configure details on a per-toaster basis. While most applications will use a single toaster, you can have multiple toasters with different configurations that handle different kinds of toasts or different pages. You can also use this to simply allow a more declarative way to configure toasters.
 
+Accepts the full range of configuration options.
+
 ```html
 <template x-toaster="{ position: 'bottom-left', duration: 3000 }"></template>
 ```
@@ -39,6 +41,8 @@ You can also configure details on a per-toaster basis. While most applications w
 ### Toast Configuration
 
 Finally, you can configure individual toasts. This is generally done when you want to have a specific toast behave differently than the rest. This is done by passing a configuration object to the `$toast` method.
+
+Accepts Toast configuration options only.
 
 ```html
 <button type="button"
