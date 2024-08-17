@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AlpineTS Sandbox</title>
+    <script type="module" src="./index.ts"></script>
+  </head>
+  <body>
+    <form
+      action="#"
+      x-form
+      style="
+        display: flex;
+        flex-direction: column;
+        align-items: start;
+        gap: 1rem;
+      ">
+      <label x-form:control>
+        <span>name:</span>
+        <input type="text" name="name" id="name" />
+        <span x-form:error></span>
+      </label>
+      <label x-form:control>
+        <span>email:</span>
+        <input type="email" name="email" id="email" />
+        <span x-form:error></span>
+      </label>
+      <label x-form:control>
+        <span>password:</span>
+        <input type="password" name="password" id="password" />
+        <span x-form:error></span>
+      </label>
+      <button type="submit">Submit</button>
+    </form>
+    <div id="output"></div>
+  </body>
+</html>
