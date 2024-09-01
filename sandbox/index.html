@@ -7,20 +7,41 @@
     <title>AlpineTS Sandbox</title>
     <script type="module" src="./index.ts"></script>
   </head>
-  <body>
-    <div x-data>
-      <button type="button" @click="$toasts.show('Hello, world!')">
-        Add Toast
-      </button>
-      <template x-for="toast in $toasts.queue" :key="toast.id">
-        <div x-show="toast.shown">
-          <div toast>
-            <p x-text="toast.id"></p>
-            <p x-html="toast.message"></p>
-          </div>
-          <button type="button" @click="$toast.dismiss()">Close</button>
+  <body style="display: flex; gap: 1rem; overflow-x: scroll">
+    <template>
+      <div style="display: flex; flex-direction: column; gap: 2rem">
+        <div
+          style="
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            min-width: max-content;
+          ">
+          <h2>Method</h2>
+          <button type="button" data-add>Click Me To Add 10000 rows</button>
+          <button type="button" data-add-one>Click Me To Add 1 rows</button>
+          <button type="button" data-shuffle>
+            Click Me to shuffle all rows
+          </button>
+          <button type="button" data-remove-one>
+            Click Me to remove 1 row
+          </button>
+          <button type="button" data-swap>Click Me to swap 2 rows</button>
+          <button type="button" data-sort>Click Me to sort all rows</button>
+          <button type="button" data-reverse>
+            Click Me to reverse all rows
+          </button>
+          <button type="button" data-remove-second>
+            Click Me to remove every other row
+          </button>
+          <button type="button" data-remove>Click Me to remove all rows</button>
         </div>
-      </template>
-    </div>
+        <ul>
+          <template id="content">
+            <li>hello</li>
+          </template>
+        </ul>
+      </div>
+    </template>
   </body>
 </html>

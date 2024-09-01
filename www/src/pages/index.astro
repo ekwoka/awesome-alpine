@@ -11,7 +11,7 @@ const READY = false;
 const posts = (await getCollection('post'))
   .filter((post) => post.data.published)
   .sort((a, b) => b.data.date.getTime() - a.data.date.getTime())
-  .slice(0, 3);
+  .slice(0, 5);
 ---
 <LandingPage title="Learn Alpine" description="The Best Unofficial Resource for learning all that Alpine has to offer!">
   <div class="flex flex-col lg:flex-row w-full max-w-full min-h-screen">

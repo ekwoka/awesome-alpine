@@ -1,0 +1,589 @@
+---
+title: 'Loops on Loops: Improving Alpine x-for Performance'
+author: 'Eric Kwoka'
+description: "DOM Diffing is tough! It's even harder when you're needing to diff the DOM over large loops of data. But, what if we can reduce the amount of looping, and make DOM updates more efficient?"
+date: 2024-08-15
+published: false
+---
+
+Improving Alpine has been tough! Sure we were able to [optimized the Data Stack](/posts/alpine-performance-part-1) and [patch up a memory leak](/posts/alpine-performance-part-2), but there is still more to do! Alpine is quite efficient, all things considered, and the places where it has some room to improve are quite complex and intricate.
+
+But that's what makes it fun! I managed to finally get through a working version of an improvement to the [`x-for`](https://alpinejs.dev/directives/for) algorithm!
+
+## What the heck is `x-for`?
+
+For those newer, or even unfamiliar with Alpine, `x-for` is a directive that allows you to loop over a list of items and render a template for each item. It's not exactly revolutionary, as it's quite similar to `v-for` in Vue, or `ngFor` in Angular. You've seen it before, and you'll see it again!
+
+```html
+<ul x-data="{ items: ['one', 'two', 'three'] }">
+    <template x-for="item in items" :key="item">
+        <li x-text="item"></li>
+    </template>
+</ul>
+```
+<blockquote>
+  <ul x-data="{ items: ['one', 'two', 'three'] }">
+      <template x-for="item in items" x-bind:key="item">
+          <li x-text="item"></li>
+      </template>
+  </ul>
+</blockquote>
+
+## The Problem
+
+While first render is quite straightforward, just loop over data and generate elements, reacting to changes in the list and updating the rendered elements is a bit more complex. It also produces some bugs!!!
+
+Notably, when used with the [`Sort` plugin](https://alpinejs.dev/plugins/sort), the render can get quite confused. You can drag and drop items in the list, but when the list tries to rerender, it gets quite confused. It's not a good look!
+
+```html
+<div
+  x-data="{
+    items: ['Item 1', 'Item 2', 'Item 3']
+    resort(item, position) {
+
+      const index = items.findIndex(element => element == item);
+
+      if (index !== -1) {
+          const removedItem = items.splice(index, 1)[0];
+          items.splice(position, 0, removedItem);
+      }
+    }
+  }"
+>
+  <p>Sortable</p>
+  <ol x-sort="resort">
+    <template
+      x-for="item in items"
+      :key="item"
+    >
+      <li
+        x-sort:item="item"
+        x-text="item"
+      ></li>
+    </template>
+  </ol>
+</div>
+```
+
+[Check this out in the Sandbox](/play?share=X-b0g-biBGJr)
+
+When you move items around, the list gets confused and will [often move elements to incorrect positions](https://github.com/alpinejs/alpine/discussions/4192)! The underlying data is correct, but the algorithm is losing it's place.
+
+### Root Cause Analysis
+
+Let's start with what causes the issue with `Sort`.
+
+`Sort` moves the elements in the live DOM tree when it moves items around. Underneath is uses `Sortable`, so not much to do about that in the Alpine level.
+
+Then when the underlying list is updated, Alpine rerenders, and incorrectly moves elements around.
+
+This all comes down to this code for handling elements that need to move:
+
+> This is truncated code, and from my own alternative version of Alpine, so does not reflect the EXACT code in Alpine, but does reflect the logic.
+
+```ts
+keys.forEach((key, index) => {
+  const prevIndex = prevKeys.indexOf(key);
+
+  // ...
+
+  // A key has moved.
+  if (prevIndex !== index) {
+    const keyInSpot = prevKeys.splice(index, 1)[0];
+    const keyForSpot = prevKeys.splice(prevIndex - 1, 1)[0];
+
+    prevKeys.splice(index, 0, keyForSpot);
+    prevKeys.splice(prevIndex, 0, keyInSpot);
+
+    moves.push([keyInSpot, keyForSpot]);
+  }
+
+  // ...
+});
+```
+
+We can see here that, when Alpine is evaluating the new key list, it just compares against the previous spot in the list it was, and queues up an element swap as well.
+
+```ts
+moves.forEach(([keyInSpot, keyForSpot]) => {
+  const elInSpot = lookup[keyInSpot];
+  const elForSpot = lookup[keyForSpot];
+
+  const marker = document.createElement('div');
+
+  mutateDom(() => {
+    elForSpot.after(marker);
+    elInSpot.after(elForSpot);
+    elForSpot._x_currentIfEl && elForSpot.after(elForSpot._x_currentIfEl);
+    marker.before(elInSpot);
+    elInSpot._x_currentIfEl && elInSpot.after(elInSpot._x_currentIfEl);
+    marker.remove();
+  });
+
+  // ...
+});
+```
+
+It then just does lookups, and swaps the elements.
+
+It never actually checks where those elements are! So anything else that may have moved an element, is suddenly wildly out of place, and the DOM no longer represents the data, even after a refresh.
+
+That's bad.
+
+Luckily, there is a solution!
+
+## The Solution
+
+The simplest solution to solve this problem, would be to not use the previous key list as a source of truth, but instead pull it from the DOM itself.
+
+Something like...
+
+```ts
+const oldKeys = Array.from(template.parent.children) // Get all the candidate elements in order
+  .filter(child => lookup.has(child)) // Remove any elements not from this x-for
+  .map(child => child.key); // map them to the keys
+```
+
+There would probably need to be some other code to adjust, but you can see the idea.
+
+But I'm not a fan of this solution. It does solve this most immediate problem (de-synchronized state). But it just adds more code. More code is more work. More code is more bugs. More code is more maintenance.
+
+What if we could fix this by writing less code?
+
+## Loops on Loops
+
+A major cause for concern in the existing implementation, is iterating many many times.
+
+- (`forEach`) Loop over Data to generate Keys and Scopes
+- (`forEach`) Loop over old Keys to find Keys that have been removed
+  - (`indexOf`) Loops over the new Keys to check for the old Keys
+- (`filter`) Loop over old keys and filter out the removed keys
+  - (`includes`) Loops over the list of removed keys to see if a key is in it
+- (`forEach`) Loop over the new keys to build update list
+  - (`indexOf`) Loops over the remaining old keys to see if the key is new
+  - (if new)
+    - (`splice`) Updates list of old keys to include new key
+  - (if moved)
+    - (`splice`) Updates list of old keys to remove current key
+    - (`splice`) Updates list of old keys to remove old key from old position
+    - (`splice`) Updates list of old keys to include old key in new position
+    - (`splice`) Updates list of old keys to include current key
+- (`forEach`) Loop over removed keys to remove and cleanup
+- (`forEach`) Loop over list of moved keys to move elements
+- (`forEach`) Loop over list of added keys to add elements
+- (`forEach`) Loop over list of unmoved keys to refresh the scope as needed
+
+That's a TON of loops!!!
+
+Just to put elements in the right place!
+
+If we were to estimate this with Big O notation, it could be a worst case of... `O(4n + n^3)`! Heck, I'm not a mathematician! But it's a heckuva lot of loops!
+
+A lot of times, highly optimizing loop logic isn't going to matter a ton, since most of the time the length of the lists is small, but I've worked on projects that had lists of 1000+ items, and it just really does not work! Alpine can sometimes struggle with lists of 100 items!
+
+> Most performance issues with long lists are due to the DOM and actually handling the looped over component trees, and not this specific loop logic.
+
+## Rewrite it in ~~Rust~~ *JavaScript*
+
+Having poured over this code before, and looking at it more for solving this `Sort` issue, I was definitely struck by just how much is going on. There is just a lot of code trying to shuffle things around, and this `prevKeys` list is essentially back to the problems of the Virtual DOM. Where you are storing a representation of what you believe the DOM should be in Memory.
+
+And we all know [the Virtual DOM is pure overhead](https://svelte.dev/blog/virtual-dom-is-pure-overhead).
+
+What if we just... didn't do that?
+
+We have Input (the list of data). This provides us with the keys, and scopes, etc.
+
+We need to make the Output (a list of elements in the DOM).
+
+Now, this can get quite scary, especially when the source starts with the comment
+
+```ts
+// Prepare yourself. There's a lot going on here. Take heart,
+// every bit of complexity in this function was added for
+// the purpose of making Alpine fast with large datas.
+```
+
+Hopefully I'm not just gonna end up doing a bunch of work, and it all is worse...
+
+### Benchmarking Before
+
+Before we get into our rewrite, lets see how the current version is doing.
+
+I'll show multiple synthetic benchmarks as we go, and also have benchmarks from the [JS Framework Benchmark](#todo) to show the "real world" start and end.
+
+Synthetic benchmarks are conducted in an isolated environment without Alpine, and any Alpine methods mocked with noops. These will isolate the performance of the `x-for` directive itself, and not reflect the cost of the generated components being initialized or torn down.
+
+> The timings are split into `Own Processing` and `Paint` to separate the direct costs of running our algorithm, and the costs of the browser actually handling the changes. `Paint` here refers to both `repaint` and `reflow` operations, as separating them is much more difficult to do.
+
+
+
+| Action | Own Processing (ms) | Paint (ms) | Total (ms) |
+| --- | --- | --- | --- |
+| Add 10,000 Items | 40.370 | 103.590 | **143.960** |
+| Add Additional 1 Item | 48.285 | 11.330 | **59.615** |
+| Shuffle 10,001 Items | 101.775 | 131.885 | **233.660** |
+| Remove 1 Item | 45.830 | 13.610 | **59.440** |
+| Swapping 2 Items | 33.205 | 13.800 | **47.005** |
+| Sort 10,000 Items | 88.785 | 125.085 | **213.870** |
+| Reverse 10,000 Items | 319.760 | 132.890 | **452.650** |
+| Remove Every Other Item | 36.880 | 13.980 | **50.860** |
+| Remove Remaining 5,000 Items | 21.950 | 1.845 | **23.795** |
+
+> These were done on Arc Browser on a M1 Pro MacBook Pro.
+
+Naturally, large bulk changes won't totally reflect real world use cases (who is going to shuffle 10,000 items regularly?), so this also mixes in some tasks that are more mundane: Adding 1 item, removing 1 item, and swapping 2 items. Things that should be extremely fast without any framework overhead. These can help catch issues where the old (or new) algorithms have optimizations for common cases, even if bulk changes are slow.
+
+A bit surprising here is how Shuffling is notably faster than reversing the list, while both are significantly longer than making the list. Not even really sure how to explain that, but it's interesting nonetheless. Something about the algorithm can get items into their places faster when it's jumbled up.
+
+We also see that adding an additional item to the list, removing an item from the list, or swapping two items in the list, are not faster than just building the list from scratch. This is curious, as you'd expect any algorithm to be faster when making minor changes than when rebuilding the whole list.
+
+Well, let's get break it down and get to work!
+
+> The Following will be semi-pseudo code, it basically functions to demonstrate the logic, but removes/abstracts certain important factors of the real implementation.
+
+### Creating Elements
+
+```ts
+let prev = template
+scopes.forEach(scope => {
+  const node = createElement()
+  addScopeToNode(node, scope)
+  prev.after(node)
+  prev = node
+})
+```
+
+This is massively simpler. We just loop over the data, create the elements, and add them to the DOM. BAM!
+
+
+| Action | Own (ms) | Paint (ms) | Total (ms) | Difference |
+| --- | --- | --- | --- | --- |
+| Add 10,000 Items | 8.000 | 105.865 | **113.865** | <span class="text-green-600 dark:text-green-400">-30 (-21%)</span> |
+
+Wow, that is faster. About **30ms** faster!
+
+Obviously, this leaves a lot to be desired (like...everything), but it does give us a good theoretical limit.
+
+### Removing Elements
+
+What about removing elements? We can't just leave all the elements on the page every time. We need to remove the old ones, or they'll just pile up!
+
+```ts
+let prev = template
+const elements = scopes.map(scope => {
+  const node = createElement()
+  addScopeToNode(node, scope)
+  prev.after(node)
+  prev = node
+  return node
+})
+
+template.elements.forEach(cleanupElement)
+
+template.elements = elements
+```
+
+We just remove the old elements, and store the new elements. We don't need to keep track of keys, or indexes, or anything. We just remove the old elements, and add the new ones. This can handle all of our actions, so lets see how this compares.
+
+| Action | Own | Paint | Total | Difference |
+| --- | --- | --- | --- | --- |
+| Add 10,000 Items | 9.010 | 108.735 | **117.745** | <span class="text-green-600 dark:text-green-400">-26 (-18%)</span> |
+| Add Additional 1 Item | 30.705 | 107.345 | **138.050** | <span class="text-red-600 dark:text-red-400">78 (132%)</span> |
+| Shuffle 10,001 Items | 30.075 | 129.220 | **159.295** | <span class="text-green-600 dark:text-green-400">-74 (-32%)</span> |
+| Remove 1 Item | 31.600 | 104.220 | **135.820** | <span class="text-red-600 dark:text-red-400">76 (128%)</span> |
+| Swapping 2 Items | 33.355 | 111.440 | **144.795** | <span class="text-red-600 dark:text-red-400">98 (208%)</span> |
+| Sort 10,000 Items | 29.040 | 107.245 | **136.285** | <span class="text-green-600 dark:text-green-400">-78 (-36%)</span> |
+| Reverse 10,000 Items | 28.120 | 102.090 | **130.210** | <span class="text-green-600 dark:text-green-400">-322 (-71%)</span> |
+| Remove Every Other Item | 24.395 | 61.275 | **85.670** | <span class="text-red-600 dark:text-red-400">35 (68%)</span> |
+| Remove Remaining 5,000 Items | 11.590 | 1.735 | **13.325** | <span class="text-green-600 dark:text-green-400">-10 (-44%)</span> |
+
+This is quite expected. Nearly all operations take a similar about of time, since virtually everything requires the same amount of work. The only factors are how many old elements and how many new elements. They are quite a bit faster for our own processing in most cases.
+
+We can also see where the original algorithm did have some optimizations! When we aren't doing much movement, the original has massive gains in regards to the time to browser paint! The Browser just needs to do less if the element just stays where it is! This will be something important to watch for in the final implementation.
+
+### Moving Elements
+
+But these tests do leave out an important part of Alpine: Components!
+
+These items will not just be boring elements, but will be components, all that have their own work to do, and state. If we always remove the old elements, and make brand new elements, then not only could active state in those components be lost making a really bad User Experience, but there could be a lot of work spent initializing and destroying components.
+
+If we really knew that most of the list changes were actually swapping out all the items, maybe that would be acceptable. But that's not the case.
+
+So much of working with lists in a web app is about adding and removing small numbers of items from a list. It would be a shame to lose that efficiency.
+
+We can see in the original implementation, and the documentation, that a `:key` is used to identify unique items between renders. So lets leverage that!
+
+```ts
+let prev = template
+const elements = keyScopes.forEach(([key,scope]) => {
+  if (template.elements.has(key)) {
+    const node = template.elements.get(key)
+    addScopeToNode(node, scope)
+    prev.after(node)
+    prev = node
+    return node
+  }
+  const node = createElement()
+  addScopeToNode(node, scope)
+  template.elements.set(key, node)
+  prev.after(node)
+  prev = node
+  return node
+})
+
+
+template.elements.values()
+  .filter(el => !elements.includes(el))
+  .forEach(cleanupElement)
+```
+
+Now we loop over our `keyScope` entries, see if we already have a reference to it, and if we do, we use that. If we don't, we create a new element, and store it in our `Map`. Then we just loop over the old elements, and remove any that are no longer in the list.
+
+We can safely assume that this should take a bit longer than the create/destroy version we used before, since we have to do some extra work to manage our lists, but the goal is that it only be a little slower, since we can know we will save a lot of work on the component lifecycles.
+
+| Action | Own | Paint | Total | Diff from Previous |
+| --- | --- | --- | --- | --- |
+| Add 10,000 Items | 21.155 | 103.310 | **124.465** | <span class="text-red-600 dark:text-red-400">7 (6%)</span> |
+| Add Additional 1 Item | 38.750 | 102.855 | **141.605** | <span class="text-red-600 dark:text-red-400">4 (3%)</span> |
+| Shuffle 10,001 Items | 49.965 | 106.140 | **156.105** | <span class="text-green-600 dark:text-green-400">-3 (-2%)</span> |
+| Remove 1 Item | 42.830 | 148.030 | **190.860** | <span class="text-red-600 dark:text-red-400">55 (41%)</span> |
+| Swapping 2 Items | 37.985 | 109.535 | **147.520** | <span class="text-red-600 dark:text-red-400">3 (2%)</span> |
+| Sort 10,000 Items | 30.660 | 105.360 | **136.020** | <span class="text-red-600 dark:text-red-400">0 (0%)</span> |
+| Reverse 10,000 Items | 38.165 | 103.225 | **141.390** | <span class="text-red-600 dark:text-red-400">11 (9%)</span> |
+| Remove Every Other Item | 36.900 | 53.505 | **90.405** | <span class="text-red-600 dark:text-red-400">5 (6%)</span> |
+| Remove Remaining 5,000 Items | 15.080 | 1.730 | **16.810** | <span class="text-red-600 dark:text-red-400">3 (26%)</span> |
+
+Well, that's not great...
+
+Our own processing time is a bit longer than before, and still a lot faster than the original logic in many places, but our paint cost is quite a lot higher all over the place, making our totals averaging a "*meh*" result.
+
+So, with it being related to `paint`, we'd have to understand more about what the heck `painting` even is!
+
+## Repaint & Reflow
+
+Repaint primarily refers to sitations that change the appearance of elements (like CSS changes), while reflow refers to changes that affect the layout of the page (like adding or removing elements and text).
+
+Some basic actions can cause just a repaint or just a reflow, or both! Imagine you move an element and that also causes a css selector on something else to change! That's a repaint and a reflow!
+
+Repaint and Reflow are quite expensive operations, and are part of the reason things like the Virtual DOM was created. Now, the actual DOM has progressed so far that the Virtual DOM is a net cost, but the DOM is still costly. So, we need to be careful about how we handle changes to the DOM.
+
+Our above paint costs are pretty consistent between every kind of operation, mainly just limited by the total number of elements. We move every element on every process of the list. See that `prev.append(node)`?
+
+### How Did Alpine Avoid This?
+
+Part of how Alpine avoided this was all that extra processing. The LOOPS!!! Oh no! Maybe Caleb was right. Every bit of complexity really was needed!
+
+Maybe we can look over some aspects of how it behaves, and see if we can co-opt some optimizations without going all the way back to the mess from before.
+
+```js
+// Rather than making DOM manipulations inside one large loop, we'll
+// instead track which mutations need to be made in the following
+// arrays. After we're finished, we can batch them at the end.
+let adds = []
+let moves = []
+let removes = []
+let sames = []
+```
+
+It seems Caleb may have seen this coming! He simply gathers up what changes need to be made. This allows the code to prevent "moving" elements that are already in a good spot. If we think about the the main places where this optimized the paint, we end up with 4 main operations:
+
+- Adding 1 Item
+- Removing 1 Item
+- Swapping 2 Items
+- Removing Every Other Item
+
+These are all operations where the elements are already in a good spot, and don't need to be moved. So, we can just skip them!
+
+### Optimizing Runs
+
+Let's focus on those first 3. The main characteristic of these is that most elements are just in the same place. The element in front and them, and the element after them are the same. They don't change. We can probably just check if the element is already immediately after the element that came before it. If it is, we don't need to move it!
+
+```ts
+// ...
+if (template.elements.has(key)) {
+  const node = template.elements.get(key)
+  addScopeToNode(node, scope)
+  if (prev.nextElementSibling !== node) prev.after(node)
+  prev = node
+  return node
+}
+// ...
+```
+
+Here we do a simple check, and if the element is already in the right spot, we just move onto the next!
+
+But one thing the old implementation did well, which is great for the swap benchmark, is directly switching the places of two elements... What if here, we swapped the next element (after `prev`) with wherever the current node is?
+
+```ts
+// ...
+if (template.elements.has(key)) {
+  const node = template.elements.get(key)
+  addScopeToNode(node, scope)
+  if (prev.nextElementSibling !== node) {
+    node.replaceWith(prev.nextElementSibling)
+    prev.after(node)
+  }
+  prev = node
+  return node
+}
+// ...
+```
+
+Now we don't just have the next element be immediately next, but swap it with elements later in the list! Maybe this will cause some issues when just moving one element from far down in the list, to far higher up, but we can see how it goes!
+
+| Action | Own | Paint | Total | Diff from Previous |
+| --- | --- | --- | --- | --- |
+| Add Additional 1 Item | 13.330 | 13.415 | **26.745** | <span class="text-green-600 dark:text-green-400">-115 (-81%)</span> |
+| Remove 1 Item | 12.500 | 13.995 | **26.495** | <span class="text-green-600 dark:text-green-400">-164 (-86%)</span> |
+| Swapping 2 Items | 9.335 | 25.640 | **34.975** | <span class="text-green-600 dark:text-green-400">-113 (-76%)</span> |
+| Remove Every Other Item | 37.095 | 52.130 | **89.225** | <span class="text-green-600 dark:text-green-400">-1 (-1%)</span> |
+
+Okay! Now we're talking!
+
+We've managed to recoup most of the losses, and now our Add and Remove single items are very fast! And we can see they've also just made our own processing faster, since we don't even need to evaluate the code to do the "move" operation.
+
+Our Swap is a bit slower, likely because once the first changed item is found, until the next one that it swapped with is hit, it will need to move every element.
+
+> The `swap` action swaps a random item from the first half of the list with a random item from the second half of the list, so on average there would be 3000+ items between them.
+
+This might be one that we can settle for a "good enough", since the act of swapping just 2 items far away from eachother on a large list is a bit close to the end.
+
+### Optimizing Midpoint Removals
+
+What about speeding up the `Remove Every Other` action? Also a major edge case, but it is indicative of the cost generally of removing nodes. Mainly that any removed item will cause a reflow on every item after it, just like a normal array!
+
+We can see in Alpine that, after processing what changes should be made later, `removes` is the first list handled. This is followed by moves, and then additions/insertions. Seems Caleb was one step (or 2 years?) ahead of me!
+
+Right now, our `removal` phase needs to happen after the processing of all the nodes, because it compares against the list.
+
+We've already gathered the keys however (in the `keyScopes` array), so we already have constructive knowledge of elements we can remove.
+
+I've been a bit cagey thus far about the logic in creating the `keyScopes`, but a simplified version is roughly
+
+```ts
+const keyScopes = items.map((item, index) => {
+  const scope = {
+    iteratorNames,
+    item,
+    index,
+    items,
+  };
+
+  return [evaluateKey(item), scope];
+});
+```
+
+Unfortunately, there isn't a super clean way to solve this, but hopefully we can keep it pretty simple.
+
+So we have the element lookup from the `template`. What if we moved elements from that lookup, to a new lookup (if they exist) right here in this loop that happens before the elements are process? Then we can just remove the remaining elements and then only use the new lookup for the rest of the process.
+
+```ts
+const oldLookup = template.elements
+template.elements = new Map()
+const keyScopes = items.map((item, index) => {
+  const scope = {/*...*/};
+  const key = evaluateKey(item)
+
+  // Move elements to new lookup
+  if (oldLookup.has(key)) {
+    template.elements.set(key, oldLookup.get(key))
+    oldLookup.delete(key)
+  }
+  return [key, scope];
+});
+
+// Remove remaining elements
+oldLookup.forEach(cleanupElement)
+```
+
+This should be a good operation! It not only lets us remove elements early, so they don't get in the way
+| Action | Own | Paint | Total | Diff |
+| --- | --- | --- | --- | --- |
+| Remove Every Other Item | 11.685 | 18.135 | **29.820** | <span class="text-green-600 dark:text-green-400">-59 (-67%)</span> |
+
+Now THAT's optimization!!!
+
+Interestingly, since this also just optimizes how the Removals are identified, it actually improves the speed of every action! Even the ones that don't have any removals! Just look at the addition of 1 item! How did that get so much faster? I had to run the test multiple times to make sure it wasn't a fluke!
+
+| Action | Own | Paint | Total | Difference |
+| --- | --- | --- | --- | --- |
+| Add 10,000 Items | 10.795 | 136.525 | **147.320** | <span class="text-red-600 dark:text-red-400">23 (18%)</span> |
+| Add Additional 1 Item | 5.740 | 24.170 | **29.910** | <span class="text-red-600 dark:text-red-400">3 (12%)</span> |
+| Shuffle 10,001 Items | 42.515 | 143.360 | **185.875** | <span class="text-red-600 dark:text-red-400">30 (19%)</span> |
+| Remove 1 Item | 5.860 | 29.330 | **35.190** | <span class="text-red-600 dark:text-red-400">9 (33%)</span> |
+| Swapping 2 Items | 11.360 | 29.615 | **40.975** | <span class="text-red-600 dark:text-red-400">6 (17%)</span> |
+| Sort 10,000 Items | 28.970 | 104.990 | **133.960** | <span class="text-green-600 dark:text-green-400">-2 (-2%)</span> |
+| Reverse 10,000 Items | 30.185 | 108.235 | **138.420** | <span class="text-green-600 dark:text-green-400">-3 (-2%)</span> |
+| Remove Every Other Item | 11.685 | 18.135 | **29.820** | <span class="text-green-600 dark:text-green-400">-59 (-67%)</span> |
+| Remove Remaining 5,000 Items | 15.540 | 1.900 | **17.440** | <span class="text-red-600 dark:text-red-400">1 (4%)</span> |
+
+## The Result
+
+Above was an abstracted version of the code, but the actual implementation is quite similar. There are some optimizations that could be too much for this article to go into, but you can reference [the PR](#todo) for the actual implementation.
+
+### Synthetic Benchmarks
+
+| Action | Own | Paint | Total | Diff from Original |
+| --- | --- | --- | --- | --- |
+| Add 10,000 Items | 13.645 | 110.590 | **124.235** | <span class="text-green-600 dark:text-green-400">-20 (-14%)</span> |
+| Add Additional 1 Item | 17.275 | 15.570 | **32.845** | <span class="text-green-600 dark:text-green-400">-27 (-45%)</span> |
+| Shuffle 10,001 Items | 53.115 | 112.655 | **165.770** | <span class="text-green-600 dark:text-green-400">-68 (-29%)</span> |
+| Remove 1 Item | 14.290 | 40.605 | **54.895** | <span class="text-green-600 dark:text-green-400">-5 (-8%)</span> |
+| Swapping 2 Items | 7.215 | 54.035 | **61.250** | <span class="text-red-600 dark:text-red-400">14 (30%)</span> |
+| Sort 10,000 Items | 41.605 | 100.950 | **142.555** | <span class="text-green-600 dark:text-green-400">-71 (-33%)</span> |
+| Reverse 10,000 Items | 32.650 | 113.810 | **146.460** | <span class="text-green-600 dark:text-green-400">-306 (-68%)</span> |
+| Remove Every Other Item | 17.930 | 24.200 | **42.130** | <span class="text-green-600 dark:text-green-400">-9 (-17%)</span> |
+| Remove Remaining 5,000 Items | 14.690 | 1.840 | **16.530** | <span class="text-green-600 dark:text-green-400">-7 (-31%)</span> |
+
+That's pretty great! We have improved nearly every single operation! The things that were already pretty fast are still fast (some might say *blazingly* so), and the things that took much longer before are now barely more work. This should make Alpine more consistent in performance, and more reliable in handling large lists.
+
+### JS Framework Benchmark
+
+The [JS Framework Benchmark](https://krausest.github.io/js-framework-benchmark/2024/table_chrome_127.0.6533.72.html) is a popular benchmark for testing JS UI Frameworks. It heavily revolves around large lists, so these changes should be noticeable here.
+
+> Tested in Chrome on Apple M1 Pro Macbook Pro with Alpine 3.14.1. React provided as a reference point.
+
+|Name|React|<span class="text-green-600 dark:text-green-400">New Alpine</span>|<span class="text-red-600 dark:text-red-400">Old Alpine</span>|
+|---|---|---|---|
+|create rows|59.5|<span class="text-green-600 dark:text-green-400">140.1</span>|<span class="text-red-600 dark:text-red-400">144.3</span>|
+|replace all rows|70.2|<span class="text-green-600 dark:text-green-400">154.5</span>|<span class="text-red-600 dark:text-red-400">165.6</span>|
+|updating every 10th row|28.3|<span class="text-green-600 dark:text-green-400">29.5</span>|<span class="text-red-600 dark:text-red-400">29.9</span>|
+|select row|9.6|<span class="text-green-600 dark:text-green-400">51.5</span>|<span class="text-red-600 dark:text-red-400">56.4</span>|
+|swap rows|219.8|<span class="text-green-600 dark:text-green-400">42.1</span>|<span class="text-red-600 dark:text-red-400">45.1</span>|
+|remove row|25.8|<span class="text-green-600 dark:text-green-400">32.1</span>|<span class="text-red-600 dark:text-red-400">33.7</span>|
+|create many rows|789.6|<span class="text-green-600 dark:text-green-400">1,169.8</span>|<span class="text-red-600 dark:text-red-400">1,236.7</span>|
+|append rows to large table|67.5|<span class="text-green-600 dark:text-green-400">146.4</span>|<span class="text-red-600 dark:text-red-400">157.7</span>|
+|clear rows|36.0|<span class="text-red-600 dark:text-red-400">69.1</span>|<span class="text-green-600 dark:text-green-400">62.9</span>|
+|weighted mean|1.46|<span class="text-green-600 dark:text-green-400">2.45</span>|<span class="text-red-600 dark:text-red-400">2.54</span>|
+
+It's noticeable! Not groundbreakingly so, but milliseconds make seconds and seconds makes pain! Even relatively small 5% improvements make a big difference if you can find enough of them!
+
+You might notice these differences are much smaller, relatively, than the synthetic benchmarks. This is because the JS Framework Benchmark is also measuring Alpine making other kinds of changes as well as much more internal processing that we can isolated away.
+
+It can be much harder to see how incremental steps make changes if you have too much other stuff that can get in the way. Afterall, these operations are still quite fast, and rely on the browser a lot, so tests can very wildly.
+
+But regardless, 5-10% across the board is a great improvement!
+
+### Bundle Size
+
+Of course, it's not all about performance! Bundle size is also important! Did we manage to make things faster while also deleting code?
+
+ - Bundle: 43.68 kB → 42.98 kB (**-703 B**)
+ - Brotli: 14.37 kB → 14.07 kB (**-306 B**)
+
+A modest 2% reduction!
+
+### Big Lists
+
+10,000 items would already be a ton to handle in Alpine, and is mostly just to get numbers that are large enough to analyze. But let's go crazy and see how things hold up!
+
+Here's some larger list operations for fun:
+
+| Action | Original | Refactor | Difference (%) |
+| --- | --- | --- | --- |
+| Adding 10,000 + 10,000 Items | **258** | **157** | -39.15% |
+| Add 100,000 Items | **2,784** | **1,491** | -46.44% |
+| Rerender Same Items | **2,863** | **125** | -95.63% |
+| Shuffling 100,000 Items | **8,163** | **1,839** | -77.47% |
+| Removing Every Other Item | **1,855** | **338** | -81.78% |
+| Removing 100,000 Items | **827** | **115** | -86.09% |
