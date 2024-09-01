@@ -3,7 +3,7 @@ title: 'Loops on Loops: Improving Alpine x-for Performance'
 author: 'Eric Kwoka'
 description: "DOM Diffing is tough! It's even harder when you're needing to diff the DOM over large loops of data. But, what if we can reduce the amount of looping, and make DOM updates more efficient?"
 date: 2024-08-15
-published: true
+published: false
 ---
 
 Improving Alpine has been tough! Sure we were able to [optimized the Data Stack](/posts/alpine-performance-part-1) and [patch up a memory leak](/posts/alpine-performance-part-2), but there is still more to do! Alpine is quite efficient, all things considered, and the places where it has some room to improve are quite complex and intricate.
@@ -570,6 +570,8 @@ Of course, it's not all about performance! Bundle size is also important! Did we
 
  - Bundle: 43.68 kB → 42.98 kB (**-703 B**)
  - Brotli: 14.37 kB → 14.07 kB (**-306 B**)
+
+A modest 2% reduction!
 
 ### Big Lists
 
