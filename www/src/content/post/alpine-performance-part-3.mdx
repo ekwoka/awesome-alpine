@@ -3,12 +3,14 @@ title: 'Loops on Loops: Improving Alpine x-for Performance'
 author: 'Eric Kwoka'
 description: "DOM Diffing is tough! It's even harder when you're needing to diff the DOM over large loops of data. But, what if we can reduce the amount of looping, and make DOM updates more efficient?"
 date: 2024-08-15
-published: false
+published: true
 ---
 
 Improving Alpine has been tough! Sure we were able to [optimized the Data Stack](/posts/alpine-performance-part-1) and [patch up a memory leak](/posts/alpine-performance-part-2), but there is still more to do! Alpine is quite efficient, all things considered, and the places where it has some room to improve are quite complex and intricate.
 
 But that's what makes it fun! I managed to finally get through a working version of an improvement to the [`x-for`](https://alpinejs.dev/directives/for) algorithm!
+
+> tl;dr: I made `x-for` more stable, and a bit faster! Track the PR [here](https://github.com/alpinejs/alpine/pull/4361)
 
 ## What the heck is `x-for`?
 
@@ -519,7 +521,7 @@ Interestingly, since this also just optimizes how the Removals are identified, i
 
 ## The Result
 
-Above was an abstracted version of the code, but the actual implementation is quite similar. There are some optimizations that could be too much for this article to go into, but you can reference [the PR](#todo) for the actual implementation.
+Above was an abstracted version of the code, but the actual implementation is quite similar. There are some optimizations that could be too much for this article to go into, but you can reference [the PR](https://github.com/alpinejs/alpine/pull/4361) for the actual implementation.
 
 ### Synthetic Benchmarks
 
