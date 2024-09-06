@@ -22,7 +22,7 @@ import Toasts from '@awesome-alpine/toasts';
 Alpine.plugin(Toasts({
   position: 'top-right',
   duration: 5000,
-  dismissable: true,
+  dismissible: true,
 }));
 
 Alpine.start();
@@ -46,7 +46,7 @@ Accepts Toast configuration options only.
 
 ```html
 <button type="button"
-  @click="$toast.success('You are so pretty', { dismissable: false, duration: 10_000 })">
+  @click="$toast.success('You are so pretty', { dismissible: false, duration: 10_000 })">
   What are you?
 </button>
 ```

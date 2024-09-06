@@ -15,7 +15,7 @@ export class Toast implements ToastControls {
     public id: number,
     public type: string = 'info',
     public message: string,
-    public details: ToastDetails = {},
+    public options: ToastOptionsSet = {},
   ) {}
 
   /**
@@ -66,11 +66,59 @@ interface ToastControls {
   dismiss(): this;
 }
 
-export type ToastDetails = {
-  /**
-   * Timeout for hiding the toast automatically
-   * @type {Number}
-   */
-  timeout?: number;
-  [key: string]: unknown;
+export type ToastOptions = ToastOptionsSet & {
+  success: ToastOptionsSet;
+  error: ToastOptionsSet;
+  loading: ToastOptionsSet;
+  custom: ToastOptionsSet;
 };
+
+export type ToastOptionsSet = Partial<{
+  /**
+   * How long to display the toast before automatically dismissing
+   * @type {number}
+   */
+  duration: number;
+
+  /**
+   * Whether the toast can be dismissed by clicking on it
+   * @type {boolean}
+   */
+  dismissible: boolean;
+
+  /**
+   * Styles to apply inline on the toast
+   * @type {CSSStyleDeclaration}
+   */
+  style: CSSStyleDeclaration;
+  /**
+   * Class to apply to the toast
+   * @type {string}
+   */
+  className: string;
+
+  /**
+   * Icon to display on the toast
+   * safe html
+   * @type {string}
+   */
+  icon: string;
+
+  /**
+   * Change colors of default success/error/loading icon
+   * hex color code
+   * @type {object}
+   * @property {string} primary
+   * @property {string} secondary
+   */
+  iconTheme: {
+    primary: string;
+    secondary: string;
+  };
+
+  /**
+   * Attributes to apply to the toast
+   * @type {Record<string, string>}
+   */
+  attrs: Record<string, string>;
+}>;
