@@ -14,6 +14,10 @@ export const Toasts = ((AlpineOrDefaults: Alpine | Partial<ToastOptions>) => {
     const toastManager = Alpine.reactive<ToastManager>({
       queue: [] as Toast[],
 
+      get count() {
+        return this.queue.length;
+      },
+
       show(
         message: string,
         type = 'info',
@@ -117,6 +121,7 @@ export const Toasts = ((AlpineOrDefaults: Alpine | Partial<ToastOptions>) => {
       });
     });
     Alpine.directive('toast-transition', (el, _, { evaluate, effect }) => {
+      el.style.display = 'grid';
       const animation = new Animation(
         new KeyframeEffect(
           el,
@@ -124,7 +129,7 @@ export const Toasts = ((AlpineOrDefaults: Alpine | Partial<ToastOptions>) => {
             {
               opacity: '0',
               gridTemplateRows: '0fr',
-              transform: 'scale(0.25)',
+              transform: 'scale(0.50)',
               margin: '0',
             },
             {
@@ -179,6 +184,12 @@ type ToastManager = {
    * @type {Array<Toast>}
    */
   queue: Toast[];
+
+  /**
+   * The Count of queued Toasts
+   * @type {number}
+   */
+  count: number;
 
   /**
    * Add a generically typed toast to the queue, and show it
