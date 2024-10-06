@@ -1,9 +1,12 @@
 import type { Alpine, PluginCallback } from 'alpinejs';
 
-import { Toast, type ToastDetails } from './Toast.ts';
+import { Toast, type ToastOptions, type ToastOptionsSet } from './Toast.ts';
+import { defaultOptions } from './defaultOptions.ts';
 
-export const Toasts = ((AlpineOrDefaults: Alpine | ToastDetails) => {
-  const defaults = isAlpine(AlpineOrDefaults) ? {} : AlpineOrDefaults;
+export const Toasts = ((AlpineOrDefaults: Alpine | Partial<ToastOptions>) => {
+  const defaults = isAlpine(AlpineOrDefaults)
+    ? defaultOptions
+    : (deepMergeAll({}, defaultOptions, AlpineOrDefaults) as ToastOptions);
   const plugin = (Alpine: Alpine) => {
     let toastId = 0;
     const toasterTimeout = 1000;
@@ -11,10 +14,14 @@ export const Toasts = ((AlpineOrDefaults: Alpine | ToastDetails) => {
     const toastManager = Alpine.reactive<ToastManager>({
       queue: [] as Toast[],
 
+      get count() {
+        return this.queue.length;
+      },
+
       show(
         message: string,
         type = 'info',
-        details: ToastDetails = {},
+        details: ToastOptionsSet = {},
       ): Toast | void {
         if (!message) {
           return console.error('$toasts.show requires a message');
@@ -25,37 +32,49 @@ export const Toasts = ((AlpineOrDefaults: Alpine | ToastDetails) => {
             toastId++,
             type,
             message,
-            Object.assign({}, defaults, details),
+            deepMergeAll({}, defaults, details),
           ),
         );
         this.queue.push(toast);
-        toast.hide(details?.timeout ?? toasterTimeout);
+        toast.hide(details?.duration ?? toasterTimeout);
         return toast;
       },
       success(
         message: string,
-        details: ToastDetails = { timeout: 2000 },
+        details: ToastOptionsSet = { duration: 2000 },
       ): Toast | void {
-        return this.show(message, 'success', details);
+        return this.show(
+          message,
+          'success',
+          deepMergeAll({}, defaults, defaults.success, details),
+        );
       },
-      error(
-        message: string,
-        details: ToastDetails = { timeout: 5000 },
-      ): Toast | void {
-        return this.show(message, 'error', details);
+      error(message: string, details: ToastOptionsSet = {}): Toast | void {
+        return this.show(
+          message,
+          'error',
+          deepMergeAll({}, defaults, defaults.error, details),
+        );
       },
       loading(
         message: string,
-        details: ToastDetails = { timeout: 0 },
+        details: ToastOptionsSet = { duration: 0 },
       ): Toast | void {
-        return this.show(message, 'loading', details);
+        return this.show(
+          message,
+          'loading',
+          deepMergeAll({}, defaults, defaults.loading, details),
+        );
       },
       promise<T>(
         pr: Promise<T>,
         message: PromiseHandlers<T>,
-        details: ToastDetails = { timeout: 0 },
+        details: Partial<Omit<ToastOptions, 'custom'>> = {},
       ) {
-        const toast = this.loading(message.loading, details);
+        const toast = this.loading(
+          message.loading,
+          deepMergeAll({}, details, details.loading ?? {}),
+        );
         if (!toast) return;
         pr.then(
           (result) => {
@@ -64,6 +83,7 @@ export const Toasts = ((AlpineOrDefaults: Alpine | ToastDetails) => {
               typeof message.success === 'function'
                 ? message.success(result)
                 : message.success;
+            toast.options = deepMergeAll({}, details, details.success ?? {});
             toast.hide(2000);
           },
           (error) => {
@@ -72,6 +92,7 @@ export const Toasts = ((AlpineOrDefaults: Alpine | ToastDetails) => {
               typeof message.error === 'function'
                 ? message.error(error)
                 : message.error;
+            toast.options = deepMergeAll({}, details, details.error ?? {});
             toast.hide(5000);
           },
         );
@@ -100,6 +121,7 @@ export const Toasts = ((AlpineOrDefaults: Alpine | ToastDetails) => {
       });
     });
     Alpine.directive('toast-transition', (el, _, { evaluate, effect }) => {
+      el.style.display = 'grid';
       const animation = new Animation(
         new KeyframeEffect(
           el,
@@ -107,7 +129,7 @@ export const Toasts = ((AlpineOrDefaults: Alpine | ToastDetails) => {
             {
               opacity: '0',
               gridTemplateRows: '0fr',
-              transform: 'scale(0.25)',
+              transform: 'scale(0.50)',
               margin: '0',
             },
             {
@@ -137,7 +159,7 @@ export const Toasts = ((AlpineOrDefaults: Alpine | ToastDetails) => {
   return plugin;
 }) as {
   (Alpine: Alpine): void;
-  (defaults: ToastDetails): PluginCallback;
+  (defaults: ToastOptionsSet): PluginCallback;
 };
 
 const isAlpine = (MaybeAlpine: unknown): MaybeAlpine is Alpine =>
@@ -162,6 +184,12 @@ type ToastManager = {
    * @type {Array<Toast>}
    */
   queue: Toast[];
+
+  /**
+   * The Count of queued Toasts
+   * @type {number}
+   */
+  count: number;
 
   /**
    * Add a generically typed toast to the queue, and show it
@@ -257,4 +285,22 @@ type PromiseHandlers<T> = {
   loading: string;
   success: string | ((result: T) => string);
   error: string | ((error: unknown) => string);
+};
+
+const deepMergeAll = <T extends Record<string, unknown>>(...sources: T[]): T =>
+  sources.reduce(deepMerge);
+
+const deepMerge = <T extends Record<string, unknown>>(
+  target: T,
+  source: T,
+): T => {
+  for (const key in source) {
+    if (typeof source[key] === 'object' && source[key] !== null) {
+      if (!target[key]) Reflect.set(target, key, {});
+      deepMerge(target[key] as T, source[key] as T);
+    } else {
+      Reflect.set(target, key, source[key]);
+    }
+  }
+  return target;
 };

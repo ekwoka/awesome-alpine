@@ -45,10 +45,7 @@
     </div>
     <div class="fixed right-4 bottom-4 flex flex-col-reverse items-end">
       <template x-toaster>
-        <div
-          x-toast-transition
-          @click="$toast.dismiss()"
-          class="grid grid-rows-[0fr]">
+        <div x-toast-transition @click="$toast.dismiss()">
           <div
             class="min-h-0 overflow-hidden bg-white rounded-md border shadow-md">
             <div class="flex gap-2 py-2 px-4">

@@ -8,7 +8,7 @@ date: 2024-08-10
 # Toast Options
 
 ```ts
-type ToastOptions = ToastOptionsSet && Partial<{
+type ToastOptions = ToastOptionsSet & Partial<{
   success: ToastOptionsSet,
   error: ToastOptionsSet,
   loading: ToastOptionsSet,
@@ -19,7 +19,7 @@ type ToastOptions = ToastOptionsSet && Partial<{
 type ToastOptionsSet = Partial<{
   // Behavior
   duration: number,
-  dismissable: boolean,
+  dismissible: boolean,
 
   // Styling
   style: CSSStyleDeclaration,
@@ -45,11 +45,11 @@ type ToastOptionsSet = Partial<{
 
 Controls how long the toast stays on screen before it is automatically dismissed. Number provided is in milliseconds. Set to `0` to disable auto-dismissal.
 
-## `dismissable: boolean`
+## `dismissible: boolean`
 
 - default: `true`
 
-Controls whether the toast can be dismissed by the user. If set to `false`, the toast will not be manually dismissable by clicking on the toast.
+Controls whether the toast can be dismissed by the user. If set to `false`, the toast will not be manually dismissible by clicking on the toast.
 
 Useful to disable for critical toasts and toasts that have interactivity. You can still dismiss these toasts programmatically, so consider using a custom Toast.
 
