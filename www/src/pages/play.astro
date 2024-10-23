@@ -1,4 +1,8 @@
 ---
+import {
+  Request as CLOUDFLARE_REQUEST,
+  Response as CLOUDFLARE_RESPONSE,
+} from '@cloudflare/workers-types';
 import { base64URL } from '@ekwoka/alpine-history';
 import Header from '../components/header.astro';
 import Editor from '../components/organisms/editor.astro';
@@ -14,7 +18,12 @@ const searchParams = currentURL.searchParams;
 if (searchParams.has('share')) {
   const shareKey = searchParams.get('share');
   const shareData = await Astro.locals.runtime.env.PLAY_SHARE.get(shareKey);
-  if (shareData) return Astro.redirect(`${currentURL.pathname}?${shareData}`);
+  const response = Astro.redirect(`${currentURL.pathname}?${shareData}`);
+  Astro.locals.runtime.caches.default.put(
+    new Request(currentURL, Astro.request) as unknown as CLOUDFLARE_REQUEST,
+    response.clone() as unknown as CLOUDFLARE_RESPONSE,
+  );
+  if (shareData) return response;
 }
 const acceptedParams = new Struct({
   panel: new PropTransformer(
