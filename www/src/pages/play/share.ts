@@ -1,7 +1,9 @@
 import type { APIRoute } from 'astro';
 const relevantParams = ['coreplugins', 'html', 'script', 'ts', 'tw', 'v'];
+import versions from './alpine-versions';
 export const GET: APIRoute = async ({ request, locals }) => {
   const params = new URL(request.url).searchParams;
+  if (!params.has('v')) params.set('v', versions.alpinejs[0]);
   const result = btoa(
     Array.prototype.map
       .call(
