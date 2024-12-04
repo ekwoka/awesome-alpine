@@ -140,7 +140,6 @@ interface Props {
         <select
           x-model.fill="config.settings.version"
           class="bg-slate-800 px-2 py-1 max-w-max min-w-[12ch] font-mono ml-3">
-          <each loop="version, index in alpineVersions.alpinejs">
             {
               alpineVersions.alpinejs.map((version, idx) => (
                 <option value={version} selected={version === Astro.props.version}>
@@ -148,7 +147,6 @@ interface Props {
                 </option>
               ))
             }
-          </each>
         </select>
         <div class="flex flex-col gap-2">
           <h3>Core Plugins</h3>

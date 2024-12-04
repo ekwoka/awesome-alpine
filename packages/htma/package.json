@@ -35,10 +35,10 @@
     "test": "vitest"
   },
   "devDependencies": {
-    "@types/alpinejs": "3.13.10",
+    "@types/alpinejs": "3.13.11",
     "@types/alpinejs__intersect": "3.13.4",
     "@types/alpinejs__morph": "3.13.4",
-    "alpinejs": "3.14.3"
+    "alpinejs": "3.14.6"
   },
   "lint-staged": {
     "*.{json,js,ts,astro}": ["biome check --write"],
@@ -52,7 +52,7 @@
     "alpinejs": ">=3.0.0"
   },
   "optionalDependencies": {
-    "@alpinejs/intersect": "3.14.3",
-    "@alpinejs/morph": "3.14.3"
+    "@alpinejs/intersect": "3.14.6",
+    "@alpinejs/morph": "3.14.6"
   }
 }
