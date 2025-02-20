@@ -3,7 +3,12 @@ import { cache } from './cache';
 const NPM = 'https://registry.npmjs.com/';
 
 const MIN_VERSION = '3.11.0';
-const EXCLUDED_VERSIONS = ['3.13.6'] as SEMVER<string>[];
+const EXCLUDED_VERSIONS = [
+  '3.13.6',
+  '3.14.5',
+  '3.14.6',
+  '3.14.7',
+] as SEMVER<string>[];
 const ALPINE_PACKAGES = [
   'alpinejs',
   '@alpinejs/morph',

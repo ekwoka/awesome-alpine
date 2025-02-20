@@ -2,6 +2,6 @@
 
 interface Env {
 	PLAY_SHARE: KVNamespace;
-	NODE_VERSION: "22.10.0";
-	PNPM_VERSION: "9.12.2";
+	NODE_VERSION: "22.14.0";
+	PNPM_VERSION: "10.4.1";
 }

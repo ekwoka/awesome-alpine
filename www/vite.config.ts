@@ -1,10 +1,11 @@
+import tailwindcss from '@tailwindcss/vite';
 import { defineConfig } from 'vite';
 /// <reference types="vitest" />
 import { AlpinePackageData } from './src/plugins/vite/AlpinePackageData';
 import { DLX, URL } from './src/plugins/vite/DLX';
 
 export default defineConfig({
-  plugins: [DLX(), URL(), AlpinePackageData()],
+  plugins: [DLX(), URL(), AlpinePackageData(), tailwindcss()],
   resolve: {
     conditions: ['typescript', 'import', 'module', 'browser', 'default'],
   },
@@ -23,6 +24,9 @@ export default defineConfig({
       'Cross-Origin-Opener-Policy': 'same-origin',
       'Cross-Origin-Embedder-Policy': 'require-corp',
       'Cross-Origin-Resource-Policy': 'same-site',
+    },
+    cors: {
+      origin: 'null',
     },
   },
   worker: {

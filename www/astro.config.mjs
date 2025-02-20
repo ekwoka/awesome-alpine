@@ -1,5 +1,4 @@
 import mdx from '@astrojs/mdx';
-import tailwind from '@astrojs/tailwind';
 import { defineConfig } from 'astro/config';
 import viteConfig from './vite.config.ts';
 import { visit } from 'unist-util-visit';
@@ -7,18 +6,14 @@ import cloudflare from "@astrojs/cloudflare";
 
 import metaTags from "astro-meta-tags";
 
-// https://astro.build/config
-export default defineConfig({
+/** @type {import('astro').AstroUserConfig} */
+const config = defineConfig({
   vite: viteConfig,
   site: "https://awesomealpine.com/",
   image: {
     domains: ['loremflickr.com']
   },
-  integrations: [tailwind({
-    configFile: './tailwind.config.ts',
-    nesting: true,
-    applyBaseStyles: false
-  }), mdx({
+  integrations: [mdx({
     optimize: true
   }), metaTags()],
   markdown: {
@@ -44,6 +39,9 @@ export default defineConfig({
     cloudflareModules: true
   })
 });
+
+export default config;
+
 function addSpacesToCode() {
   return tree => visit(tree, 'element', (node, _index, parent) => {
     if (node.tagName === 'code' && parent?.tagName?.startsWith('h') && node.children[0]?.type === 'text') node.children[0].value = node.children[0].value.replaceAll(/[.})<]/g, match => `​${match}`).replaceAll(/[:{(>]/g, match => `${match}​`);

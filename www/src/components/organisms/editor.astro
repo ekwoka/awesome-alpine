@@ -22,7 +22,7 @@ interface Props {
 </script>
 <div
   x-data="editor"
-  class="flex flex-col flex-none max-md:!w-full md:w-1/2 lg:w-1/3 min-w-[400px] max-w-[1000px] md:!h-[unset]"
+  class="flex flex-col flex-none max-md:w-full! md:w-1/2 lg:w-1/3 min-w-[400px] max-w-[1000px] md:h-[unset]!"
   x-bind="$partition.scalable">
   <div
     class="flex items-center flex-none pl-5 sm:pl-6 pr-4 lg:pr-6 sticky z-10 top-0 -mb-px antialiased w-full">
@@ -32,7 +32,7 @@ interface Props {
           return (
             <button
               type="button"
-              class="relative flex py-3 text-sm leading-6 font-semibold focus:outline-none text-gray-700 hover:text-gray-900 focus:text-gray-900 dark:text-gray-300 dark:hover:text-white dark:focus:text-white capitalize"
+              class="relative flex py-3 text-sm leading-6 font-semibold focus:outline-hidden text-gray-700 hover:text-gray-900 focus:text-gray-900 dark:text-gray-300 dark:hover:text-white dark:focus:text-white capitalize"
               x-bind:class={`{ 'text-sky-500': panel === '${name}', 'text-gray-700 hover:text-gray-900 focus:text-gray-900 dark:text-gray-300 dark:hover:text-white dark:focus:text-white': panel !== '${name}' }`}
               x-on:click={`panel = '${name}'`}>
               <span
@@ -50,7 +50,7 @@ interface Props {
         <button x-data="shareButton"
           type="button"
           :disabled="status === 'loading'"
-          class="py-1 px-2 rounded bg-sky-700 hover:bg-sky-600 text-gray-100 text-sm"
+          class="py-1 px-2 rounded-sm bg-sky-700 hover:bg-sky-600 text-gray-100 text-sm"
           x-on:click="share"
           x-text="status === 'loading' ? 'Sharing...' : status === 'idle' ? 'Share' : 'Copied!'"
           >
