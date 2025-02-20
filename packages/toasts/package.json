@@ -34,7 +34,7 @@
   },
   "devDependencies": {
     "@types/alpinejs": "3.13.11",
-    "alpinejs": "3.14.6"
+    "alpinejs": "3.14.8"
   },
   "lint-staged": {
     "*.{json,js,ts,astro}": ["biome check --write"],

@@ -1,17 +1,35 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
 
-@layer utilities {
-  .font-mono {
-    font-family: ml, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
-      'Liberation Mono', 'Courier New', monospace !important;
-    font-variant-ligatures: common-ligatures !important;
-    font-feature-settings:
-      'calt' on,
-      'liga' on,
-      'ss02' on;
+@plugin '@tailwindcss/typography';
+
+@custom-variant dark (@media (prefers-color-scheme: dark));
+
+/*
+  The default border color has changed to `currentColor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentColor);
   }
+}
+
+@utility font-mono {
+  font-family: ml, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    'Liberation Mono', 'Courier New', monospace !important;
+  font-variant-ligatures: common-ligatures !important;
+  font-feature-settings:
+    'calt' on,
+    'liga' on,
+    'ss02' on;
 }
 
 :root {
@@ -32,7 +50,7 @@
   }
 
   pre code {
-    @apply block !text-base !font-mono tracking-wide !leading-[0.5] text-sm;
+    @apply block text-base! font-mono! tracking-wide leading-[0.5]! text-sm;
 
     & .line {
       @apply block leading-loose pl-[4ch] -indent-[4ch];
@@ -71,7 +89,7 @@
 pre.shiki {
   @apply h-full pl-[74px];
   & > code {
-    @apply block !text-base !font-mono tracking-[0px] !leading-[0.5] text-sm whitespace-pre-wrap;
+    @apply block text-base! font-mono! tracking-[0px] leading-[0.5]! text-sm whitespace-pre-wrap;
     counter-reset: step;
     counter-increment: step 0;
 

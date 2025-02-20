@@ -4,16 +4,16 @@ pages_build_output_dir = "dist"
 compatibility_date = "2024-07-18"
 
 [vars]
-NODE_VERSION = "22.10.0"
-PNPM_VERSION = "9.12.2"
+NODE_VERSION = "22.14.0"
+PNPM_VERSION = "10.4.1"
 
 [[kv_namespaces]]
 id = "c76eede46cd7435e943da93197322f4b"
 binding = "PLAY_SHARE"
 
 [env.production.vars]
-NODE_VERSION = "22.10.0"
-PNPM_VERSION = "9.12.2"
+NODE_VERSION = "22.14.0"
+PNPM_VERSION = "10.4.1"
 
 [[env.production.kv_namespaces]]
 id = "c76eede46cd7435e943da93197322f4b"

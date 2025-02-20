@@ -1,48 +1,36 @@
-import { url } from 'esm.sh/build?urlfollow';
+import { base64 } from '@ekwoka/alpine-history';
+import esbuild from 'esbuild-wasm';
+import wasmURL from 'esbuild-wasm/esbuild.wasm?url';
 import { CorePlugin } from './lazyModules/alpinePlugins';
 
-const { build } = (await import(/* @vite-ignore */ url)) as {
-  build: (input: string | BuildInput) => Promise<BuildOutput>;
-};
-
 let timeout: NodeJS.Timeout;
-const debouncedBuild = (code: string, config: EditorConfig) => {
+let initialized = false;
+const debouncedBuild = (code: string) => {
   clearTimeout(timeout);
   timeout = setTimeout(async () => {
-    const esm = await build({
-      code,
-      source: code,
-      loader: config.settings.typescript ? 'ts' : 'js',
-      dependencies: {
-        alpinejs: config.settings.version,
-        ...config.plugins.reduce(
-          (acc, plugin) => {
-            acc[`@alpinejs/${CorePlugin[plugin].toLowerCase()}`] =
-              config.settings.version;
-            return acc;
-          },
-          {} as Record<string, string>,
-        ),
+    if (!initialized)
+      await esbuild.initialize({ wasmURL }).then(() => {
+        initialized = true;
+      });
+    const esm = await esbuild.build({
+      bundle: false,
+      minify: true,
+      write: false,
+      stdin: {
+        contents: code,
+        sourcefile: 'index.ts',
       },
+      format: 'esm',
+      target: 'es2022',
     });
-    currentPromise.resolve?.(esm);
+    console.log('esbuild output', esm);
+    const output = esm.outputFiles?.[0].text;
+    currentPromise.resolve?.({
+      url: `data:application/javascript;base64,${base64.to(output)}`,
+    });
     currentPromise.promise = null;
     currentPromise.resolve = null;
   }, 1000);
-};
-
-type BuildInput = {
-  code: string;
-  source: string;
-  loader?: 'js' | 'jsx' | 'ts' | 'tsx';
-  dependencies?: Record<string, string>;
-  types?: string;
-};
-
-type BuildOutput = {
-  id: string;
-  url: string;
-  bundleUrl: string;
 };
 
 const currentPromise: {
@@ -54,9 +42,7 @@ const currentPromise: {
 };
 
 type ESModule = {
-  id: string;
   url: string;
-  bundleUrl: string;
 };
 
 export const transpile = (
@@ -67,13 +53,14 @@ export const transpile = (
     currentPromise.resolve = res;
   });
   const codeWithPlugins = `
-  import Alpine from 'alpinejs';
+  import Alpine from '${esmUrl('alpinejs', config.settings.version)}';
   ${config.plugins
     .map(
       (plugin) =>
-        `import ${CorePlugin[plugin]} from '@alpinejs/${CorePlugin[
-          plugin
-        ].toLowerCase()}';`,
+        `import ${CorePlugin[plugin]} from '${esmUrl(
+          `@alpinejs/${CorePlugin[plugin].toLowerCase()}`,
+          config.settings.version,
+        )}';`,
     )
     .join('\n')}
   ${config.plugins
@@ -84,7 +71,7 @@ export const transpile = (
 
   export default Alpine;
   `;
-  debouncedBuild(codeWithPlugins, config);
+  debouncedBuild(codeWithPlugins);
   return currentPromise.promise;
 };
 
@@ -96,3 +83,6 @@ type EditorConfig = {
     version: `${number}.${number}.${number}`;
   };
 };
+
+const esmUrl = (dep: string, version: `${number}.${number}.${number}`) =>
+  `https://esm.sh/${dep}@${version}`;

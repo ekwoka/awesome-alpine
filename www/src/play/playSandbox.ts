@@ -71,9 +71,7 @@ const actions = {
     state.Alpine?.initTree(document.body);
   },
   loadScript: async (script: {
-    id: string;
     url: string;
-    bundleUrl: string;
   }) => {
     state.Alpine?.destroyTree(document.body);
     state.Alpine?.stopObservingMutations();

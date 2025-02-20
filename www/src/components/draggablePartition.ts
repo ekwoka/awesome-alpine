@@ -38,7 +38,7 @@ export const Draggable = (Alpine: Alpine) => {
     Alpine.bind(el, {
       '@mousemove.prevent': '$partition.drag($event)',
       '@mouseup.window': '$partition.mouseup($event)',
-      ':class': "{ '!cursor-grabbing': $partition.dragging }",
+      ':class': "{ 'cursor-grabbing!': $partition.dragging }",
     });
   }).before('bind');
 };
