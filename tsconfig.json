@@ -1,5 +1,5 @@
 {
-  "exclude": ["**/node_modules", "**/dist", "scripts"],
+  "exclude": ["**/node_modules", "**/dist"],
   "compilerOptions": {
     "types": ["vitest/globals", "testing-library-alpine/globals"],
     "allowJs": true,

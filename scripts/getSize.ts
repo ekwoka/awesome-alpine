@@ -5,8 +5,17 @@ import prettyBytes from 'pretty-bytes';
 
 const packages = await readdir('packages');
 
+interface SizeInfo {
+  pretty: string;
+  raw: number;
+}
+interface BundleResult {
+  minified: SizeInfo;
+  brotli: SizeInfo;
+}
+
 const oldValues = JSON.parse(await readFile('size.json', 'utf8'));
-const bundleCode = async (pkg) => {
+const bundleCode = async (pkg: string): Promise<BundleResult> => {
   const { outputFiles } = await build({
     entryPoints: [`./packages/${pkg}/src/index.js`],
     inject: [],
@@ -36,21 +45,22 @@ const bundleCode = async (pkg) => {
   };
 };
 
-const sizeInfo = (bytesSize) => ({
+const sizeInfo = (bytesSize: number) => ({
   pretty: prettyBytes(bytesSize),
   raw: bytesSize,
 });
 
-const getBytes = (str) => Buffer.byteLength(str, 'utf8');
+const getBytes = (str: string | Buffer | Uint8Array): number =>
+  Buffer.byteLength(str, 'utf8');
 
-const getSizes = (code) => {
+const getSizes = (code: string | Uint8Array) => {
   const minifiedSize = getBytes(code);
   const brotliSize = getBytes(brotliCompressSync(code));
 
   return { minified: sizeInfo(minifiedSize), brotli: sizeInfo(brotliSize) };
 };
 
-const makeMessage = (old, current) => {
+const makeMessage = (old: SizeInfo | null, current: SizeInfo) => {
   if (!old) return `NEW -> ${current.pretty}`;
   const diff = current.raw - old.raw;
   if (diff === 0) return 'NO CHANGE';
@@ -60,7 +70,7 @@ const makeMessage = (old, current) => {
 };
 
 const bundleData = await Promise.all(
-  packages.map(async (pkg) => [pkg, await bundleCode(pkg)]),
+  packages.map(async (pkg: string) => [pkg, await bundleCode(pkg)]),
 );
 const content = JSON.stringify(Object.fromEntries(bundleData), null, 2);
 await writeFile('size.json', content, 'utf8');
