@@ -10,7 +10,9 @@ const _hasHTMA = (el: object): el is { [$htma]: HXBinding } => $htma in el;
 
 export const HTMA: PluginCallback = (Alpine) => {
   const elementMap = new WeakMap<HTMLElement, HXBinding>();
-  Alpine.addInitSelector(() => '[hx-get], [hx-post], [hx-put], [hx-delete]');
+  Alpine.addInitSelector(
+    () => '[hx-get], [hx-post], [hx-put], [hx-delete],[hx-patch]',
+  );
   Alpine.mapAttributes((attr) => {
     if (attr.name.startsWith('hx-'))
       attr.name = Alpine.prefixed(attr.name.replace('hx-', 'hx'));
@@ -41,6 +43,105 @@ export const HTMA: PluginCallback = (Alpine) => {
       hxData.fetch();
     });
   }).before('bind');
+
+  Alpine.directive('hxpatch', (el, { expression }, _extras) => {
+    const hxData =
+      elementMap.get(el) ||
+      elementMap
+        .set(
+          el,
+          Alpine.reactive(
+            new HXBinding(
+              el,
+              Verb.PATCH,
+              expression ||
+                el.getAttribute('href') ||
+                el.getAttribute('action') ||
+                '#',
+              Alpine,
+            ),
+          ),
+        )
+        .get(el)!;
+    el.addEventListener('click', (e) => {
+      e.preventDefault();
+      hxData.fetch();
+    });
+  }).before('bind');
+
+  Alpine.directive('hxpost', (el, { expression }, _extras) => {
+    const hxData =
+      elementMap.get(el) ||
+      elementMap
+        .set(
+          el,
+          Alpine.reactive(
+            new HXBinding(
+              el,
+              Verb.POST,
+              expression ||
+                el.getAttribute('href') ||
+                el.getAttribute('action') ||
+                '#',
+              Alpine,
+            ),
+          ),
+        )
+        .get(el)!;
+    el.addEventListener('click', (e) => {
+      e.preventDefault();
+      hxData.fetch();
+    });
+  }).before('bind');
+  Alpine.directive('hxput', (el, { expression }, _extras) => {
+    const hxData =
+      elementMap.get(el) ||
+      elementMap
+        .set(
+          el,
+          Alpine.reactive(
+            new HXBinding(
+              el,
+              Verb.PUT,
+              expression ||
+                el.getAttribute('href') ||
+                el.getAttribute('action') ||
+                '#',
+              Alpine,
+            ),
+          ),
+        )
+        .get(el)!;
+    el.addEventListener('click', (e) => {
+      e.preventDefault();
+      hxData.fetch();
+    });
+  }).before('bind');
+  Alpine.directive('hxdelete', (el, { expression }, _extras) => {
+    const hxData =
+      elementMap.get(el) ||
+      elementMap
+        .set(
+          el,
+          Alpine.reactive(
+            new HXBinding(
+              el,
+              Verb.DELETE,
+              expression ||
+                el.getAttribute('href') ||
+                el.getAttribute('action') ||
+                '#',
+              Alpine,
+            ),
+          ),
+        )
+        .get(el)!;
+    el.addEventListener('click', (e) => {
+      e.preventDefault();
+      hxData.fetch();
+    });
+  }).before('bind');
+
   Alpine.directive('hxselect', (el, { expression }, _extras) => {
     const hxData = elementMap.get(el);
     if (hxData) hxData.select = expression;

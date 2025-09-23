@@ -11,12 +11,12 @@
   },
   "htma": {
     "minified": {
-      "pretty": "2.58 kB",
-      "raw": 2582
+      "pretty": "3.56 kB",
+      "raw": 3565
     },
     "brotli": {
-      "pretty": "918 B",
-      "raw": 918
+      "pretty": "973 B",
+      "raw": 973
     }
   },
   "toasts": {
