@@ -1,0 +1,8 @@
+{
+  "name": "toasts-demo",
+  "private": true,
+  "scripts": {
+    "start": "vite",
+    "demo": "vite"
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "name": "htmx-demo",
+  "private": true,
+  "scripts": {
+    "start": "vite",
+    "demo": "vite"
+  }
+}

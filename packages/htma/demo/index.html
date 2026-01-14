@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HTMX Demo</title>
+    <script type="module" src="./index.ts"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/htmx.org@1.9.2"></script>
+  </head>
+  <body class="flex flex-col py-8 px-4 gap-4">
+    <h1 class="text-2xl font-bold">HTMX Request Tests</h1>
+    <div class="flex gap-8 flex-col md:flex-row">
+      <menu class="grid grid-cols-2 gap-4">
+        <button
+          hx-get="http://localhost:8000/index.php"
+          hx-target="#response"
+          hx-swap="innerHTML"
+          class="border rounded py-2 px-4">
+          Test hx-get
+        </button>
+
+        <button
+          hx-post="http://localhost:8000/index.php"
+          hx-target="#response"
+          hx-swap="innerHTML"
+          class="border rounded py-2 px-4">
+          Test hx-post
+        </button>
+
+        <button
+          hx-patch="http://localhost:8000/index.php"
+          hx-target="#response"
+          hx-swap="innerHTML"
+          class="border rounded py-2 px-4">
+          Test hx-patch
+        </button>
+
+        <button
+          hx-put="http://localhost:8000/index.php"
+          hx-target="#response"
+          hx-swap="innerHTML"
+          class="border rounded py-2 px-4">
+          Test hx-put
+        </button>
+      </menu>
+    </div>
+
+    <div
+      id="response"
+      class="mt-6 p-4 border rounded bg-gray-100 text-gray-700">
+      Click any button to see the response here.
+    </div>
+  </body>
+</html>
